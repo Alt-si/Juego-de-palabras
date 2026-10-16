@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Anagrama</title>
+<meta name="description" content="Ordená las letras y encontrá la palabra. Niveles, tiempo, premios y logros.">
+<meta name="theme-color" content="#4f46e5">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-theme="claro">
+<div id="app">
+  <section id="home" class="screen">
+    <div class="topbar"><span class="coins">🪙 <b id="hCoins">0</b></span><span class="rank" id="hRank"></span><button class="ib" id="btnSound" aria-label="Sonido">🔊</button></div>
+    <div class="logo" aria-hidden="true"><i>A</i><i>N</i><i>A</i><i>G</i><i>R</i><i>A</i><i>M</i><i>A</i></div>
+    <p class="tag">Ordená las letras y encontrá la palabra</p>
+    <div class="levelcard" id="hCard"></div>
+    <button class="big" id="btnPlay">▶ Jugar</button>
+    <button class="chest" id="btnDaily"></button>
+    <button class="duel" id="btnDuel">⚔ <b>Desafiar a un amigo</b><small>Mismas palabras, gana quien haga más puntos</small></button>
+    <div class="row3"><button id="btnAch">🏅 Logros</button><button id="btnShop">🛍 Tienda</button><button id="btnStats">📊 Estadísticas</button></div>
+    <button class="link" id="btnInstall" hidden>⬇ Instalar en el celular</button>
+  </section>
+
+  <section id="game" class="screen" hidden>
+    <div class="topbar"><button class="ib" id="btnHome" aria-label="Salir">✕</button><span class="lives" id="gLives"></span><span class="coins">🪙 <b id="gCoins">0</b></span><button class="ib" id="btnPause" aria-label="Pausa">⏸</button></div>
+    <div class="dots" id="gDots"></div>
+    <div class="timer"><i id="gBar"></i><b id="gTime"></b></div>
+    <div class="streak" id="gStreak"></div>
+    <div class="cat">Pista: <b id="gCat"></b> · <span id="gLen"></span> letras</div>
+    <div class="slots" id="gSlots" aria-label="Tu respuesta"></div>
+    <div class="pool" id="gPool" aria-label="Letras"></div>
+    <div class="tools">
+      <button id="tShuffle">🔀<small>Mezclar</small></button>
+      <button id="tHint">💡<small>Pista · 10🪙</small></button>
+      <button id="tTime">⏱<small>+15 s · 15🪙</small></button>
+      <button id="tSkip">⏭<small>Pasar · −❤</small></button>
+    </div>
+    <div class="float" id="gFloat" aria-live="polite"></div>
+  </section>
+</div>
+<div id="modal" class="modal" hidden><div class="box" id="box"></div></div>
+<div id="toast" class="toast" hidden></div>
+<script src="words.js"></script>
+<script src="game.js"></script>
+<script>if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});</script>
+</body>
+</html>
