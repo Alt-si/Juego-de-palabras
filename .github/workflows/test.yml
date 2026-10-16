@@ -1,0 +1,22 @@
+name: Pruebas
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Validar sintaxis y diccionario
+        run: |
+          node --check game.js
+          node tests/words-check.js
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Instalar Playwright
+        run: pip install playwright && playwright install --with-deps chromium
+      - name: Prueba de humo
+        run: python tests/smoke.py
