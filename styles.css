@@ -126,3 +126,22 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 .goal{text-align:center;color:var(--mut);font-size:14px;font-weight:600}
 #adLvl .mid small{display:block}
 .gcard>span:nth-child(2){flex:1;min-width:0;text-align:left}.gcard{padding-bottom:10px}
+/* ---- Frases encriptadas ---- */
+.g4{background:linear-gradient(135deg,#0f766e,#1d4ed8)}
+.chips{gap:5px!important;flex-wrap:wrap}.chips span{cursor:pointer}.chips span.on{background:#fff!important;color:#1e1b4b}
+.crlogo{text-align:center;font-size:44px;line-height:1}.crlogo h1{margin:4px 0 0;font-size:34px;font-weight:900;letter-spacing:2px;line-height:1;color:var(--ink);text-shadow:0 3px 0 var(--ac),0 6px 14px #0003}
+.diffs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.diffs button{background:var(--panel);border-radius:14px;padding:10px 2px;box-shadow:0 1px 3px #0002;border:2px solid transparent;display:flex;flex-direction:column;align-items:center;gap:2px}
+.diffs button span{font-size:22px}.diffs b{font-size:13px}.diffs small{font-size:11px;color:var(--mut)}.diffs .on{border-color:var(--ac);background:var(--tileb)}
+.how{font-size:13px;color:var(--mut);text-align:center;margin:0;background:var(--panel);border-radius:14px;padding:10px 12px}
+.crphrase{display:flex;flex-wrap:wrap;gap:12px 14px;justify-content:center;background:var(--panel);border-radius:18px;padding:14px 8px;box-shadow:0 2px 8px #0002}
+.cw{display:inline-flex;gap:2px}.cp{align-self:flex-start;font-size:20px;font-weight:800;padding-top:3px}
+.cc{width:26px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:0;background:none}
+.cc .cl{width:100%;height:32px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;border-bottom:3px solid var(--ink);background:var(--tile);border-radius:6px 6px 0 0;color:var(--ink)}
+.cc>b{font-size:12px;font-weight:700;color:var(--mut);min-height:20px;display:flex;align-items:center;justify-content:center}
+.cc>b.ob{font-size:17px}.cc>b.co{width:22px;height:20px;border-radius:6px;color:#fff;font-size:10px;text-shadow:0 1px 2px #000a}
+.cc.lk .cl{background:var(--tileb);color:var(--ac)}.cc.sel .cl{background:#fde68a;border-bottom-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}
+.cc.bad .cl{background:#fecaca;color:var(--bad);border-bottom-color:var(--bad)}
+.crkeys{display:grid;grid-template-columns:repeat(9,1fr);gap:5px}.crkeys button{background:var(--panel);border-radius:10px;padding:10px 0;font-weight:800;font-size:16px;box-shadow:0 1px 3px #0002;color:var(--ink)}
+.crkeys .used{opacity:.4}.crkeys .del{background:var(--tileb)}
+.crq{font-size:18px;font-weight:700;margin:6px 0}.crau{color:var(--mut);margin:0 0 6px}
+#crGame .tools{margin-top:0}

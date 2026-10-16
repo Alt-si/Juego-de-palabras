@@ -115,6 +115,25 @@ try:
         # revancha
         g.click("#lvRe"); g.wait_for_timeout(5000)
         check(g.evaluate("!!G && !G.over && G.duel.live") and h.evaluate("!!G && !G.over"), "en vivo: revancha")
+        # --- Frases encriptadas ---
+        pg = newpage(b.new_context(viewport=V)); pg.goto(URL); pg.wait_for_timeout(300)
+        check(pg.is_visible('[data-diff="e"]'), "menú: dificultad visible en la tarjeta de Frases")
+        pg.click('[data-diff="d"]'); pg.wait_for_timeout(200)
+        check(pg.is_visible("#crHome") and pg.evaluate("SV.crDiff") == "d", "elegir dificultad abre Frases")
+        pg.click('#crDiffs [data-d="f"]'); pg.click("#crPlay"); pg.wait_for_timeout(200)
+        check(pg.is_visible("#crPhrase") and pg.evaluate("document.querySelectorAll('.cc').length") > 5, "hay casilleros")
+        check(pg.evaluate("document.querySelectorAll('.cc.lk').length") >= 1, "hay letras regaladas")
+        for r in range(5):
+            pg.evaluate("""() => { for (const s of Object.keys(P.bySym)) { if (P.guess[s] !== P.bySym[s]) { P.sel = +s; crKey(P.bySym[s]); } } }""")
+            pg.wait_for_timeout(150)
+            if r == 0:
+                check(pg.is_visible("#crNextBtn"), "frase descifrada")
+            pg.click("#crNextBtn" if r < 4 else "#crNextBtn"); pg.wait_for_timeout(150)
+        check(pg.is_visible("#crAgain") and pg.evaluate("SV.crLv.f") == 2 and pg.evaluate("SV.pts.cri") > 0, "ronda: sube de nivel y suma puntos propios")
+        pg.click("#crAgain"); pg.wait_for_timeout(150)
+        pg.evaluate("() => { const s = Object.keys(P.bySym).find((k) => !P.lock[k]); P.sel = +s; const w = CR_ABC.replace(P.bySym[s], '')[0]; crKey(w); }")
+        check(pg.evaluate("Object.keys(P.guess).length") > 1, "se puede poner una letra")
+
         check(not errs, f"sin errores de JavaScript {errs}")
         b.close()
 finally:

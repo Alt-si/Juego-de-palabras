@@ -16,3 +16,6 @@ Publicar: Settings → Pages → Branch `main` / root.
 - **Adivina**: 100 categorías (~1.175 palabras), niveles ilimitados; la dificultad sube con el nivel (palabras más difíciles, más puntos para pasar).
 - **Anagrama / Palabras escondidas**: niveles ilimitados, palabras más largas, menos tiempo y más letras de relleno a medida que avanzás.
 - **Fondos por nivel**: cada mundo (Anagrama/Escondidas) y cada escena de misterio (Adivina, con signo de pregunta) cambia al subir de nivel. Son ilustraciones SVG generadas, no fotos.
+
+## Frases encriptadas
+~300 frases famosas (refranes, citas, cine, deporte). Cada letra se oculta tras un número, un objeto o un color (al azar en cada frase). Cuatro dificultades elegibles desde el menú (Fácil, Medio, Difícil, Experto): cambia el largo de las frases y cuántas letras te regalan; en cada nivel la ronda de 5 frases se vuelve más exigente. Puntaje propio del juego.

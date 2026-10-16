@@ -43,3 +43,21 @@ for (const blk of RAW) {
 }
 if (cats < 100) throw new Error("Adivina: se esperaban 100 categorías y hay " + cats);
 console.log("Adivina: " + cats + " categorías, " + words + " palabras (" + uniq.size + " distintas), pistas OK");
+
+// ---- Frases encriptadas ----
+{
+  const src = require("fs").readFileSync(require("path").join(__dirname, "..", "frases.js"), "utf8");
+  const F = new Function(src + "; return FRASES_RAW;")();
+  const seen = new Set(); const cnt = { f: 0, m: 0, d: 0, e: 0 };
+  for (const x of F) {
+    const [t, o, extra] = x.split("|");
+    if (!t || !o || extra !== undefined) throw new Error("Frases: formato incorrecto: " + x);
+    if (seen.has(t)) throw new Error("Frases: repetida: " + t); seen.add(t);
+    if (!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ,.¡!¿?'-]+$/.test(t)) throw new Error("Frases: caracteres raros: " + t);
+    const n = norm(t).replace(/[^a-zñ]/g, "").length; const u = new Set(norm(t).replace(/[^a-zñ]/g, "")).size;
+    if (u > 27 || u < 5) throw new Error("Frases: letras distintas fuera de rango: " + t);
+    if (n <= 24) cnt.f++; if (n >= 20 && n <= 34) cnt.m++; if (n >= 30 && n <= 46) cnt.d++; if (n >= 40) cnt.e++;
+  }
+  for (const k in cnt) if (cnt[k] < 25) throw new Error("Frases: pocas en dificultad " + k + ": " + cnt[k]);
+  console.log("Frases encriptadas: " + F.length + " frases", JSON.stringify(cnt));
+}
