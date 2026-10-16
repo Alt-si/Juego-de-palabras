@@ -26,8 +26,8 @@ function crPick(d, lv) {
 
 // ---------- Menú e inicio ----------
 window.addEventListener("load", () => crMenu());
-function crMenu() { document.querySelectorAll("#menu .chips [data-diff]").forEach((c) => c.classList.toggle("on", c.dataset.diff === SV.crDiff)); }
-document.addEventListener("click", (e) => { const c = e.target.closest("[data-diff]"); if (c && c.closest("#menu")) { SV.crDiff = c.dataset.diff; save(); } }, true);
+function crMenu() { document.querySelectorAll('#menu [data-game="cri"] [data-diff]').forEach((c) => c.classList.toggle("on", c.dataset.diff === SV.crDiff)); }
+document.addEventListener("click", (e) => { const c = e.target.closest("[data-diff]"); if (c && c.closest("#menu")) { const k = c.closest("[data-game]").dataset.game; if (k === "cri") SV.crDiff = c.dataset.diff; else SV.dif[k] = c.dataset.diff; save(); } }, true);
 function crOpen() {
   $("#menu").hidden = true; $("#crGame").hidden = true; $("#crHome").hidden = false; crHome();
 }

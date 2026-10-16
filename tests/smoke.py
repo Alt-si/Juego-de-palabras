@@ -117,8 +117,8 @@ try:
         check(g.evaluate("!!G && !G.over && G.duel.live") and h.evaluate("!!G && !G.over"), "en vivo: revancha")
         # --- Frases encriptadas ---
         pg = newpage(b.new_context(viewport=V)); pg.goto(URL); pg.wait_for_timeout(300)
-        check(pg.is_visible('[data-diff="e"]'), "menú: dificultad visible en la tarjeta de Frases")
-        pg.click('[data-diff="d"]'); pg.wait_for_timeout(200)
+        check(pg.is_visible('[data-game="cri"] [data-diff="e"]'), "menú: dificultad visible en la tarjeta de Frases")
+        pg.click('[data-game="cri"] [data-diff="d"]'); pg.wait_for_timeout(200)
         check(pg.is_visible("#crHome") and pg.evaluate("SV.crDiff") == "d", "elegir dificultad abre Frases")
         pg.click('#crDiffs [data-d="f"]'); pg.click("#crPlay"); pg.wait_for_timeout(200)
         check(pg.is_visible("#crPhrase") and pg.evaluate("document.querySelectorAll('.cc').length") > 5, "hay casilleros")
@@ -137,6 +137,14 @@ try:
         # --- monedas individuales ---
         wl = pg.evaluate("({a: SV.wal.ana, h: SV.wal.hid, i: SV.wal.adi, c: SV.wal.cri})")
         check(wl["c"] > 0 and wl["h"] == 0 and wl["i"] == 0, f"monedas por juego: Frases no mezcla las de otros {wl}")
+
+        # --- dificultad en los demás juegos ---
+        pg = newpage(b.new_context(viewport=V)); pg.goto(URL); pg.wait_for_timeout(300)
+        pg.click('[data-game="ana"] [data-diff="e"]'); pg.wait_for_timeout(200)
+        check(pg.evaluate("SV.dif.ana") == "e" and pg.is_visible("#hDiffs"), "Anagrama: dificultad elegida desde el menú")
+        pg.click("#btnPlay"); pg.wait_for_timeout(300)
+        te = pg.evaluate("timerTotal()"); pg.evaluate("SV.dif.ana = 'f'"); tf = pg.evaluate("timerTotal()")
+        check(tf > te, f"Fácil da más tiempo que Experto ({tf} > {te})")
 
         check(not errs, f"sin errores de JavaScript {errs}")
         b.close()

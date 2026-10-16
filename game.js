@@ -5,7 +5,7 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&
 const PER_LEVEL = 10, LIVES = 3, TICK = 100;
 
 // ---------- Guardado ----------
-const DEF = { coins: 0, adBest: {}, pts: { ana: 0, hid: 0, adi: 0, cri: 0 }, crLv: { f: 1, m: 1, d: 1, e: 1 }, crDiff: "f", crSeen: [], crSolved: 0, adQuick: 0, adAces: 0, adLevel: 1, adSeen: [], level: 1, stars: {}, lvH: 1, starsH: {}, solved: 0, bestStreak: 0, ach: {}, theme: "claro", owned: ["claro"], sound: true, lastDaily: "", dailyStreak: 0, seen: [], played: 0, fastest: 0, name: "", duels: 0, duelWins: 0 };
+const DEF = { coins: 0, adBest: {}, pts: { ana: 0, hid: 0, adi: 0, cri: 0 }, crLv: { f: 1, m: 1, d: 1, e: 1 }, crDiff: "f", dif: { ana: "m", hid: "m", adi: "m" }, crSeen: [], crSolved: 0, adQuick: 0, adAces: 0, adLevel: 1, adSeen: [], level: 1, stars: {}, lvH: 1, starsH: {}, solved: 0, bestStreak: 0, ach: {}, theme: "claro", owned: ["claro"], sound: true, lastDaily: "", dailyStreak: 0, seen: [], played: 0, fastest: 0, name: "", duels: 0, duelWins: 0 };
 let SV;
 try { SV = { ...DEF, ...JSON.parse(localStorage.getItem("anagrama-v1") || "{}") }; } catch { SV = { ...DEF }; }
 // Monedas individuales por juego: SV.coins apunta a la billetera del juego en pantalla.
@@ -24,6 +24,19 @@ const rangeOf = (lv) => (lv <= RANGES.length ? RANGES[lv - 1] : lv < 16 ? [9, 10
 const timeFor = (lv, len) => Math.max(lv >= 20 ? 20 : 25, 20 + 5 * len - Math.min(lv, 15) * 2);
 const TITLES = [[1, "Novato"], [3, "Aprendiz"], [5, "Curioso"], [8, "Palabrero"], [11, "Lingüista"], [15, "Erudito"], [20, "Maestro del anagrama"], [30, "Leyenda"]];
 const titleOf = (lv) => TITLES.filter((t) => lv >= t[0]).pop()[1];
+// Dificultad elegible (Anagrama, Escondidas, Adivina): modifica tiempo, largo, letras de más, tier de palabras y puntos.
+const DIF = {
+  f: { name: "Fácil", icon: "🌱", time: 1.4, len: -1, extra: -2, tier: -1, mult: 0.8 },
+  m: { name: "Medio", icon: "🌿", time: 1, len: 0, extra: 0, tier: 0, mult: 1 },
+  d: { name: "Difícil", icon: "🔥", time: 0.8, len: 1, extra: 2, tier: 1, mult: 1.3 },
+  e: { name: "Experto", icon: "💀", time: 0.65, len: 2, extra: 3, tier: 2, mult: 1.6 },
+};
+const difOf = (k) => DIF[(SV.dif && SV.dif[k]) || "m"];
+const gameDif = () => (typeof G !== "undefined" && G && G.duel ? DIF.m : difOf(CUR));
+function difBar(el, k) {
+  el.innerHTML = Object.entries(DIF).map(([c, v]) => `<button data-dg="${c}" class="${SV.dif[k] === c ? "on" : ""}"><span>${v.icon}</span><b>${v.name}</b><small>×${String(v.mult).replace(".", ",")} pts</small></button>`).join("");
+  el.onclick = (e) => { const b = e.target.closest("[data-dg]"); if (b) { SV.dif[k] = b.dataset.dg; save(); difBar(el, k); } };
+}
 let CUR = "ana"; // juego elegido en el menú: "ana" (Anagrama) o "hid" (Palabras escondidas)
 const GRANKS = [[0, "Novato"], [300, "Aprendiz"], [1000, "Curioso"], [2500, "Ingenioso"], [5000, "Astuto"], [9000, "Erudito"], [15000, "Genio"], [25000, "Maestro mental"], [40000, "Leyenda"]];
 function addPts(k, n) { SV.pts = SV.pts || { ana: 0, hid: 0, adi: 0, cri: 0 }; SV.pts[k] = (SV.pts[k] || 0) + n; SV.wal[k] = (SV.wal[k] || 0) + n; }
@@ -89,7 +102,7 @@ function renderHome() {
   applyTheme(); viewLevel = Math.min(viewLevel, curLevel()); SCENES.apply(SCENES.world(viewLevel));
   $("#hLogo").innerHTML = [...(CUR === "hid" ? "ESCONDIDAS" : "ANAGRAMA")].map((c) => `<i>${c}</i>`).join("");
   $("#hTag").textContent = CUR === "hid" ? "Hay letras de más: encontrá la palabra escondida" : "Ordená las letras y encontrá la palabra";
-  $("#hCoins").textContent = SV.coins;
+  difBar($("#hDiffs"), CUR === "hid" ? "hid" : "ana"); $("#hCoins").textContent = SV.coins;
   $("#hRank").textContent = titleOf(topLevel()) + " · " + ptsOf(CUR) + " pts";
   $("#btnSound").textContent = SV.sound ? "🔊" : "🔇";
     $("#hCard").innerHTML = `<button class="ib" id="lvPrev" ${viewLevel <= 1 ? "disabled" : ""} aria-label="Nivel anterior">‹</button>
@@ -144,7 +157,7 @@ $("#box").addEventListener("click", (e) => {
 // ---------- Juego ----------
 let G = null, timerId = null;
 function pickWords(lv) {
-  const [a, b] = rangeOf(lv);
+  const [a0, b0] = rangeOf(lv), dl = gameDif().len, a = Math.max(4, a0 + dl), b = Math.min(12, b0 + dl);
   let c = []; for (let n = a; n <= b; n++) c = c.concat(POOL[n] || []);
   const fresh = c.filter((x) => !SV.seen.includes(x.L));
   const src = fresh.length >= PER_LEVEL + 5 ? fresh : c;
@@ -168,7 +181,7 @@ function nextWord() {
   G.total = G.left = timerTotal(); G.wordHints = 0; G.busy = false;
   renderGame(); startTimer();
 }
-const timerTotal = () => timeFor(G.duel ? 5 : G.lv, G.len) + (G.kind === "hid" ? 10 : 0);
+const timerTotal = () => Math.round(timeFor(G.duel ? 5 : G.lv, G.len) * (G.duel ? 1 : difOf(G.kind).time)) + (G.kind === "hid" ? 10 : 0);
 // El diccionario de Anagrama y Palabras escondidas se amplía con todas las palabras de Adivina (4 a 12 letras).
 function extendPool() {
   const seen = new Set(Object.values(POOL).flat().map((x) => x.L));
@@ -185,7 +198,7 @@ const hidClue = (w) => (typeof CLUES !== "undefined" && CLUES[w]) || (buildAdivi
 const VOW = "AEIOU", CON = "BCDFGLMNPRSTVZ";
 function makeScr(L, kind, lv) {
   if (kind !== "hid") return scramble(L);
-  const extra = Math.max(3, Math.min(3 + Math.floor(lv / 3), 8, 16 - L.length));
+  const extra = Math.max(2, Math.min(3 + Math.floor(lv / 3) + gameDif().extra, 11, 16 - L.length));
   const a = [...L];
   for (let i = 0; i < extra; i++) a.push(rnd(5) < 2 ? VOW[rnd(5)] : CON[rnd(CON.length)]);
   return shuffle(a);
@@ -247,7 +260,7 @@ function float(t, cls) { const f = $("#gFloat"); f.className = "float " + (cls |
 function solveWord() {
   G.busy = true; G.solved++; G.streak++; SV.solved++; SV.bestStreak = Math.max(SV.bestStreak, G.streak);
   const ratio = G.left / G.total; if (G.wordHints === 0) SV.fastest = Math.max(SV.fastest, ratio);
-  const gain = Math.max(5, 10 + G.len + Math.ceil(10 * ratio) + Math.min(G.streak, 10) * 2 - 5 * G.wordHints);
+  const gain = Math.round(Math.max(5, 10 + G.len + Math.ceil(10 * ratio) + Math.min(G.streak, 10) * 2 - 5 * G.wordHints) * (G.duel ? 1 : difOf(G.kind).mult));
   if (G.duel) { G.duel.pts += gain; G.n++; } else addPts(G.kind, gain); save();
   liveSend();
   $("#gSlots").classList.add("win"); $("#gCoins").textContent = SV.coins;
@@ -417,7 +430,7 @@ function showMenu() {
   $("#mTotal").textContent = gr.total.toLocaleString("es-AR") + " pts";
   $("#mBar").style.width = (gr.next ? Math.min(100, ((gr.total - gr.from) / (gr.next - gr.from)) * 100) : 100) + "%";
   $("#mNext").textContent = gr.next ? `Próximo rango: ${gr.nextName} (${(gr.next - gr.total).toLocaleString("es-AR")} pts)` : "¡Rango máximo!";
-  $("#mPtsAna").textContent = ptsOf("ana") + " pts"; $("#mPtsHid").textContent = ptsOf("hid") + " pts"; $("#mPtsAdi").textContent = ptsOf("adi") + " pts"; $("#mPtsCri").textContent = ptsOf("cri") + " pts"; if (typeof crMenu === "function") crMenu();
+  $("#mPtsAna").textContent = ptsOf("ana") + " pts"; $("#mPtsHid").textContent = ptsOf("hid") + " pts"; $("#mPtsAdi").textContent = ptsOf("adi") + " pts"; $("#mPtsCri").textContent = ptsOf("cri") + " pts"; if (typeof crMenu === "function") crMenu(); document.querySelectorAll("#menu [data-game]").forEach((c) => { const k = c.dataset.game; if (k !== "cri") c.querySelectorAll("[data-diff]").forEach((x) => x.classList.toggle("on", x.dataset.diff === SV.dif[k])); });
   $("#mLvAna").textContent = `Nivel ${SV.level}`; $("#mLvHid").textContent = `Nivel ${SV.lvH}`; $("#mLvAdi").textContent = `Nivel ${SV.adLevel}`;
 }
 function openGame(k) { if (k === "adi") return showAdHome(); if (k === "cri") return crOpen(); CUR = k; viewLevel = curLevel(); $("#menu").hidden = true; $("#home").hidden = false; renderHome(); }
@@ -547,7 +560,7 @@ const plainText = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(
 function showAdHome() {
   buildAdivina(); SCENES.apply(SCENES.mystery(SV.adLevel));
   $("#menu").hidden = true; $("#home").hidden = true; $("#game").hidden = true; $("#adGame").hidden = true; $("#adHome").hidden = false; adOn = true;
-  $("#adCoins").textContent = SV.coins;
+  difBar($("#adDiffs"), "adi"); $("#adCoins").textContent = SV.coins;
   $("#adLvl").innerHTML = `<div class="mid"><small>Nivel</small><b>${SV.adLevel}</b><small>${adTitle(SV.adLevel)} · ${ptsOf("adi")} pts</small><small class="world">🔍 ${SCENES.mysteryName(SV.adLevel)}</small><small>Para pasar: ${adPass(SV.adLevel)} pts de 500 en una ronda</small></div>`;
   renderAdCats();
 }
@@ -569,7 +582,7 @@ function adBuildClues(e) {
   return [[A[0]], [A[1]], [auto[0], 1], [A[2]], [auto[1], 1], [A[3]], [auto[2], 1], [auto[3], 1], [auto[4], 1], [auto[5], 1]];
 }
 function adPick(pool, L) {
-  const T = adTier(L), seen = new Set(SV.adSeen);
+  const T = Math.max(1, Math.min(4, adTier(L) + difOf("adi").tier)), seen = new Set(SV.adSeen);
   return shuffle(pool).map((e) => ({ e, s: Math.abs(e.t - T) + Math.random() * 0.9 + (seen.has(e.w) ? 3 : 0) })).sort((a, b) => a.s - b.s).slice(0, AD_ROUND).map((x) => x.e);
 }
 function adStart(cat) {
@@ -606,7 +619,7 @@ function adGuess() {
   adFloat("No es. ¡Otra pista!", "bad"); $("#adIn").value = ""; AD.shown++; adRender();
 }
 function adFinish(pts, msg, good) {
-  AD.busy = true; AD.results.push({ w: AD.cur.w, pts, shown: AD.shown }); AD.total += pts; addPts("adi", pts);
+  AD.busy = true; AD.results.push({ w: AD.cur.w, pts, shown: AD.shown }); AD.total += pts; addPts("adi", Math.round(pts * difOf("adi").mult));
   if (pts) { SV.solved++; if (AD.shown <= 3) SV.adQuick++; if (AD.shown === 1) SV.adAces++; }
   save(); checkAch(); $("#adTotal").textContent = SV.coins;
   adFloat(msg, good ? "good" : "bad"); beep(good ? SND.ok : SND.lose);
