@@ -172,6 +172,8 @@ function renderGame() {
   const dn = G.duel ? G.n : G.solved;
   $("#gDots").innerHTML = Array.from({ length: PER_LEVEL }, (_, i) => `<i class="${i < dn ? "done" : i === dn ? "cur" : ""}"></i>`).join("");
   $("#gCat").textContent = G.w.c; $("#gLen").textContent = G.kind === "hid" ? `${G.len} letras · sobran ${G.tiles.length - G.len}` : `${G.len} letras`;
+  const cl = G.kind === "hid" && typeof CLUES !== "undefined" && CLUES[G.w.w];
+  $("#gClue").hidden = !cl; $("#gClue").textContent = cl ? "💬 " + cl : "";
   $("#gStreak").textContent = G.streak >= 2 ? `🔥 Racha x${G.streak}` : "";
   renderTiles(); renderTime();
 }

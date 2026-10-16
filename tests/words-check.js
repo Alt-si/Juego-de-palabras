@@ -9,3 +9,13 @@ for (const k in POOL) for (const x of POOL[k]) {
   seen.add(x.L); n++;
 }
 console.log(n + " palabras sin repetir");
+
+// Cada palabra debe tener su frase-pista y no puede nombrar la palabra.
+const CLUES = new Function(fs.readFileSync(__dirname + "/../clues.js", "utf8") + "\nreturn CLUES;")();
+const norm = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+for (const k in POOL) for (const x of POOL[k]) {
+  const c = CLUES[x.w];
+  if (!c) throw new Error("falta la pista de: " + x.w);
+  if (norm(c).includes(norm(x.w))) throw new Error("la pista nombra la palabra: " + x.w);
+}
+console.log("pistas completas");

@@ -42,6 +42,7 @@
     <div class="timer"><i id="gBar"></i><b id="gTime"></b></div>
     <div class="streak" id="gStreak"></div>
     <div class="cat">Pista: <b id="gCat"></b> · <span id="gLen"></span></div>
+    <div class="clue" id="gClue" hidden></div>
     <div class="slots" id="gSlots" aria-label="Tu respuesta"></div>
     <div class="pool" id="gPool" aria-label="Letras"></div>
     <div class="tools">
@@ -56,6 +57,7 @@
 <div id="modal" class="modal" hidden><div class="box" id="box"></div></div>
 <div id="toast" class="toast" hidden></div>
 <script src="words.js"></script>
+<script src="clues.js"></script>
 <script src="game.js"></script>
 <script>if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});</script>
 </body>
