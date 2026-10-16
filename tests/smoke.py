@@ -134,6 +134,10 @@ try:
         pg.evaluate("() => { const s = Object.keys(P.bySym).find((k) => !P.lock[k]); P.sel = +s; const w = CR_ABC.replace(P.bySym[s], '')[0]; crKey(w); }")
         check(pg.evaluate("Object.keys(P.guess).length") > 1, "se puede poner una letra")
 
+        # --- monedas individuales ---
+        wl = pg.evaluate("({a: SV.wal.ana, h: SV.wal.hid, i: SV.wal.adi, c: SV.wal.cri})")
+        check(wl["c"] > 0 and wl["h"] == 0 and wl["i"] == 0, f"monedas por juego: Frases no mezcla las de otros {wl}")
+
         check(not errs, f"sin errores de JavaScript {errs}")
         b.close()
 finally:

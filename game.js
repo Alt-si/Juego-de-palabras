@@ -8,6 +8,14 @@ const PER_LEVEL = 10, LIVES = 3, TICK = 100;
 const DEF = { coins: 0, adBest: {}, pts: { ana: 0, hid: 0, adi: 0, cri: 0 }, crLv: { f: 1, m: 1, d: 1, e: 1 }, crDiff: "f", crSeen: [], crSolved: 0, adQuick: 0, adAces: 0, adLevel: 1, adSeen: [], level: 1, stars: {}, lvH: 1, starsH: {}, solved: 0, bestStreak: 0, ach: {}, theme: "claro", owned: ["claro"], sound: true, lastDaily: "", dailyStreak: 0, seen: [], played: 0, fastest: 0, name: "", duels: 0, duelWins: 0 };
 let SV;
 try { SV = { ...DEF, ...JSON.parse(localStorage.getItem("anagrama-v1") || "{}") }; } catch { SV = { ...DEF }; }
+// Monedas individuales por juego: SV.coins apunta a la billetera del juego en pantalla.
+{
+  const old = SV.coins || 0;
+  if (!SV.wal) SV.wal = { ana: old, hid: 0, adi: 0, cri: 0 };
+  const key = () => { try { if (!$("#crHome").hidden || !$("#crGame").hidden) return "cri"; if (adOn) return "adi"; } catch {} return CUR === "hid" ? "hid" : "ana"; };
+  Object.defineProperty(SV, "coins", { enumerable: false, configurable: true, get() { return SV.wal[key()] || 0; }, set(v) { SV.wal[key()] = v; } });
+}
+const walletTotal = () => Object.values(SV.wal).reduce((a, b) => a + b, 0);
 const save = () => { try { localStorage.setItem("anagrama-v1", JSON.stringify(SV)); } catch {} };
 
 // ---------- Reglas de niveles ----------
@@ -18,7 +26,7 @@ const TITLES = [[1, "Novato"], [3, "Aprendiz"], [5, "Curioso"], [8, "Palabrero"]
 const titleOf = (lv) => TITLES.filter((t) => lv >= t[0]).pop()[1];
 let CUR = "ana"; // juego elegido en el menú: "ana" (Anagrama) o "hid" (Palabras escondidas)
 const GRANKS = [[0, "Novato"], [300, "Aprendiz"], [1000, "Curioso"], [2500, "Ingenioso"], [5000, "Astuto"], [9000, "Erudito"], [15000, "Genio"], [25000, "Maestro mental"], [40000, "Leyenda"]];
-function addPts(k, n) { SV.pts = SV.pts || { ana: 0, hid: 0, adi: 0 }; SV.pts[k] = (SV.pts[k] || 0) + n; SV.coins += n; }
+function addPts(k, n) { SV.pts = SV.pts || { ana: 0, hid: 0, adi: 0, cri: 0 }; SV.pts[k] = (SV.pts[k] || 0) + n; SV.wal[k] = (SV.wal[k] || 0) + n; }
 const ptsOf = (k) => (SV.pts && SV.pts[k]) || 0;
 const totalPts = () => ptsOf("ana") + ptsOf("hid") + ptsOf("adi") + ptsOf("cri");
 function globalRank() { const t = totalPts(); let i = 0; GRANKS.forEach((r, j) => { if (t >= r[0]) i = j; }); const n = GRANKS[i + 1]; return { name: GRANKS[i][1], i, next: n ? n[0] : null, nextName: n ? n[1] : null, from: GRANKS[i][0], total: t }; }
@@ -404,7 +412,7 @@ function showMenu() {
   SCENES.apply(null);
   $("#adHome").hidden = true; $("#adGame").hidden = true; adOn = false; $("#crHome").hidden = true; $("#crGame").hidden = true;
   $("#home").hidden = true; $("#game").hidden = true; $("#menu").hidden = false;
-  $("#mCoins").textContent = SV.coins; applyTheme();
+  $("#mCoins").textContent = walletTotal(); applyTheme();
   const gr = globalRank(); $("#mRank").textContent = gr.name;
   $("#mTotal").textContent = gr.total.toLocaleString("es-AR") + " pts";
   $("#mBar").style.width = (gr.next ? Math.min(100, ((gr.total - gr.from) / (gr.next - gr.from)) * 100) : 100) + "%";
