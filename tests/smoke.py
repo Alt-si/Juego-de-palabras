@@ -39,6 +39,24 @@ try:
         pg.click("#nextLv"); pg.evaluate("G.left=0.05"); pg.wait_for_timeout(2000)
         check(pg.evaluate("G.lives") == 2, "Anagrama: perder tiempo resta una vida")
 
+        # --- Adivina ---
+        ad = newpage(b.new_context(viewport=V)); ad.goto(URL); ad.wait_for_timeout(300)
+        ad.click('[data-game="adi"]'); ad.click('[data-cat="Animales"]')
+        check(ad.evaluate("AD.shown") == 1 and ad.locator("#adClues li").count() == 1, "Adivina: arranca con una pista")
+        ad.click("#adMore"); ad.click("#adMore")
+        check("Vale 80 pts" in ad.inner_text("#adWorth"), "Adivina: con 3 pistas vale 80 puntos")
+        ad.fill("#adIn", "xxxx"); ad.click("#adGo")
+        check(ad.evaluate("AD.shown") == 4, "Adivina: un error destapa otra pista")
+        ad.fill("#adIn", ad.evaluate("AD.cur.w.toUpperCase()")); ad.click("#adGo"); ad.wait_for_timeout(200)
+        check(ad.evaluate("AD.total") == 70, "Adivina: acertar con 4 pistas da 70 puntos")
+        ad.wait_for_timeout(1700)
+        for i in range(4):
+            ad.fill("#adIn", ad.evaluate("AD.cur.w")); ad.click("#adGo"); ad.wait_for_timeout(1800)
+        check("Ronda terminada" in ad.inner_text("#box"), "Adivina: fin de ronda")
+        check(ad.evaluate("SV.adBest.Animales") == 70 + 100 * 4, "Adivina: récord guardado (acertando a la primera pista vale 100)")
+        check(ad.evaluate("document.querySelectorAll('#adClues li').length") >= 1, "Adivina: lista de pistas")
+        ad.click("#adCatsBtn"); check(ad.is_visible("#adCats"), "Adivina: vuelve a las categorías")
+
         # --- Palabras escondidas ---
         pg = newpage(b.new_context(viewport=V)); pg.goto(URL); pg.wait_for_timeout(400)
         pg.click('[data-game="hid"]'); pg.click("#btnPlay")

@@ -20,6 +20,24 @@
     <h1 class="mt">Elegí un juego</h1>
     <button class="gcard g1" data-game="ana"><span class="ico">🔤</span><span><b>Anagrama</b><small>Ordená las letras y armá la palabra</small></span><em id="mLvAna"></em></button>
     <button class="gcard g2" data-game="hid"><span class="ico">🔍</span><span><b>Palabras escondidas</b><small>Hay letras de más: encontrá la palabra</small></span><em id="mLvHid"></em></button>
+    <button class="gcard g3" data-game="adi"><span class="ico">🕵️</span><span><b>Adivina</b><small>10 pistas: ¡cuantas menos uses, más puntos!</small></span><em>10 categorías</em></button>
+  </section>
+
+  <section id="adHome" class="screen" hidden>
+    <div class="topbar"><button class="ib" id="adBack" aria-label="Menú de juegos">‹</button><span class="coins">🪙 <b id="adCoins">0</b></span><span class="rank">Adivina</span></div>
+    <h1 class="mt">¿Qué categoría?</h1>
+    <p class="tag">Descubrí la palabra oculta con la menor cantidad de pistas</p>
+    <div class="cats" id="adCats"></div>
+  </section>
+
+  <section id="adGame" class="screen" hidden>
+    <div class="topbar"><button class="ib" id="adQuit" aria-label="Salir">✕</button><span class="rank" id="adCatName"></span><span class="coins">🪙 <b id="adTotal">0</b></span></div>
+    <div class="dots" id="adDots"></div>
+    <div class="worth" id="adWorth"></div>
+    <ol class="clues" id="adClues"></ol>
+    <div class="guess"><input id="adIn" placeholder="Escribí tu respuesta" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="send"><button class="big" id="adGo">Adivinar</button></div>
+    <div class="tools two"><button id="adMore">💡<small>Otra pista</small></button><button id="adSkip">⏭<small>Pasar · 0 pts</small></button></div>
+    <div class="float" id="adFloat" aria-live="polite"></div>
   </section>
 
   <section id="home" class="screen" hidden>
@@ -58,6 +76,7 @@
 <div id="toast" class="toast" hidden></div>
 <script src="words.js"></script>
 <script src="clues.js"></script>
+<script src="adivina.js"></script>
 <script src="game.js"></script>
 <script>if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});</script>
 </body>

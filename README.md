@@ -1,6 +1,6 @@
 # Anagrama
 
-Menú con dos juegos: **Anagrama** (ordená las letras) y **Palabras escondidas** (hay letras de más; a los 10 s finales se marcan las que lleva la palabra).
+Menú con tres juegos: **Anagrama** (ordená las letras), **Adivina** (10 pistas: cuantas menos uses, más puntos) y **Palabras escondidas** (hay letras de más; a los 10 s finales se marcan las que lleva la palabra).
 
 Primer juego: ordená las letras y encontrá la palabra. PWA estática (HTML/CSS/JS), funciona sin conexión y se instala en el celular.
 

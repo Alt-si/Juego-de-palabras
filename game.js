@@ -5,7 +5,7 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&
 const PER_LEVEL = 10, LIVES = 3, TICK = 100;
 
 // ---------- Guardado ----------
-const DEF = { coins: 0, level: 1, stars: {}, lvH: 1, starsH: {}, solved: 0, bestStreak: 0, ach: {}, theme: "claro", owned: ["claro"], sound: true, lastDaily: "", dailyStreak: 0, seen: [], played: 0, fastest: 0, name: "", duels: 0, duelWins: 0 };
+const DEF = { coins: 0, adBest: {}, adQuick: 0, adAces: 0, level: 1, stars: {}, lvH: 1, starsH: {}, solved: 0, bestStreak: 0, ach: {}, theme: "claro", owned: ["claro"], sound: true, lastDaily: "", dailyStreak: 0, seen: [], played: 0, fastest: 0, name: "", duels: 0, duelWins: 0 };
 let SV;
 try { SV = { ...DEF, ...JSON.parse(localStorage.getItem("anagrama-v1") || "{}") }; } catch { SV = { ...DEF }; }
 const save = () => { try { localStorage.setItem("anagrama-v1", JSON.stringify(SV)); } catch {} };
@@ -34,6 +34,8 @@ const ACH = [
   ["l5", "Nivel 5", "Llegá al nivel 5", () => SV.level >= 5, 50],
   ["l10", "Nivel 10", "Llegá al nivel 10", () => SV.level >= 10, 150],
   ["perfect", "Perfecto", "3 estrellas en un nivel", () => [...Object.values(SV.stars), ...Object.values(SV.starsH)].some((n) => n >= 3), 30],
+  ["ad1", "Ojo de águila", "Adiviná una palabra con la primera pista", () => SV.adAces >= 1, 50],
+  ["ad3", "Detective", "Adiviná 5 palabras con 3 pistas o menos", () => SV.adQuick >= 5, 60],
   ["h5", "Buscapalabras", "Llegá al nivel 5 de Palabras escondidas", () => SV.lvH >= 5, 50],
   ["speed", "Rayo", "Resolvé una palabra con más del 75 % del tiempo sobrando", () => SV.fastest >= 0.75, 20],
   ["rich", "Ahorrista", "Juntá 500 monedas", () => SV.coins >= 500, 50],
@@ -379,11 +381,12 @@ window.addEventListener("hashchange", checkInvite);
 
 // ---------- Menú ----------
 function showMenu() {
+  $("#adHome").hidden = true; $("#adGame").hidden = true; adOn = false;
   $("#home").hidden = true; $("#game").hidden = true; $("#menu").hidden = false;
   $("#mCoins").textContent = SV.coins; applyTheme();
   $("#mLvAna").textContent = `Nivel ${SV.level}`; $("#mLvHid").textContent = `Nivel ${SV.lvH}`;
 }
-function openGame(k) { CUR = k; viewLevel = curLevel(); $("#menu").hidden = true; $("#home").hidden = false; renderHome(); }
+function openGame(k) { if (k === "adi") return showAdHome(); CUR = k; viewLevel = curLevel(); $("#menu").hidden = true; $("#home").hidden = false; renderHome(); }
 
 // ---------- Duelo en vivo ----------
 // Conexión directa entre los dos celulares (WebRTC) usando PeerJS; no hay servidor propio.
@@ -492,6 +495,83 @@ function showLiveResult() {
   if (!G.paid) { G.paid = true; SV.duels++; if (w > 0) { SV.duelWins++; SV.coins += 50; } save(); checkAch(); beep(SND.win); }
   modal(`<h2>${w > 0 ? "🏆 ¡Ganaste!" : w < 0 ? "😮 Perdiste" : "🤝 ¡Empate!"}</h2><div class="vs"><div><small>Vos</small><b>${me}</b></div><span>vs</span><div><small>${oppName()}</small><b>${o.pts}</b></div></div>${o.left && !o.done ? "<p>Tu rival abandonó antes de terminar.</p>" : ""}${w > 0 ? '<p class="big2">+50 🪙</p>' : ""}${o.left ? "" : '<button class="big" id="lvRe">🔁 Revancha</button>'}<button class="link" id="goHome">Inicio</button>`, true);
   const re = $("#lvRe"); if (re) re.onclick = () => { if (LIVE.role === "host") sendStart(); else { Net.send({ t: "rematch" }); re.textContent = "Pedido enviado…"; re.disabled = true; } };
+}
+
+// ---------- Adivina ----------
+// 10 pistas por palabra (de la más difícil a la más fácil). Cuantas menos pistas uses, más puntos.
+let adOn = false;
+const AD = { cat: "", words: [], i: 0, shown: 0, total: 0, results: [], clues: [], cur: null, busy: false };
+const AD_ROUND = 5, AD_ICON = { Animales: "🐘", Frutas: "🍎", Hogar: "🏠", Naturaleza: "🌲", Transporte: "🚆", Objetos: "⌚", Lugares: "🏫", Espacio: "🚀", Comidas: "🍕", "Arte y música": "🎸" };
+const adPts = (shown) => 110 - 10 * shown;
+function showAdHome() {
+  $("#menu").hidden = true; $("#home").hidden = true; $("#game").hidden = true; $("#adGame").hidden = true; $("#adHome").hidden = false; adOn = false;
+  $("#adCoins").textContent = SV.coins;
+  const cats = Object.keys(ADIVINA);
+  $("#adCats").innerHTML = cats.map((c) => `<button data-cat="${esc(c)}"><span class="ico">${AD_ICON[c] || "❓"}</span>${esc(c)}<small>${SV.adBest[c] ? "Récord: " + SV.adBest[c] : "Sin jugar"}</small></button>`).join("") + `<button class="mix" data-cat="Mezcla"><span class="ico">🎲</span>Mezcla de todo<small>${SV.adBest.Mezcla ? "Récord: " + SV.adBest.Mezcla : "Sin jugar"}</small></button>`;
+}
+$("#adCats").addEventListener("click", (e) => { const b = e.target.closest("[data-cat]"); if (b) adStart(b.dataset.cat); });
+$("#adBack").onclick = showMenu;
+function adBuildClues(w, cat) {
+  const A = ADIVINA[cat][w], easy = CLUES[w], T = [...w.toUpperCase()];
+  const vow = T.filter((c) => "AEIOUÁÉÍÓÚ".includes(c)).length;
+  const pattern = T.map((c, i) => (i % 2 === 0 ? c : "_")).join(" ");
+  const auto = [`Tiene ${T.length} letras.`, `Empieza con la letra ${T[0]}.`, `Termina con la letra ${T[T.length - 1]}.`, `Tiene ${vow} vocales y ${T.length - vow} consonantes.`, `Así se ve con algunas letras: ${pattern}`];
+  return [[A[0]], [A[1]], [auto[0], 1], [A[2]], [auto[1], 1], [A[3]], [auto[2], 1], [easy || A[3]], [auto[3], 1], [auto[4], 1]];
+}
+function adStart(cat) {
+  AD.cat = cat; AD.i = 0; AD.total = 0; AD.results = [];
+  const pool = cat === "Mezcla" ? Object.keys(ADIVINA).flatMap((c) => Object.keys(ADIVINA[c]).map((w) => [c, w])) : Object.keys(ADIVINA[cat]).map((w) => [cat, w]);
+  AD.words = shuffle(pool).slice(0, AD_ROUND);
+  $("#adHome").hidden = true; $("#adGame").hidden = false; adOn = true;
+  $("#adCatName").textContent = cat; $("#adTotal").textContent = SV.coins;
+  adNext();
+}
+function adNext() {
+  const [c, w] = AD.words[AD.i]; AD.cur = { c, w }; AD.clues = adBuildClues(w, c); AD.shown = 1; AD.busy = false;
+  $("#adIn").value = ""; adRender(true);
+}
+function adRender(fresh) {
+  $("#adDots").innerHTML = Array.from({ length: AD_ROUND }, (_, i) => `<i class="${i < AD.i ? "done" : i === AD.i ? "cur" : ""}"></i>`).join("");
+  $("#adWorth").textContent = `Pista ${AD.shown}/10 · Vale ${adPts(AD.shown)} pts`;
+  $("#adClues").innerHTML = AD.clues.slice(0, AD.shown).map((c, i) => `<li class="${c[1] ? "auto" : ""} ${i === AD.shown - 1 ? "new" : ""}"><b>${i + 1}</b><span>${esc(c[0])}</span></li>`).join("");
+  const ul = $("#adClues"); ul.scrollTop = ul.scrollHeight;
+  $("#adMore").disabled = AD.shown >= 10;
+  if (fresh) $("#adIn").focus({ preventScroll: true });
+}
+function adFloat(t, cls) { const f = $("#adFloat"); f.className = "float " + (cls || ""); f.textContent = t; void f.offsetWidth; f.classList.add("go"); }
+function adMore() { if (AD.busy || AD.shown >= 10) return; AD.shown++; adRender(); beep(SND.coin); }
+function adAnswers() { const w = AD.cur.w; return [letters(w), ...(ALIAS[w] || []).map(letters)]; }
+function adGuess() {
+  if (AD.busy) return;
+  const g = letters($("#adIn").value.trim()); if (!g) return;
+  if (adAnswers().includes(g)) return adWin();
+  beep(SND.bad); vib([60, 40, 60]); $("#adIn").classList.add("shake"); setTimeout(() => $("#adIn").classList.remove("shake"), 400);
+  if (AD.shown >= 10) return adLose();
+  adFloat("No es. ¡Otra pista!", "bad"); $("#adIn").value = ""; AD.shown++; adRender();
+}
+function adFinish(pts, msg, good) {
+  AD.busy = true; AD.results.push({ w: AD.cur.w, pts, shown: AD.shown }); AD.total += pts; SV.coins += pts;
+  if (pts) { SV.solved++; if (AD.shown <= 3) SV.adQuick++; if (AD.shown === 1) SV.adAces++; }
+  save(); checkAch(); $("#adTotal").textContent = SV.coins;
+  adFloat(msg, good ? "good" : "bad"); beep(good ? SND.ok : SND.lose);
+  $("#adClues").insertAdjacentHTML("beforeend", `<li class="new"><b>${good ? "✔" : "✖"}</b><span class="reveal-msg">${esc(AD.cur.w.toUpperCase())}</span></li>`);
+  const ul = $("#adClues"); ul.scrollTop = ul.scrollHeight;
+  setTimeout(() => { AD.i++; AD.i >= AD_ROUND ? adEnd() : adNext(); }, 1600);
+}
+function adWin() { const p = adPts(AD.shown); adFinish(p, `+${p} 🪙`, true); }
+function adLose() { adFinish(0, "Era esa palabra…", false); }
+$("#adGo").onclick = adGuess;
+$("#adIn").addEventListener("keydown", (e) => { if (e.key === "Enter") adGuess(); });
+$("#adMore").onclick = adMore;
+$("#adSkip").onclick = () => { if (!AD.busy) adLose(); };
+$("#adQuit").onclick = () => { if (confirm("¿Salir de la ronda?")) showAdHome(); };
+function adEnd() {
+  const rec = !SV.adBest[AD.cat] || AD.total > SV.adBest[AD.cat]; if (rec) SV.adBest[AD.cat] = AD.total; save();
+  const bonus = AD.results.every((r) => r.pts > 0) ? 50 : 0; if (bonus) { SV.coins += bonus; save(); }
+  beep(SND.win);
+  modal(`<h2>🕵️ ¡Ronda terminada!</h2><p class="big2">${AD.total} pts</p>${rec ? '<p class="rankup">¡Nuevo récord!</p>' : `<p>Tu récord: ${SV.adBest[AD.cat]}</p>`}<div class="list">${AD.results.map((r) => `<div class="li ${r.pts ? "got" : ""}"><span>${r.pts ? "✅" : "❌"}</span><div><b>${esc(r.w)}</b><small>${r.pts ? r.shown + (r.shown === 1 ? " pista" : " pistas") : "No la adivinaste"}</small></div><em>${r.pts}</em></div>`).join("")}</div>${bonus ? '<p class="big2">+50 🪙 por acertar todas</p>' : ""}<button class="big" id="adAgain">Jugar otra vez</button><button class="link" id="adCatsBtn">Elegir categoría</button>`, true);
+  $("#adAgain").onclick = () => { closeModal(); adStart(AD.cat); };
+  $("#adCatsBtn").onclick = () => { closeModal(); showAdHome(); };
 }
 
 viewLevel = SV.level; showMenu(); checkInvite();

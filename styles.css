@@ -94,3 +94,19 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .duel.live{background:linear-gradient(135deg,#f59e0b,#ef4444)}
 .code{font-size:40px;font-weight:800;letter-spacing:6px;color:var(--ac);background:var(--bg);border-radius:14px;padding:8px}
 .clue{text-align:center;background:var(--panel);border-radius:14px;padding:10px 14px;font-weight:600;box-shadow:0 1px 3px #0002}
+.g3{background:linear-gradient(135deg,#ea580c,#db2777)}
+.cats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cats button{background:var(--panel);border-radius:16px;padding:16px 8px;font-weight:700;box-shadow:0 2px 0 #0002;display:flex;flex-direction:column;gap:2px;align-items:center}
+.cats small{color:var(--mut);font-weight:500}.cats .ico{font-size:28px}
+.cats .mix{grid-column:1/-1;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff}.cats .mix small{color:#fffb}
+.worth{text-align:center;font-weight:800;color:var(--ac);font-size:18px}
+.clues{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px;flex:1;overflow:auto}
+.clues li{background:var(--panel);border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:flex-start;box-shadow:0 1px 3px #0002}
+.clues li b{background:var(--tileb);color:var(--ink);min-width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px}
+.clues li.new{border:2px solid var(--ac);animation:pop .35s}
+.clues li.auto b{background:var(--gold);color:#fff}
+@keyframes pop{from{transform:scale(.95);opacity:.2}}
+.guess{display:flex;gap:8px}.guess input{flex:1;min-width:0;font:inherit;padding:12px;border-radius:12px;border:2px solid var(--tileb);background:var(--panel);color:var(--ink)}
+.guess .big{width:auto;padding:12px 16px;font-size:16px}
+.tools.two{grid-template-columns:1fr 1fr}
+.reveal-msg{text-align:center;font-size:22px;font-weight:800;color:var(--good)}
