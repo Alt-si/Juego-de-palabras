@@ -15,14 +15,22 @@
 </head>
 <body data-theme="claro">
 <div id="app">
-  <section id="home" class="screen">
-    <div class="topbar"><span class="coins">🪙 <b id="hCoins">0</b></span><span class="rank" id="hRank"></span><button class="ib" id="btnSound" aria-label="Sonido">🔊</button></div>
-    <div class="logo" aria-hidden="true"><i>A</i><i>N</i><i>A</i><i>G</i><i>R</i><i>A</i><i>M</i><i>A</i></div>
-    <p class="tag">Ordená las letras y encontrá la palabra</p>
+  <section id="menu" class="screen">
+    <div class="topbar"><span class="coins">🪙 <b id="mCoins">0</b></span><span class="rank">Juegos mentales</span><span></span></div>
+    <h1 class="mt">Elegí un juego</h1>
+    <button class="gcard g1" data-game="ana"><span class="ico">🔤</span><span><b>Anagrama</b><small>Ordená las letras y armá la palabra</small></span><em id="mLvAna"></em></button>
+    <button class="gcard g2" data-game="hid"><span class="ico">🔍</span><span><b>Palabras escondidas</b><small>Hay letras de más: encontrá la palabra</small></span><em id="mLvHid"></em></button>
+  </section>
+
+  <section id="home" class="screen" hidden>
+    <div class="topbar"><button class="ib" id="btnMenu" aria-label="Menú de juegos">‹</button><span class="coins">🪙 <b id="hCoins">0</b></span><span class="rank" id="hRank"></span><button class="ib" id="btnSound" aria-label="Sonido">🔊</button></div>
+    <div class="logo" id="hLogo" aria-hidden="true"></div>
+    <p class="tag" id="hTag"></p>
     <div class="levelcard" id="hCard"></div>
     <button class="big" id="btnPlay">▶ Jugar</button>
     <button class="chest" id="btnDaily"></button>
-    <button class="duel" id="btnDuel">⚔ <b>Desafiar a un amigo</b><small>Mismas palabras, gana quien haga más puntos</small></button>
+    <button class="duel live" id="btnLive">⚡ <b>Duelo en vivo</b><small>Los dos juegan a la vez y ven el avance del otro</small></button>
+    <button class="duel" id="btnDuel">📨 <b>Desafío por link</b><small>Tu amigo juega después, con las mismas palabras</small></button>
     <div class="row3"><button id="btnAch">🏅 Logros</button><button id="btnShop">🛍 Tienda</button><button id="btnStats">📊 Estadísticas</button></div>
     <button class="link" id="btnInstall" hidden>⬇ Instalar en el celular</button>
   </section>
@@ -30,9 +38,10 @@
   <section id="game" class="screen" hidden>
     <div class="topbar"><button class="ib" id="btnHome" aria-label="Salir">✕</button><span class="lives" id="gLives"></span><span class="coins">🪙 <b id="gCoins">0</b></span><button class="ib" id="btnPause" aria-label="Pausa">⏸</button></div>
     <div class="dots" id="gDots"></div>
+    <div class="rival" id="gRival" hidden></div>
     <div class="timer"><i id="gBar"></i><b id="gTime"></b></div>
     <div class="streak" id="gStreak"></div>
-    <div class="cat">Pista: <b id="gCat"></b> · <span id="gLen"></span> letras</div>
+    <div class="cat">Pista: <b id="gCat"></b> · <span id="gLen"></span></div>
     <div class="slots" id="gSlots" aria-label="Tu respuesta"></div>
     <div class="pool" id="gPool" aria-label="Letras"></div>
     <div class="tools">
