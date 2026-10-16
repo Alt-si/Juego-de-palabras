@@ -110,3 +110,10 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .guess .big{width:auto;padding:12px 16px;font-size:16px}
 .tools.two{grid-template-columns:1fr 1fr}
 .reveal-msg{text-align:center;font-size:22px;font-weight:800;color:var(--good)}
+body.scened::before{content:"";position:fixed;inset:0;z-index:-2;background:var(--scene) center bottom/cover no-repeat}
+body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(--veil,transparent)}
+[data-theme=oscuro]{--veil:rgba(15,23,42,.72)}
+.levelcard .world{display:block;margin-top:2px}
+.search{font:inherit;padding:12px 14px;border-radius:14px;border:2px solid var(--tileb);background:var(--panel);color:var(--ink);width:100%}
+.goal{text-align:center;color:var(--mut);font-size:14px;font-weight:600}
+#adLvl .mid small{display:block}

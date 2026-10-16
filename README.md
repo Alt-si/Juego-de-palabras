@@ -11,3 +11,8 @@ Primer juego: ordená las letras y encontrá la palabra. PWA estática (HTML/CSS
 - Progreso guardado en el dispositivo (localStorage).
 
 Publicar: Settings → Pages → Branch `main` / root.
+
+## Contenido largo y progresión
+- **Adivina**: 100 categorías (~1.175 palabras), niveles ilimitados; la dificultad sube con el nivel (palabras más difíciles, más puntos para pasar).
+- **Anagrama / Palabras escondidas**: niveles ilimitados, palabras más largas, menos tiempo y más letras de relleno a medida que avanzás.
+- **Fondos por nivel**: cada mundo (Anagrama/Escondidas) y cada escena de misterio (Adivina, con signo de pregunta) cambia al subir de nivel. Son ilustraciones SVG generadas, no fotos.
