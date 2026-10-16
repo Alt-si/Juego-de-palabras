@@ -16,11 +16,13 @@
 <body data-theme="claro">
 <div id="app">
   <section id="menu" class="screen">
-    <div class="topbar"><span class="coins">🪙 <b id="mCoins">0</b></span><span class="rank">Juegos mentales</span><span></span></div>
-    <h1 class="mt">Elegí un juego</h1>
-    <button class="gcard g1" data-game="ana"><span class="ico">🔤</span><span><b>Anagrama</b><small>Ordená las letras y armá la palabra</small></span><em id="mLvAna"></em></button>
-    <button class="gcard g2" data-game="hid"><span class="ico">🔍</span><span><b>Palabras escondidas</b><small>Hay letras de más: encontrá la palabra</small></span><em id="mLvHid"></em></button>
-    <button class="gcard g3" data-game="adi"><span class="ico">🕵️</span><span><b>Adivina</b><small>100 categorías · 10 pistas: ¡cuantas menos uses, más puntos!</small></span><em id="mLvAdi"></em></button>
+    <div class="topbar"><span class="coins">🪙 <b id="mCoins">0</b></span><span class="rank" id="mRank"></span><span></span></div>
+    <div class="brand"><div class="brain">🧠</div><h1>JUEGOS<br><span>MENTALES</span></h1><p>Entrená tu cabeza, un nivel a la vez</p></div>
+    <div class="grank"><div><b id="mTotal"></b><small>puntaje global</small></div><div class="gbar"><i id="mBar"></i></div><small id="mNext"></small></div>
+    <h2 class="mt">Elegí un juego</h2>
+    <button class="gcard g1" data-game="ana"><span class="ico">🔤</span><span><b>Anagrama</b><small>Ordená las letras y armá la palabra</small></span><em><span id="mLvAna"></span><u id="mPtsAna"></u></em></button>
+    <button class="gcard g2" data-game="hid"><span class="ico">🔍</span><span><b>Palabras escondidas</b><small>Hay letras de más: encontrá la palabra</small></span><em><span id="mLvHid"></span><u id="mPtsHid"></u></em></button>
+    <button class="gcard g3" data-game="adi"><span class="ico">🕵️</span><span><b>Adivina</b><small>100 categorías · 10 pistas: ¡cuantas menos uses, más puntos!</small></span><em><span id="mLvAdi"></span><u id="mPtsAdi"></u></em></button>
   </section>
 
   <section id="adHome" class="screen" hidden>
