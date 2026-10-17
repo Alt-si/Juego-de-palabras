@@ -50,20 +50,21 @@ function crRound() {
 }
 function crPhrase() {
   const ph = CR.list[CR.i], d = CR.d;
-  const letters = [...new Set([...ph.t].map(crLetter).filter(Boolean))];
+  const au = ph.o === "Refrán" || ph.o === "Dicho popular" ? "" : ph.o;
+  const letters = [...new Set([...(ph.t + " " + au)].map(crLetter).filter(Boolean))];
   const mode = ["num", "obj", "col"][Math.floor(Math.random() * 3)];
   const order = crShuffle([...Array(27).keys()]);
   const sym = {}; letters.forEach((L, i) => (sym[L] = order[i]));
   const lock = {}, guess = {};
   crShuffle(letters).slice(0, Math.min(crReveal(d, CR.lv), letters.length - 2)).forEach((L) => { lock[sym[L]] = L; guess[sym[L]] = L; });
-  P = { ph, letters, mode, sym, bySym: Object.fromEntries(letters.map((L) => [sym[L], L])), guess, lock, sel: null, wrong: {}, hints: 0, checks: 0, auth: false, mistakes: 0, over: false };
+  P = { ph, au, all: ph.t + " " + au, letters, mode, sym, bySym: Object.fromEntries(letters.map((L) => [sym[L], L])), guess, lock, sel: null, wrong: {}, hints: 0, checks: 0, mistakes: 0, over: false };
   crNext();
   $("#crTitle").textContent = `${CR_DIFF[d].icon} ${CR_DIFF[d].name} · Nivel ${CR.lv}`;
   $("#crTotal").textContent = SV.coins;
   $("#crDots").innerHTML = CR.list.map((_, i) => `<i class="${i < CR.i ? "done" : i === CR.i ? "cur" : ""}"></i>`).join("");
   const o = ph.o, plain = o === "Refrán" || o === "Dicho popular";
-  $("#crTag").textContent = plain ? (o === "Refrán" ? "📜 Es un refrán" : "💬 Es un dicho popular") : "🎓 Es una cita célebre · ¿de quién será?";
-  $("#crHint small").textContent = `Letra · ${CR_DIFF[d].hint}🪙`; $("#crAuth").hidden = plain; $("#crAuth").querySelector("small").textContent = "Autor · −10";
+  $("#crTag").textContent = plain ? (o === "Refrán" ? "📜 Es un refrán" : "💬 Es un dicho popular") : "🎓 Cita célebre · completá también al autor";
+  $("#crHint small").textContent = `Letra · ${CR_DIFF[d].hint}🪙`;
   crDraw();
 }
 function crSymHtml(s) {
@@ -71,18 +72,22 @@ function crSymHtml(s) {
   if (P.mode === "obj") return `<b class="ob">${CR_OBJ[s]}</b>`;
   return `<b class="co" style="background:hsl(${Math.round((s * 360) / 27)} 75% ${s % 2 ? 42 : 60}%)">${s + 1}</b>`;
 }
-function crDraw() {
-  const words = P.ph.t.split(" ");
-  $("#crPhrase").innerHTML = words.map((w) => `<span class="cw">${[...w].map((ch) => {
+function crCells(text) {
+  return text.split(" ").filter(Boolean).map((w) => `<span class="cw">${[...w].map((ch) => {
     const L = crLetter(ch); if (!L) return `<span class="cp">${esc(ch)}</span>`;
     const s = P.sym[L], g = P.guess[s];
     return `<button class="cc${P.lock[s] ? " lk" : ""}${P.sel === s ? " sel" : ""}${P.wrong[s] ? " bad" : ""}" data-s="${s}"><span class="cl">${g || ""}</span>${crSymHtml(s)}</button>`;
   }).join("")}</span>`).join("");
+}
+const crWorth = () => Math.max(10, CR_DIFF[CR.d].base + P.ph.n * 3 - P.hints * 15 - P.checks * 10 - P.mistakes * 8);
+function crDraw() {
+  $("#crPhrase").innerHTML = `<div class="crtext">${crCells(P.ph.t)}</div>` + (P.au ? `<div class="crauthor"><span class="cp dash">—</span>${crCells(P.au)}</div>` : `<div class="crorigin">— ${esc(P.ph.o)}</div>`);
+  $("#crWorth").innerHTML = `Esta frase vale <b>${crWorth()} pts</b>`;
   const used = new Set(Object.values(P.guess));
   $("#crKeys").innerHTML = [...CR_ABC].map((L) => `<button data-k="${L}" class="${used.has(L) ? "used" : ""}">${L}</button>`).join("") + `<button data-k="DEL" class="del">⌫</button>`;
 }
 function crNext(from) {
-  const order = []; [...P.ph.t].forEach((ch) => { const L = crLetter(ch); if (L && !order.includes(P.sym[L])) order.push(P.sym[L]); });
+  const order = []; [...P.all].forEach((ch) => { const L = crLetter(ch); if (L && !order.includes(P.sym[L])) order.push(P.sym[L]); });
   const start = from == null ? -1 : order.indexOf(from);
   for (let k = 1; k <= order.length; k++) { const s = order[(start + k) % order.length]; if (!P.guess[s]) { P.sel = s; return; } }
   P.sel = from == null ? null : from;
@@ -113,7 +118,7 @@ function crComplete() {
 }
 function crSolve() {
   P.over = true; const d = CR.d;
-  const gain = Math.max(10, CR_DIFF[d].base + P.ph.n * 3 - P.hints * 15 - P.checks * 5 - (P.auth ? 10 : 0) - P.mistakes * 8);
+  const gain = crWorth();
   addPts("cri", gain); CR.pts += gain; CR.solved++; SV.crSolved++; SV.crSeen.push(P.ph.t); save(); checkAch(); beep(SND.win); vib([60, 40, 100]);
   $("#crTotal").textContent = SV.coins; P.sel = null; crDraw();
   const last = CR.i === CR.list.length - 1;
@@ -137,16 +142,16 @@ $("#crHint").onclick = () => {
   const open = Object.keys(P.bySym).filter((s) => !P.lock[s]); if (!open.length) return;
   const s = P.sel != null && !P.lock[P.sel] ? P.sel : +open[Math.floor(Math.random() * open.length)], L = P.bySym[s];
   const other = Object.keys(P.guess).find((k) => P.guess[k] === L && +k !== s); if (other != null) { delete P.guess[other]; delete P.wrong[other]; }
-  SV.coins -= CR_DIFF[CR.d].hint; P.hints++; P.guess[s] = L; P.lock[s] = L; delete P.wrong[s]; save(); $("#crTotal").textContent = SV.coins; beep(SND.coin);
+  SV.coins -= CR_DIFF[CR.d].hint; P.hints++; crFloat("−15 pts", "bad"); P.guess[s] = L; P.lock[s] = L; delete P.wrong[s]; save(); $("#crTotal").textContent = SV.coins; beep(SND.coin);
   crNext(s); crDraw(); crComplete();
 };
 $("#crCheck").onclick = () => {
   if (!P || P.over) return; P.checks++;
   const bad = Object.keys(P.guess).filter((s) => !P.lock[s] && P.guess[s] !== P.bySym[s]);
   bad.forEach((s) => (P.wrong[s] = 1));
-  toast(bad.length ? `${bad.length} ${bad.length === 1 ? "letra está mal" : "letras están mal"} (en rojo)` : "Todo lo que pusiste va bien 👍"); crDraw();
+  toast((bad.length ? `${bad.length} ${bad.length === 1 ? "letra está mal" : "letras están mal"} (en rojo)` : "Todo lo que pusiste va bien 👍") + " · −10 pts"); crFloat("−10 pts", "bad"); crDraw();
 };
-$("#crAuth").onclick = () => { if (!P || P.over) return; if (!P.auth) { P.auth = true; } toast(`👤 ${P.ph.o}`); };
+function crFloat(t, cls) { const f = $("#crFloat"); f.className = "float " + (cls || ""); f.textContent = t; void f.offsetWidth; f.classList.add("go"); }
 $("#crSkip").onclick = () => {
   if (!P || P.over) return;
   modal(`<h2>¿Pasar esta frase?</h2><p>No suma puntos.</p><button class="big" id="crYes">Pasar</button><button class="mini" data-close>Seguir</button>`);

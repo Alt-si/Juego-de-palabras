@@ -664,3 +664,21 @@ document.addEventListener("click", (e) => {
   const gr = globalRank();
   modal(`<h2>Rangos mentales</h2><p>Sumá puntos en cualquiera de los juegos para subir.</p><div class="list">${GRANKS.map((r, j) => `<div class="li ${j === gr.i ? "mine" : ""}"><span>${j <= gr.i ? r[2] : "🔒"}</span><div><b>${r[1]}</b><small>${r[0].toLocaleString("es-AR")} pts</small></div>${j === gr.i ? "<em>Vos</em>" : j < gr.i ? "<em>✔</em>" : ""}</div>`).join("")}</div><button class="big" data-close>Cerrar</button>`);
 });
+
+// ---------- Ayuda: cómo se juega ----------
+const HELP = {
+  ana: ["🔤 Anagrama", ["Ordená las letras mezcladas y armá la palabra antes de que se acabe el tiempo.", "Tocá las letras en orden. Si te equivocás o se acaba el tiempo perdés una vida ❤.", "10 palabras = subís de nivel.", "Ayudas: 🔀 mezclar, 💡 pista (revela una letra), ⏱ tiempo extra."]],
+  hid: ["🔍 Palabras escondidas", ["Hay más letras que las que necesita la palabra: usá la frase-pista para descubrirla.", "Armala solo con las letras justas. A los 10 s finales se marcan las letras correctas.", "3 vidas ❤ y 10 palabras por nivel."]],
+  adi: ["🕵️ Adivina", ["Elegí una categoría y descubrí la palabra oculta.", "Arrancás con 1 pista; cada error o \"otra pista\" abre una más.", "Cuantas menos pistas uses, más puntos ganás (hasta 100 por palabra).", "Juntá los puntos de la meta del nivel para pasar."]],
+  cri: ["🔐 Frases encriptadas", ["Cada letra se esconde detrás de un número, un objeto o un color, y se repite en toda la frase.", "Tocá un casillero y elegí la letra: se completa en todos los que tienen el mismo símbolo.", "En las citas célebres también tenés que completar al autor.", "💡 regala una letra (−15 pts) y ✔ Revisar marca los errores (−10 pts cada vez). Mirá cuánto vale la frase."]],
+  qv: ["🖼️ ¿Qué ves?", ["Mirá la imagen y completá las letras que faltan de la palabra.", "10 imágenes por nivel, 3 vidas ❤ y tiempo límite.", "Cuanto más subís o más difícil elegís, menos letras de ayuda te damos."]],
+  all: ["❓ Cómo se juega", ["Elegí un juego y una dificultad: cuanto más difícil, más puntos ganás.", "Cada juego tiene sus propios niveles, puntos y monedas.", "La suma de tus puntos sube tu rango global, de Novato a Leyenda.", "Tocá el ❓ dentro de cada juego para ver sus reglas."]]
+};
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-help]"); if (!b) return;
+  let k = b.dataset.help; if (k === "cur") k = CUR;
+  const h = HELP[k] || HELP.all; const paused = typeof G !== "undefined" && G && !G.paused && !$("#game").hidden;
+  if (paused) G.paused = true;
+  modal(`<div class="helpbox"><h2>${h[0]}</h2>${h[1].map((t) => `<p class="hl">• ${t}</p>`).join("")}${k !== "all" ? `<p class="hg">Dificultad</p><p class="hl">Fácil, Medio, Difícil o Experto: cuanto más difícil, menos ayuda y más puntos.</p>` : ""}<button class="big" id="helpOk">¡Entendido!</button></div>`, true);
+  $("#helpOk").onclick = () => { closeModal(); if (paused && G) G.paused = false; };
+});

@@ -169,3 +169,13 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 .gsteps i.done{background:#fff4;opacity:1}.gsteps i.cur{background:#fff;opacity:1;box-shadow:0 0 0 3px #ffd23a;transform:scale(1.12)}
 .gnext{margin:8px 0 0;font-size:13px;text-align:center;position:relative;z-index:1}.gnext b{font-weight:800}
 .li.mine{background:var(--tileb);border-radius:12px}
+
+.tools.three{grid-template-columns:repeat(3,1fr)}
+.crworth{text-align:center;font-size:14px;color:var(--mut);font-weight:600}.crworth b{color:var(--ac);font-size:16px}
+.crtext{display:flex;flex-wrap:wrap;gap:12px 14px;justify-content:center}
+.crauthor{display:flex;flex-wrap:wrap;gap:10px 12px;justify-content:center;align-items:flex-start;margin-top:8px;padding-top:10px;border-top:2px dashed var(--tileb)}
+.crauthor .dash{padding-top:6px}.crorigin{text-align:center;margin-top:8px;color:var(--mut);font-weight:700}
+.crphrase{flex-direction:column;align-items:stretch;gap:0}
+.ib.help{font-weight:900;color:var(--ac)}
+.helpbox h2{margin:0 0 6px}.helpbox .hl{text-align:left;margin:6px 0;font-size:15px;line-height:1.35}.helpbox .hl b{color:var(--ac)}
+.helpbox .hg{margin:10px 0 2px;font-weight:800;text-align:left}

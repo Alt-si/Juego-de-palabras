@@ -16,7 +16,7 @@
 <body data-theme="claro">
 <div id="app">
   <section id="menu" class="screen">
-    <div class="topbar"><span class="coins">🪙 <b id="mCoins">0</b></span><span class="rank" id="mRank"></span><span></span></div>
+    <div class="topbar"><span class="coins">🪙 <b id="mCoins">0</b></span><span class="rank" id="mRank"></span><button class="ib help" data-help="all" aria-label="Cómo se juega">?</button></div>
     <div class="brand"><div class="brain">🧠</div><h1>JUEGOS<br><span>MENTALES</span></h1><p>Entrená tu cabeza, un nivel a la vez</p></div>
     <button class="grank" id="gRank" aria-label="Ver todos los rangos">
       <div class="gtop"><div class="gbadge" id="mBadge">🥚</div><div class="gname"><small>TU RANGO</small><b id="mRankName"></b></div><div class="gpts"><b id="mTotal">0</b><small>puntos</small></div></div>
@@ -34,7 +34,7 @@
   </section>
 
   <section id="adHome" class="screen" hidden>
-    <div class="topbar"><button class="ib" id="adBack" aria-label="Menú de juegos">‹</button><span class="coins">🪙 <b id="adCoins">0</b></span><span class="rank">Adivina</span></div>
+    <div class="topbar"><button class="ib" id="adBack" aria-label="Menú de juegos">‹</button><span class="coins">🪙 <b id="adCoins">0</b></span><span class="rank">Adivina</span><button class="ib help" data-help="adi" aria-label="Cómo se juega">?</button></div>
     <div class="diffs" id="adDiffs"></div>
     <div class="levelcard" id="adLvl"></div>
     <p class="tag">Descubrí la palabra oculta con la menor cantidad de pistas</p>
@@ -43,7 +43,7 @@
   </section>
 
   <section id="adGame" class="screen" hidden>
-    <div class="topbar"><button class="ib" id="adQuit" aria-label="Salir">✕</button><span class="rank" id="adCatName"></span><span class="coins">🪙 <b id="adTotal">0</b></span></div>
+    <div class="topbar"><button class="ib" id="adQuit" aria-label="Salir">✕</button><span class="rank" id="adCatName"></span><span class="coins">🪙 <b id="adTotal">0</b></span><button class="ib help" data-help="adi" aria-label="Cómo se juega">?</button></div>
     <div class="dots" id="adDots"></div>
     <div class="goal" id="adGoal"></div>
     <div class="worth" id="adWorth"></div>
@@ -54,7 +54,7 @@
   </section>
 
   <section id="crHome" class="screen" hidden>
-    <div class="topbar"><button class="ib" id="crBack" aria-label="Menú de juegos">‹</button><span class="coins">🪙 <b id="crCoins">0</b></span><span class="rank" id="crRank"></span></div>
+    <div class="topbar"><button class="ib" id="crBack" aria-label="Menú de juegos">‹</button><span class="coins">🪙 <b id="crCoins">0</b></span><span class="rank" id="crRank"></span><button class="ib help" data-help="cri" aria-label="Cómo se juega">?</button></div>
     <div class="crlogo">🔐<h1>FRASES<br>ENCRIPTADAS</h1></div>
     <p class="tag">Elegí la dificultad y descifrá la frase famosa</p>
     <div class="diffs" id="crDiffs"></div>
@@ -64,17 +64,18 @@
   </section>
 
   <section id="crGame" class="screen" hidden>
-    <div class="topbar"><button class="ib" id="crQuit" aria-label="Salir">✕</button><span class="rank" id="crTitle"></span><span class="coins">🪙 <b id="crTotal">0</b></span></div>
+    <div class="topbar"><button class="ib" id="crQuit" aria-label="Salir">✕</button><span class="rank" id="crTitle"></span><span class="coins">🪙 <b id="crTotal">0</b></span><button class="ib help" data-help="cri" aria-label="Cómo se juega">?</button></div>
     <div class="dots" id="crDots"></div>
     <div class="goal" id="crTag"></div>
+    <div class="crworth" id="crWorth"></div>
     <div class="crphrase" id="crPhrase"></div>
     <div class="crkeys" id="crKeys"></div>
-    <div class="tools" id="crTools"><button id="crHint">💡<small>Letra · 10🪙</small></button><button id="crCheck">✔<small>Revisar</small></button><button id="crAuth">👤<small>Autor</small></button><button id="crSkip">⏭<small>Pasar</small></button></div>
+    <div class="tools three" id="crTools"><button id="crHint">💡<small>Letra · 10🪙</small></button><button id="crCheck">✔<small>Revisar</small></button><button id="crSkip">⏭<small>Pasar</small></button></div>
     <div class="float" id="crFloat" aria-live="polite"></div>
   </section>
 
   <section id="qvHome" class="screen" hidden>
-    <div class="topbar"><button class="ib" id="qvBack" aria-label="Menú de juegos">‹</button><span class="coins">🪙 <b id="qvCoins">0</b></span><span class="rank" id="qvRank"></span></div>
+    <div class="topbar"><button class="ib" id="qvBack" aria-label="Menú de juegos">‹</button><span class="coins">🪙 <b id="qvCoins">0</b></span><span class="rank" id="qvRank"></span><button class="ib help" data-help="qv" aria-label="Cómo se juega">?</button></div>
     <div class="crlogo">🖼️<h1>¿QUÉ VES?</h1></div>
     <p class="tag">Mirá la imagen y completá la palabra</p>
     <div class="diffs" id="qvDiffs"></div>
@@ -84,7 +85,7 @@
   </section>
 
   <section id="qvGame" class="screen" hidden>
-    <div class="topbar"><button class="ib" id="qvQuit" aria-label="Salir">✕</button><span class="lives" id="qvLives"></span><span class="coins">🪙 <b id="qvTotal">0</b></span></div>
+    <div class="topbar"><button class="ib" id="qvQuit" aria-label="Salir">✕</button><span class="lives" id="qvLives"></span><span class="coins">🪙 <b id="qvTotal">0</b></span><button class="ib help" data-help="qv" aria-label="Cómo se juega">?</button></div>
     <div class="dots" id="qvDots"></div>
     <div class="timer"><i id="qvBar"></i><b id="qvTime"></b></div>
     <div class="qvimg" id="qvImg"></div>
@@ -95,7 +96,7 @@
   </section>
 
   <section id="home" class="screen" hidden>
-    <div class="topbar"><button class="ib" id="btnMenu" aria-label="Menú de juegos">‹</button><span class="coins">🪙 <b id="hCoins">0</b></span><span class="rank" id="hRank"></span><button class="ib" id="btnSound" aria-label="Sonido">🔊</button></div>
+    <div class="topbar"><button class="ib" id="btnMenu" aria-label="Menú de juegos">‹</button><span class="coins">🪙 <b id="hCoins">0</b></span><span class="rank" id="hRank"></span><button class="ib" id="btnSound" aria-label="Sonido">🔊</button><button class="ib help" data-help="cur" aria-label="Cómo se juega">?</button></div>
     <div class="logo" id="hLogo" aria-hidden="true"></div>
     <p class="tag" id="hTag"></p>
     <div class="diffs" id="hDiffs"></div>
@@ -109,7 +110,7 @@
   </section>
 
   <section id="game" class="screen" hidden>
-    <div class="topbar"><button class="ib" id="btnHome" aria-label="Salir">✕</button><span class="lives" id="gLives"></span><span class="coins">🪙 <b id="gCoins">0</b></span><button class="ib" id="btnPause" aria-label="Pausa">⏸</button></div>
+    <div class="topbar"><button class="ib" id="btnHome" aria-label="Salir">✕</button><span class="lives" id="gLives"></span><span class="coins">🪙 <b id="gCoins">0</b></span><button class="ib" id="btnPause" aria-label="Pausa">⏸</button><button class="ib help" data-help="cur" aria-label="Cómo se juega">?</button></div>
     <div class="dots" id="gDots"></div>
     <div class="rival" id="gRival" hidden></div>
     <div class="timer"><i id="gBar"></i><b id="gTime"></b></div>
