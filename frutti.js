@@ -1,5 +1,5 @@
 "use strict";
-// Tuti Frutti: duelo por letra y categorías (en vivo o por link). Corrección: existe / bien escrita / repetida con el rival.
+// Tutti Frutti: duelo por letra y categorías (en vivo o por link). Corrección: existe / bien escrita / repetida con el rival.
 const TF_LETTERS = "ABCDEFGHILMNOPRSTV", TF_LIMIT = 120, TF_GRACE = 20, TF_BONUS = 10;
 const TF_BY = Object.fromEntries(TF_CATS.map((c) => [c[0], { id: c[0], name: c[1], icon: c[2], words: c[3].split(",") }]));
 let TF = null, TFT = 0;
@@ -81,7 +81,7 @@ document.addEventListener("click", (e) => {
 
 // ---------- Partida (varias rondas que se acumulan) ----------
 function tfCountdown(seed, cats, rounds, msg) {
-  let n = 3; modal(`<h2>${msg || "⚔ " + oppName()}</h2><p>Tuti Frutti · ${cats.length} categorías · ${rounds} partidas</p><p class="big2" id="cd">${n}</p>`, true);
+  let n = 3; modal(`<h2>${msg || "⚔ " + oppName()}</h2><p>Tutti Frutti · ${cats.length} categorías · ${rounds} partidas</p><p class="big2" id="cd">${n}</p>`, true);
   const iv = setInterval(() => { n--; if (!LIVE) return clearInterval(iv); if (n <= 0) { clearInterval(iv); tfStart(seed, cats, rounds, null, true); } else $("#cd").textContent = n; }, 1000);
 }
 function tfStart(seed, cats, rounds, from, live) {
@@ -203,7 +203,7 @@ function tfFinal() {
   const btns = live ? (left ? "" : '<button class="big" id="tfRe">🔁 Revancha</button>') : `<button class="big" id="tfShare">📤 ${TF.from ? "Desafiar de vuelta" : "Invitar a un amigo"}</button><button class="mini wide" id="tfCopy">Copiar link</button>`;
   modal(`<div class="tfres"><h2>${head}</h2>${vs}${w > 0 ? `<p class="big2">+${TF.rounds * 10} 🪙</p>` : ""}${left ? "<p>Tu rival abandonó el duelo.</p>" : ""}${!hasOpp ? "<p>Mandá el desafío: tu amigo juega las mismas letras y gana quien acumule más puntos.</p>" : ""}<div class="tfscroll"><table class="tft"><tr><th>#</th><th>Letra</th><th>Vos</th>${hasOpp ? `<th>${oname}</th>` : ""}</tr>${rows}</table></div>${btns}<button class="link" id="tfHomeBtn">Inicio</button></div>`, true);
   if (live) { const re = $("#tfRe"); if (re) re.onclick = () => { if (LIVE.role === "host") sendStart(); else { Net.send({ t: "rematch" }); re.textContent = "Pedido enviado…"; re.disabled = true; } }; return; }
-  const url = tfLink(), text = TF.from ? `¡Te devuelvo el desafío en Tuti Frutti (${TF.rounds} partidas)! Hice ${TF.tot} puntos.` : `${SV.name} te desafía en Tuti Frutti (${TF.rounds} partidas): hizo ${TF.tot} puntos. ¿Podés superarlo?`;
+  const url = tfLink(), text = TF.from ? `¡Te devuelvo el desafío en Tutti Frutti (${TF.rounds} partidas)! Hice ${TF.tot} puntos.` : `${SV.name} te desafía en Tutti Frutti (${TF.rounds} partidas): hizo ${TF.tot} puntos. ¿Podés superarlo?`;
   $("#tfShare").onclick = () => { if (navigator.share) navigator.share({ title: "Juegos mentales", text, url }).catch(() => {}); else window.open("https://wa.me/?text=" + encodeURIComponent(text + "\n" + url), "_blank"); };
   $("#tfCopy").onclick = () => (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(() => toast("Link copiado"), () => prompt("Copiá el link:", url));
 }
@@ -214,7 +214,7 @@ function tfInvite() {
   let name = "Un amigo", rs = []; try { name = decodeURIComponent(m[4]).slice(0, 16) || name; rs = decodeURIComponent(m[5]).split("^").map((x) => { const [t, a] = x.split(";"); const raw = (a || "").split("|").slice(0, cats.length); return { time: Math.min(TF_LIMIT, +t || TF_LIMIT), ans: raw.map((y) => y.replace(/^\+/, "").slice(0, 30)), ok: raw.map((y, i) => (y[0] === "+" ? i : -1)).filter((i) => i >= 0) }; }); } catch {}
   if (rs.length !== rounds) { modal("<h2>Desafío incompleto</h2><p>El link está cortado. Pedile que lo mande de nuevo.</p><button class=\"big\" data-close>Entendido</button>"); return true; }
   const from = { name, rounds: rs };
-  modal(`<h2>⚔ ¡${esc(name)} te desafió!</h2><p><b>Tuti Frutti</b> · ${rounds} partidas · ${cats.length} categorías. Jugás las mismas letras: gana quien acumule más puntos.</p><button class="big" id="tfAccept">Aceptar el desafío</button><button class="link" data-close>Ahora no</button>`, true);
+  modal(`<h2>⚔ ¡${esc(name)} te desafió!</h2><p><b>Tutti Frutti</b> · ${rounds} partidas · ${cats.length} categorías. Jugás las mismas letras: gana quien acumule más puntos.</p><button class="big" id="tfAccept">Aceptar el desafío</button><button class="link" data-close>Ahora no</button>`, true);
   $("#tfAccept").onclick = () => askName(() => tfStart(+m[1], cats, rounds, from, false));
   return true;
 }

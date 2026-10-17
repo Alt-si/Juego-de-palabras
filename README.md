@@ -25,10 +25,10 @@ Publicar: Settings → Pages → Branch `main` / root.
 
 **Ilustraciones propias:** las imágenes de ¿Qué ves? son dibujos originales (SVG hechos con formas simples, en `iconos-*.js`), sin derechos de terceros. Dificultad: Experto da 3× los puntos, tiempo ×0,45, palabras mucho más largas, una vida menos, pistas a 40 monedas y (en Adivina) solo 6 pistas.
 
-## Duelos y Tuti Frutti
+## Duelos y Tutti Frutti
 - **Duelos en todos los juegos**: Adivina (5 palabras), Frases encriptadas (3 frases) y ¿Qué ves? (10 imágenes) tienen "Duelo en vivo" y "Desafío por link" (`duelos.js`).
-- **Tuti Frutti** (`frutti.js`, `frutti-data.js`, `frutti-data2.js`): solo duelos de 5, 10, 15 o 20 partidas (cada una con su letra) y los puntos se acumulan: gana quien más suma. Bien escrita 10, repetida con el rival 5, mal escrita 5, no existe 0, más 10 de bonus para quien termina todo en menos tiempo. Acepta plurales.
+- **Tutti Frutti** (`frutti.js`, `frutti-data.js`, `frutti-data2.js`): solo duelos de 5, 10, 15 o 20 partidas (cada una con su letra) y los puntos se acumulan: gana quien más suma. Bien escrita 10, repetida con el rival 5, mal escrita 5, no existe 0, más 10 de bonus para quien termina todo en menos tiempo. Acepta plurales.
 - La validación usa listas de palabras por categoría (`frutti-data.js`): una palabra real que no esté en la lista cuenta como "no existe". Se pueden ampliar agregando palabras.
 - Pruebas: `python3 tests/smoke.py` y `python3 tests/duelos.py`.
 - **Series acumuladas** (`serie.js`): en todos los juegos se elige cuántos duelos dura la partida (1, 3, 5 o 10). Los puntos de cada duelo se suman y gana quien más acumula. En vivo se sincroniza "Siguiente duelo"; por link el desafío (`#s=`) lleva el puntaje de cada duelo.
-- **Verificación en Tuti Frutti**: la app no puede consultar la RAE sola (no tiene API pública). En la corrección, cada palabra marcada "no existe" o "mal escrita" trae un botón "Ver en la RAE" y "Es válida": si la palabra está en la RAE, el jugador la acepta y suma 10 (en vivo el rival lo ve).
+- **Verificación en Tutti Frutti**: la app no puede consultar la RAE sola (no tiene API pública). En la corrección, cada palabra marcada "no existe" o "mal escrita" trae un botón "Ver en la RAE" y "Es válida": si la palabra está en la RAE, el jugador la acepta y suma 10 (en vivo el rival lo ve).

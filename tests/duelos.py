@@ -1,4 +1,4 @@
-"""Pruebas de Tuti Frutti y de los duelos de Adivina / Frases / ¿Qué ves? (PeerJS simulado)."""
+"""Pruebas de Tutti Frutti y de los duelos de Adivina / Frases / ¿Qué ves? (PeerJS simulado)."""
 import os, subprocess, sys, time
 from playwright.sync_api import sync_playwright
 
@@ -16,17 +16,17 @@ try:
         pg = np(b.new_context(viewport=V)); pg.goto(URL); pg.wait_for_timeout(300)
         # corrector de Adivina
         check(pg.evaluate("spellOk('elefnate','elefante') && !spellOk('gato','pato')"), "corrector: acepta errores de tipeo")
-        # puntaje de Tuti Frutti
+        # puntaje de Tutti Frutti
         r = pg.evaluate("""(()=>{
           const L='A', cats=['anim','colo','fruta'];
           const me={ans:['Aguila','Azul','Anana'],time:30}, op={ans:['aguila','Amarilo','Arbol'],time:50};
           const s=tfScore(cats,L,me,op); return {rows:s.rows.map(r=>[r.a.st,r.pts,r.rep,r.opts,r.b.st]),total:s.total,opp:s.totalOpp,bonus:s.bonus};})()""")
-        check(r["rows"][0][2] and r["rows"][0][1] == 5 and r["rows"][0][3] == 5, "Tuti: palabra repetida con el rival suma 5 a cada uno")
-        check(r["rows"][1][0] == "ok" and r["rows"][1][1] == 10 and r["rows"][1][4] == "mal" and r["rows"][1][3] == 5, "Tuti: bien escrita 10, mal escrita 5")
-        check(r["rows"][2][4] == "no" and r["rows"][2][3] == 0, "Tuti: palabra inexistente 0")
-        check(r["rows"][2][0] == "ok" and r["bonus"] == 10 and r["total"] == 5 + 10 + 10 + 10, "Tuti: bonus por menor tiempo")
-        check(pg.evaluate("tfCheck('anim','Zorro','A').st") == "letra", "Tuti: debe empezar con la letra")
-        check(pg.evaluate("tfCheck('cuer','Pene','P').st") == "ok" and pg.evaluate("tfCheck('cielo','Planetas','P').st") == "ok" and pg.evaluate("tfCheck('cielo','planeta','P').st") == "ok", "Tuti: pene, planeta y planetas son válidas (plurales incluidos)")
+        check(r["rows"][0][2] and r["rows"][0][1] == 5 and r["rows"][0][3] == 5, "Tutti: palabra repetida con el rival suma 5 a cada uno")
+        check(r["rows"][1][0] == "ok" and r["rows"][1][1] == 10 and r["rows"][1][4] == "mal" and r["rows"][1][3] == 5, "Tutti: bien escrita 10, mal escrita 5")
+        check(r["rows"][2][4] == "no" and r["rows"][2][3] == 0, "Tutti: palabra inexistente 0")
+        check(r["rows"][2][0] == "ok" and r["bonus"] == 10 and r["total"] == 5 + 10 + 10 + 10, "Tutti: bonus por menor tiempo")
+        check(pg.evaluate("tfCheck('anim','Zorro','A').st") == "letra", "Tutti: debe empezar con la letra")
+        check(pg.evaluate("tfCheck('cuer','Pene','P').st") == "ok" and pg.evaluate("tfCheck('cielo','Planetas','P').st") == "ok" and pg.evaluate("tfCheck('cielo','planeta','P').st") == "ok", "Tutti: pene, planeta y planetas son válidas (plurales incluidos)")
         FIND = "(L)=>TF.cats.map(id=>{const m=tfIndex(id);for(const [k,w] of m) if(k[0]===L.toLowerCase()) return w;return '';})"
         def ronda(pg, texto=None):
             L = pg.evaluate("TF.letter"); words = pg.evaluate(FIND, L)
@@ -38,50 +38,50 @@ try:
         # duelo por link (5 partidas acumuladas)
         a = np(b.new_context(viewport=V)); a.goto(URL); a.evaluate("SV.name='Ana';SV.tfCats=['anim','colo','fruta'];save()")
         a.click('[data-game="tf"]'); a.wait_for_timeout(200)
-        check(a.is_visible("#tfHome") and a.locator("#tfCats .chip").count() >= 20 and a.locator("#tfRounds .chip").count() == 4, "Tuti: elegir categorías y cantidad de partidas")
+        check(a.is_visible("#tfHome") and a.locator("#tfCats .chip").count() >= 20 and a.locator("#tfRounds .chip").count() == 4, "Tutti: elegir categorías y cantidad de partidas")
         a.click('[data-tfr="10"]'); a.click('[data-tfr="5"]')
         a.click('[data-tf="link"]'); a.wait_for_timeout(300)
-        check(a.locator("#tfRows input").count() == 3, "Tuti: una casilla por categoría")
+        check(a.locator("#tfRows input").count() == 3, "Tutti: una casilla por categoría")
         allw = []; letters = []
         for r in range(5):
-            letters.append(a.evaluate("TF.letter")); allw.append(ronda(a)); check("Partida %d de 5" % (r + 1) in a.inner_text("#box"), f"Tuti: resultado de la partida {r+1}")
+            letters.append(a.evaluate("TF.letter")); allw.append(ronda(a)); check("Partida %d de 5" % (r + 1) in a.inner_text("#box"), f"Tutti: resultado de la partida {r+1}")
             siguiente(a); a.wait_for_timeout(300)
-        check(len(set(letters)) == 5, "Tuti: cada partida tiene otra letra")
-        check("Invitar a un amigo" in a.inner_text("#box") and a.evaluate("TF.tot") > 0, "Tuti: el que desafía ve el total acumulado y el link")
+        check(len(set(letters)) == 5, "Tutti: cada partida tiene otra letra")
+        check("Invitar a un amigo" in a.inner_text("#box") and a.evaluate("TF.tot") > 0, "Tutti: el que desafía ve el total acumulado y el link")
         link = a.evaluate("tfLink()")
         c = np(b.new_context(viewport=V)); c.goto(link); c.wait_for_timeout(400)
-        check("te desafió" in c.inner_text("#box") and "5 partidas" in c.inner_text("#box"), "Tuti: link de desafío")
+        check("te desafió" in c.inner_text("#box") and "5 partidas" in c.inner_text("#box"), "Tutti: link de desafío")
         c.click("#tfAccept"); c.fill("#nameIn", "Beto"); c.click("#nameOk"); c.wait_for_timeout(300)
         for r in range(5):
-            check(c.evaluate("TF.letter") == letters[r], f"Tuti: misma letra en la partida {r+1}")
+            check(c.evaluate("TF.letter") == letters[r], f"Tutti: misma letra en la partida {r+1}")
             ronda(c); siguiente(c); c.wait_for_timeout(300)
-        check("vs" in c.inner_text("#box") and c.evaluate("TF.log.length") == 5 and "Desafiar de vuelta" in c.inner_text("#box"), "Tuti: resultado final acumulado contra el desafiante")
+        check("vs" in c.inner_text("#box") and c.evaluate("TF.log.length") == 5 and "Desafiar de vuelta" in c.inner_text("#box"), "Tutti: resultado final acumulado contra el desafiante")
         # en vivo
         ctx = b.new_context(viewport=V); ctx.add_init_script(path=os.path.join(HERE, "peer-shim.js"))
         h = np(ctx); g = np(ctx); h.goto(URL); g.goto(URL); h.wait_for_timeout(300)
         h.evaluate("SV.name='Ana';SV.tfCats=['anim','colo','fruta'];SV.tfRounds=5;save()"); h.click('[data-game="tf"]'); h.click('[data-tf="live"]'); h.wait_for_timeout(600)
         code = h.evaluate("LIVE.code"); g.goto(URL + f"#r={code}.tf"); g.wait_for_timeout(400)
         g.evaluate("SV.name='Beto';save()"); g.click("#liveEnter"); h.wait_for_timeout(5000)
-        check(h.evaluate("!!TF && TF.live") and g.evaluate("!!TF && TF.live") and h.evaluate("TF.letter") == g.evaluate("TF.letter") and g.evaluate("TF.cats.length") == 3 and g.evaluate("TF.rounds") == 5, "Tuti en vivo: arrancan con la misma letra, categorías y partidas")
+        check(h.evaluate("!!TF && TF.live") and g.evaluate("!!TF && TF.live") and h.evaluate("TF.letter") == g.evaluate("TF.letter") and g.evaluate("TF.cats.length") == 3 and g.evaluate("TF.rounds") == 5, "Tutti en vivo: arrancan con la misma letra, categorías y partidas")
         for r in range(5):
             L = h.evaluate("TF.letter"); wl = h.evaluate(FIND, L)
             h.fill('[data-tfi="0"]', wl[0]); g.wait_for_timeout(300)
-            if r == 0: check("1/3" in g.inner_text("#tfRival"), "Tuti en vivo: se ve el avance del rival")
+            if r == 0: check("1/3" in g.inner_text("#tfRival"), "Tutti en vivo: se ve el avance del rival")
             for i, w in enumerate(wl): h.fill(f'[data-tfi="{i}"]', w)
             h.evaluate("tfBastaClick()"); g.wait_for_timeout(400)
-            if r == 0: check(g.evaluate("TF.endAt") > 0 and "Esperando" in h.inner_text("#box"), "Tuti en vivo: el otro tiene tiempo límite al terminar el primero")
+            if r == 0: check(g.evaluate("TF.endAt") > 0 and "Esperando" in h.inner_text("#box"), "Tutti en vivo: el otro tiene tiempo límite al terminar el primero")
             g.fill('[data-tfi="0"]', "xxxx"); g.evaluate("tfBastaClick()"); g.wait_for_timeout(500)
-            check("vs" in h.inner_text("#box") and "vs" in g.inner_text("#box"), f"Tuti en vivo: resultado de la partida {r+1}")
+            check("vs" in h.inner_text("#box") and "vs" in g.inner_text("#box"), f"Tutti en vivo: resultado de la partida {r+1}")
             h.evaluate("(document.getElementById('tfNext')||document.getElementById('tfFinalBtn')).click()"); g.evaluate("(document.getElementById('tfNext')||document.getElementById('tfFinalBtn')).click()")
             if r < 4: h.wait_for_timeout(4500)
         h.wait_for_timeout(600)
-        check("Ganaste el duelo" in h.inner_text("#box") and "Perdiste el duelo" in g.inner_text("#box"), "Tuti en vivo: gana quien acumula más en las 5 partidas")
+        check("Ganaste el duelo" in h.inner_text("#box") and "Perdiste el duelo" in g.inner_text("#box"), "Tutti en vivo: gana quien acumula más en las 5 partidas")
         # validar una palabra con la RAE (el jugador la acepta)
         t2 = np(b.new_context(viewport=V)); t2.goto(URL); t2.evaluate("SV.name='Ana';SV.tfCats=['anim','colo','fruta'];save()"); t2.click('[data-game="tf"]'); t2.click('[data-tf="link"]'); t2.wait_for_timeout(300)
         L2 = t2.evaluate("TF.letter"); t2.fill('[data-tfi="0"]', L2 + "qzqzq"); t2.evaluate("tfBastaClick()"); t2.wait_for_timeout(400)
-        check("No existe" in t2.inner_text("#box") and "Ver en la RAE" in t2.inner_text("#box") and t2.evaluate("TF.tot") == 0, "Tuti: palabra desconocida ofrece verificar en la RAE")
+        check("No existe" in t2.inner_text("#box") and "Ver en la RAE" in t2.inner_text("#box") and t2.evaluate("TF.tot") == 0, "Tutti: palabra desconocida ofrece verificar en la RAE")
         t2.click('[data-tfok="a:0"]'); t2.wait_for_timeout(200)
-        check("Aceptada" in t2.inner_text("#box") and t2.evaluate("TF.tot") == 10, "Tuti: palabra validada suma 10")
+        check("Aceptada" in t2.inner_text("#box") and t2.evaluate("TF.tot") == 10, "Tutti: palabra validada suma 10")
         # series acumuladas por link (Adivina, 3 duelos)
         s1 = np(b.new_context(viewport=V)); s1.goto(URL); s1.evaluate("SV.name='Ana';SV.srRounds=3;save()"); s1.click('[data-game="adi"]'); s1.wait_for_timeout(200)
         check(s1.locator("#adHome .srsel .chip").count() == 4, "series: selector de cantidad de duelos")
