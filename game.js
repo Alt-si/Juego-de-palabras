@@ -38,11 +38,11 @@ function difBar(el, k) {
   el.onclick = (e) => { const b = e.target.closest("[data-dg]"); if (b) { SV.dif[k] = b.dataset.dg; save(); difBar(el, k); } };
 }
 let CUR = "ana"; // juego elegido en el menú: "ana" (Anagrama) o "hid" (Palabras escondidas)
-const GRANKS = [[0, "Novato"], [300, "Aprendiz"], [1000, "Curioso"], [2500, "Ingenioso"], [5000, "Astuto"], [9000, "Erudito"], [15000, "Genio"], [25000, "Maestro mental"], [40000, "Leyenda"]];
+const GRANKS = [[0, "Novato", "🥚"], [300, "Aprendiz", "🌱"], [1000, "Curioso", "🔎"], [2500, "Ingenioso", "💡"], [5000, "Astuto", "🦊"], [9000, "Erudito", "📚"], [15000, "Genio", "🧠"], [25000, "Maestro mental", "👑"], [40000, "Leyenda", "🏆"]];
 function addPts(k, n) { SV.pts = SV.pts || { ana: 0, hid: 0, adi: 0, cri: 0 }; SV.pts[k] = (SV.pts[k] || 0) + n; SV.wal[k] = (SV.wal[k] || 0) + n; }
 const ptsOf = (k) => (SV.pts && SV.pts[k]) || 0;
 const totalPts = () => ptsOf("ana") + ptsOf("hid") + ptsOf("adi") + ptsOf("cri") + ptsOf("qv");
-function globalRank() { const t = totalPts(); let i = 0; GRANKS.forEach((r, j) => { if (t >= r[0]) i = j; }); const n = GRANKS[i + 1]; return { name: GRANKS[i][1], i, next: n ? n[0] : null, nextName: n ? n[1] : null, from: GRANKS[i][0], total: t }; }
+function globalRank() { const t = totalPts(); let i = 0; GRANKS.forEach((r, j) => { if (t >= r[0]) i = j; }); const n = GRANKS[i + 1]; return { name: GRANKS[i][1], icon: GRANKS[i][2], nextIcon: n ? n[2] : "", i, next: n ? n[0] : null, nextName: n ? n[1] : null, from: GRANKS[i][0], total: t }; }
 const KSk = (k) => (k === "hid" ? { lv: "lvH", st: "starsH" } : { lv: "level", st: "stars" });
 const KS = () => KSk(CUR);
 const curLevel = () => SV[KS().lv];
@@ -430,10 +430,14 @@ function showMenu() {
   $("#adHome").hidden = true; $("#adGame").hidden = true; adOn = false; $("#crHome").hidden = true; $("#crGame").hidden = true; $("#qvHome").hidden = true; $("#qvGame").hidden = true;
   $("#home").hidden = true; $("#game").hidden = true; $("#menu").hidden = false;
   $("#mCoins").textContent = walletTotal(); applyTheme();
-  const gr = globalRank(); $("#mRank").textContent = gr.name;
-  $("#mTotal").textContent = gr.total.toLocaleString("es-AR") + " pts";
-  $("#mBar").style.width = (gr.next ? Math.min(100, ((gr.total - gr.from) / (gr.next - gr.from)) * 100) : 100) + "%";
-  $("#mNext").textContent = gr.next ? `Próximo rango: ${gr.nextName} (${(gr.next - gr.total).toLocaleString("es-AR")} pts)` : "¡Rango máximo!";
+  const gr = globalRank(); const fmt = (n) => n.toLocaleString("es-AR");
+  $("#mRank").textContent = `Rango ${gr.i + 1}/${GRANKS.length}`;
+  $("#mBadge").textContent = gr.icon; $("#mRankName").textContent = gr.name; $("#mTotal").textContent = fmt(gr.total);
+  const pct = gr.next ? Math.min(100, ((gr.total - gr.from) / (gr.next - gr.from)) * 100) : 100;
+  $("#mBar").style.width = Math.max(4, pct) + "%";
+  $("#mFrom").textContent = fmt(gr.from); $("#mTo").textContent = gr.next ? fmt(gr.next) + " pts" : "MÁX";
+  $("#mNext").innerHTML = gr.next ? `Te faltan <b>${fmt(gr.next - gr.total)} pts</b> para ser <b>${gr.nextIcon} ${gr.nextName}</b>` : "¡Llegaste al rango más alto! 🎉";
+  $("#mSteps").innerHTML = GRANKS.map((r, j) => `<i class="${j < gr.i ? "done" : j === gr.i ? "cur" : ""}" title="${r[1]}">${j <= gr.i ? r[2] : "🔒"}</i>`).join("");
   $("#mPtsAna").textContent = ptsOf("ana") + " pts"; $("#mPtsHid").textContent = ptsOf("hid") + " pts"; $("#mPtsAdi").textContent = ptsOf("adi") + " pts"; $("#mPtsCri").textContent = ptsOf("cri") + " pts"; if (typeof crMenu === "function") crMenu(); if (typeof qvMenu === "function") qvMenu(); document.querySelectorAll("#menu [data-game]").forEach((c) => { const k = c.dataset.game; if (k !== "cri" && k !== "qv") c.querySelectorAll("[data-diff]").forEach((x) => x.classList.toggle("on", x.dataset.diff === SV.dif[k])); });
   $("#mLvAna").textContent = `Nivel ${SV.level}`; $("#mLvHid").textContent = `Nivel ${SV.lvH}`; $("#mLvAdi").textContent = `Nivel ${SV.adLevel}`;
 }
@@ -653,3 +657,10 @@ function adEnd() {
 }
 
 viewLevel = SV.level; showMenu(); checkInvite();
+
+// Detalle de rangos
+document.addEventListener("click", (e) => {
+  if (!e.target.closest("#gRank")) return;
+  const gr = globalRank();
+  modal(`<h2>Rangos mentales</h2><p>Sumá puntos en cualquiera de los juegos para subir.</p><div class="list">${GRANKS.map((r, j) => `<div class="li ${j === gr.i ? "mine" : ""}"><span>${j <= gr.i ? r[2] : "🔒"}</span><div><b>${r[1]}</b><small>${r[0].toLocaleString("es-AR")} pts</small></div>${j === gr.i ? "<em>Vos</em>" : j < gr.i ? "<em>✔</em>" : ""}</div>`).join("")}</div><button class="big" data-close>Cerrar</button>`);
+});
