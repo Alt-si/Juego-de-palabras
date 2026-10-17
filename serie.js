@@ -57,7 +57,7 @@ function srFinal() {
   const re = $("#srRe"); if (re) re.onclick = () => { if (LIVE.role === "host") sendStart(); else { Net.send({ t: "rematch" }); re.textContent = "Pedido enviado…"; re.disabled = true; } };
   if (!SR.live) {
     const url = srLink(), text = SR.from ? `¡Te devuelvo el desafío en ${NAMES[kind]} (${SR.rounds} duelos)! Hice ${SR.tot} puntos.` : `${SV.name} te desafía en ${NAMES[kind]} (${SR.rounds} duelos acumulados): hizo ${SR.tot} puntos. ¿Podés superarlo?`;
-    $("#srShare").onclick = () => { if (navigator.share) navigator.share({ title: "Juegos mentales", text, url }).catch(() => {}); else window.open("https://wa.me/?text=" + encodeURIComponent(text + "\n" + url), "_blank"); };
+    $("#srShare").onclick = () => { if (navigator.share) navigator.share({ title: "Juegos mentales", text: text + INV, url }).catch(() => {}); else window.open("https://wa.me/?text=" + encodeURIComponent(text + "\n" + url + INV), "_blank"); };
     $("#srCopy").onclick = () => (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(() => toast("Link copiado"), () => prompt("Copiá el link:", url));
   }
 }

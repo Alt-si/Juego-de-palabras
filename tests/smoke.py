@@ -31,7 +31,7 @@ try:
 
         # --- menú + Anagrama ---
         pg = newpage(b.new_context(viewport=V)); pg.goto(URL); pg.wait_for_timeout(400)
-        check(pg.title() == "Anagrama", "título Anagrama")
+        check(pg.title() == "Juegos mentales", "título Juegos mentales")
         check(pg.is_visible("#menu") and pg.is_visible('[data-game="hid"]'), "menú con los dos juegos")
         pg.click('[data-game="ana"]')
         check(pg.evaluate("document.body.classList.contains('scened')"), "Anagrama: hay fondo ilustrado por nivel")

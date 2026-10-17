@@ -402,8 +402,8 @@ const duelLink = (seed, score, kind) => `${location.origin}${location.pathname}#
 function shareDuel(seed, score, text) {
   const url = duelLink(seed, score, G && G.duel && G.duel.kind);
   const msg = `${text}\n${url}`;
-  if (navigator.share) navigator.share({ title: "Anagrama", text, url }).catch(() => {});
-  else window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
+  if (navigator.share) navigator.share({ title: "Anagrama", text: text + INV, url }).catch(() => {});
+  else window.open("https://wa.me/?text=" + encodeURIComponent(msg + INV), "_blank");
 }
 function copyLink(seed, score) { const url = duelLink(seed, score, G && G.duel && G.duel.kind); (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(() => toast("Link copiado"), () => prompt("Copiá el link:", url)); }
 function duelDone() {
@@ -542,7 +542,7 @@ function hostTry() { LIVE.code = newCode(); Net.host(LIVE.code, handlers("host")
 function showLobby() {
   const url = liveLink(LIVE.code, LIVE.kind);
   modal(`<h2>⚔ Duelo en vivo</h2><p>Mandale este link a tu rival. Cuando entre, empieza solo.</p><div class="code">${LIVE.code}</div><button class="big" id="lvShare">📤 Invitar</button><button class="mini wide" id="lvCopy">Copiar link</button><p>Esperá en esta pantalla hasta que se conecte.</p><button class="link" id="lvCancel">Cancelar</button>`, true);
-  $("#lvShare").onclick = () => { const text = `${SV.name} te invita a un duelo en vivo de ${NAMES[LIVE.kind]}. ¡Entrá!`; if (navigator.share) navigator.share({ title: "Anagrama", text, url }).catch(() => {}); else window.open("https://wa.me/?text=" + encodeURIComponent(text + "\n" + url), "_blank"); };
+  $("#lvShare").onclick = () => { const text = `${SV.name} te invita a un duelo en vivo de ${NAMES[LIVE.kind]}. ¡Entrá!`; if (navigator.share) navigator.share({ title: "Anagrama", text: text + INV, url }).catch(() => {}); else window.open("https://wa.me/?text=" + encodeURIComponent(text + "\n" + url + INV), "_blank"); };
   $("#lvCopy").onclick = () => (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(() => toast("Link copiado"), () => prompt("Copiá el link:", url));
   $("#lvCancel").onclick = () => { liveReset(); closeModal(); };
 }

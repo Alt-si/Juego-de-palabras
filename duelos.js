@@ -68,7 +68,7 @@ function dxResult() {
   else { dxPay(0); head = "⚔ ¡Listo!"; body = `<div class="vs"><div><small>Tu puntaje</small><b>${me}</b></div></div><p>Mandale el desafío a un amigo: juega lo mismo y vemos quién gana.</p>`; }
   modal(`<h2>${head}</h2>${body}<button class="big" id="dxShare">📤 ${f ? "Desafiar de vuelta" : "Invitar a un amigo"}</button><button class="mini wide" id="dxCopy">Copiar link</button><button class="link" id="dxHome">Inicio</button>`, true);
   const url = dxLink(me), text = f ? `¡Te devuelvo el desafío en ${NAMES[D.kind]}! Hice ${me} puntos, superalos.` : `${SV.name} te desafía en ${NAMES[D.kind]}: hizo ${me} puntos. ¿Podés superarlo?`;
-  $("#dxShare").onclick = () => { if (navigator.share) navigator.share({ title: "Juegos mentales", text, url }).catch(() => {}); else window.open("https://wa.me/?text=" + encodeURIComponent(text + "\n" + url), "_blank"); };
+  $("#dxShare").onclick = () => { if (navigator.share) navigator.share({ title: "Juegos mentales", text: text + INV, url }).catch(() => {}); else window.open("https://wa.me/?text=" + encodeURIComponent(text + "\n" + url + INV), "_blank"); };
   $("#dxCopy").onclick = () => (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(() => toast("Link copiado"), () => prompt("Copiá el link:", url));
 }
 function dxPay(w) { if (D.paid) return; D.paid = true; SV.duels++; if (w > 0) { SV.duelWins++; SV.wal[D.kind] = (SV.wal[D.kind] || 0) + 50; duelRank(D.kind, D.pts); } save(); checkAch(); beep(SND.win); }

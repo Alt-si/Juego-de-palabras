@@ -241,3 +241,6 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 #adMic{padding:0 12px}
 .mic.on{background:#e11d48;color:#fff;animation:micp 1s infinite}
 @keyframes micp{0%,100%{box-shadow:0 0 0 0 #e11d4866}50%{box-shadow:0 0 0 10px #e11d4800}}
+/* Aviso de instalación */
+.instbar{position:fixed;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:60;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:#1e1b4b;color:#fff;font-size:.85rem;box-shadow:0 6px 20px #0006;max-width:500px;margin:0 auto}
+.instbar span{flex:1}.instbar a{background:#fbbf24;color:#1e1b4b;font-weight:800;padding:8px 12px;border-radius:10px;text-decoration:none}.instbar button{background:none;border:0;color:#fff;font-size:1.1rem}

@@ -52,3 +52,10 @@ Sin registro, sin anuncios y sin conexión (salvo duelos y voz).
 
 ## 7. Prueba cerrada → producción
 Subir el .aab a «Pruebas cerradas», agregar los 12 testers, esperar 14 días, solicitar acceso a producción.
+
+## 8. Duelos entre Android e iPhone
+- Los links de desafío (`#d=`, `#s=`, `#t=`, `#r=`) funcionan en cualquier navegador; no hace falta instalar nada.
+- **Android con la app instalada**: el link se abre directo en la app (requiere el assetlinks.json del paso 2).
+- **Android sin la app**: se abre en Chrome y, cuando la app esté publicada, muestra un aviso con botón a Google Play → en `instalar.js` poner `PLAY_LIVE = true` (y confirmar `PLAY_ID` con el Package ID real).
+- **iPhone/iPad**: se juega en Safari; aparece un aviso para «Agregar a pantalla de inicio». Importante: Safari puede borrar los datos de sitios web no instalados tras ~7 días sin uso, por eso se recomienda agregarla al inicio.
+- Todo mensaje de invitación termina con: «Android: bajá la app en Google Play · iPhone: abrí el link en Safari».
