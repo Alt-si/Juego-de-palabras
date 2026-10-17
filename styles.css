@@ -210,3 +210,22 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 .tfsum{text-align:center;font-weight:700;font-size:13px;margin:4px 0}.tfacc{margin:2px 0}.tft{width:100%;border-collapse:collapse;font-size:14px}.tft th,.tft td{padding:4px;border-bottom:1px solid #0002;text-align:center}
 .srsel{margin:8px 0;text-align:center}.srsel small{display:block;font-weight:700;margin-bottom:4px}.srsel div{display:flex;gap:6px;justify-content:center}.srsel .chip{border:1px solid #0003;background:var(--panel);color:inherit;border-radius:99px;padding:6px 14px;font-size:14px;cursor:pointer}.srsel .chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}
 .tfv{display:flex;gap:6px;align-items:center;margin-top:3px;flex-wrap:wrap}.tfv a{font-size:11px;color:var(--ac)}.tfv .mini{padding:2px 8px;font-size:11px}
+/* ---- Adaptación a distintas pantallas ---- */
+.screen{min-height:100vh;min-height:100dvh}
+.box{max-height:88vh;max-height:88dvh}
+.coins,.lives{white-space:nowrap}
+@media(max-width:360px){
+  .topbar{gap:4px}.ib{width:36px;height:36px;font-size:16px}.coins{padding:5px 9px}.rank{font-size:12px}.lives{font-size:14px}
+  .big{font-size:18px;padding:14px}.levelcard b{font-size:44px}.qvimg svg{width:110px;height:110px}
+  .crkeys{gap:4px}.crkeys button{padding:8px 0;font-size:15px}.tools button{padding:8px 2px;font-size:20px}
+}
+@media(min-width:700px){
+  #app{max-width:640px}.tile{width:52px;height:60px;font-size:28px}.qvimg svg{width:170px;height:170px}.crkeys button{padding:12px 0;font-size:18px}.tools button{padding:14px 4px}
+}
+@media(min-width:1000px){#app{max-width:720px}}
+@media(max-height:520px){
+  .screen{gap:6px;padding:6px 0 10px;min-height:0}.ib{width:34px;height:34px}.big{padding:9px;font-size:17px}
+  .tile{width:38px;height:44px;font-size:20px}.slots,.pool{gap:5px}#game .pool{min-height:0}
+  .qvimg{padding:6px 0}.qvimg svg{width:84px;height:84px}.crkeys button{padding:6px 0}.tools button{padding:6px 2px;font-size:18px}
+  .levelcard b{font-size:36px}.tfl{font-size:36px;padding:2px 12px}.tfrow input{padding:6px 10px;font-size:16px}.crphrase{padding:8px 6px}.timer{height:20px}
+}
