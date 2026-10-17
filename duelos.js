@@ -5,6 +5,7 @@ let D = null; // duelo en curso: { kind, seed, live, from, total, pts, over, pai
 const dxSeedPick = (arr, seed, n) => { const r = mulberry(seed), a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a.slice(0, n); };
 
 function dxBegin(kind, seed, from, live) {
+  if (!SRGO) SR = null; SRGO = false;
   closeModal(); history.replaceState(null, "", location.pathname);
   const n = DXG[kind].n; D = { kind, seed, live: !!live, from, total: n, pts: 0, over: false, paid: false };
   document.querySelectorAll(".screen").forEach((s) => (s.hidden = true)); adOn = false;
@@ -35,11 +36,11 @@ function dxMsg(m) {
   if (m.t === "quit") { LIVE.opp.left = true; toast("El rival abandonó el duelo"); dxBarUI(); if (D.over) dxResult(); return true; }
   return false;
 }
-function dxAbort() { if (LIVE) { Net.send({ t: "quit" }); liveReset(); } D = null; clearInterval(QT); }
-function dxExit() { if (LIVE) { Net.send({ t: "quit" }); liveReset(); } D = null; closeModal(); showMenu(); }
+function dxAbort() { SR = null; if (LIVE) { Net.send({ t: "quit" }); liveReset(); } D = null; clearInterval(QT); }
+function dxExit() { SR = null; if (LIVE) { Net.send({ t: "quit" }); liveReset(); } D = null; closeModal(); showMenu(); }
 function dxCountdown(seed, kind) {
   let n = 3; modal(`<h2>⚔ ${oppName()}</h2><p>${NAMES[kind]} · ${DXG[kind].label}</p><p class="big2" id="cd">${n}</p>`, true);
-  const iv = setInterval(() => { n--; if (!LIVE) return clearInterval(iv); if (n <= 0) { clearInterval(iv); dxBegin(kind, seed, null, true); } else $("#cd").textContent = n; }, 1000);
+  const iv = setInterval(() => { n--; if (!LIVE) return clearInterval(iv); if (n <= 0) { clearInterval(iv); SRGO = !!SR; dxBegin(kind, seed, null, true); } else $("#cd").textContent = n; }, 1000);
 }
 function dxFinish(pts) {
   D.over = true; D.pts = pts; clearInterval(QT); clearInterval(timerId);
@@ -54,6 +55,7 @@ function dxFinish(pts) {
 function dxLink(pts) { return `${location.origin}${location.pathname}#d=${D.seed}.${pts}.${D.kind}.${encodeURIComponent(SV.name)}`; }
 function dxResult() {
   if (!D) return; const me = D.pts;
+  if (SR && SR.rounds > 1) return srRoundEnd(me, D.live && LIVE ? LIVE.opp.pts : null);
   if (D.live) {
     const o = LIVE ? LIVE.opp : { pts: 0, name: "Rival" }, w = me > o.pts ? 1 : me < o.pts ? -1 : 0;
     dxPay(w);
@@ -70,10 +72,4 @@ function dxResult() {
   $("#dxCopy").onclick = () => (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(() => toast("Link copiado"), () => prompt("Copiá el link:", url));
 }
 function dxPay(w) { if (D.paid) return; D.paid = true; SV.duels++; if (w > 0) { SV.duelWins++; SV.wal[D.kind] = (SV.wal[D.kind] || 0) + 50; } save(); checkAch(); beep(SND.win); }
-document.addEventListener("click", (e) => {
-  if (e.target.id === "dxHome") return dxExit();
-  const b = e.target.closest("[data-dxk]"); if (!b) return;
-  const k = b.dataset.dxk;
-  if (b.dataset.dx === "live") askName(() => liveHost(k));
-  else askName(() => dxBegin(k, Math.floor(Math.random() * 1e9), null, false));
-});
+document.addEventListener("click", (e) => { if (e.target.id === "dxHome") dxExit(); });

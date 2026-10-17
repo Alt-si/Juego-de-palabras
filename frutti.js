@@ -35,9 +35,13 @@ function tfCheck(id, ans, letter) {
   return { st: "no", pts: 0, word: "" };
 }
 // Puntaje completo de un jugador contra el otro (opp puede ser null).
-function tfScore(cats, letter, mine, opp) {
+const tfAppr = (x, raw, letter) => (["no", "mal"].includes(x.st) && tfN(raw)[0] === letter.toLowerCase() ? { st: "ok", pts: 10, word: String(raw).trim(), key: tfN(raw), appr: true } : x);
+function tfScore(cats, letter, mine, opp, ap) {
+  ap = ap || { a: new Set(), b: new Set() };
   const rows = cats.map((id, i) => {
-    const a = tfCheck(id, mine.ans[i], letter), b = opp ? tfCheck(id, opp.ans[i], letter) : null;
+    let a = tfCheck(id, mine.ans[i], letter), b = opp ? tfCheck(id, opp.ans[i], letter) : null;
+    if (ap.a.has(i) || (mine.ok && mine.ok.includes(i))) a = tfAppr(a, mine.ans[i], letter);
+    if (b && (ap.b.has(i) || (opp.ok && opp.ok.includes(i)))) b = tfAppr(b, opp.ans[i], letter);
     const rep = !!(b && a.key && b.key && a.key === b.key);
     return { id, a, b, rep, pts: rep ? 5 : a.pts, opts: b ? (rep ? 5 : b.pts) : 0 };
   });
@@ -82,7 +86,7 @@ function tfCountdown(seed, cats, rounds, msg) {
 }
 function tfStart(seed, cats, rounds, from, live) {
   closeModal(); history.replaceState(null, "", location.pathname); clearInterval(TFT);
-  TF = { on: true, seed, cats, rounds, r: 0, letters: tfLetters(seed, rounds), from, live: !!live, tot: 0, totOpp: 0, log: [], mine: [], oppR: {}, scored: -1, ready: -1, oppReady: -1, paidEnd: false };
+  TF = { on: true, seed, cats, rounds, r: 0, ap: [], letters: tfLetters(seed, rounds), from, live: !!live, tot: 0, totOpp: 0, log: [], mine: [], oppR: {}, scored: -1, ready: -1, oppReady: -1, paidEnd: false };
   document.querySelectorAll(".screen").forEach((s) => (s.hidden = true)); adOn = false; SCENES.apply(SCENES.world(5));
   $("#tfRival").hidden = !live; $("#tfGame").hidden = false; tfRound();
 }
@@ -118,6 +122,12 @@ document.addEventListener("click", (e) => {
   if (e.target.id === "tfBasta") { if (TF && !TF.done) { const f = tfFilled(); if (f < TF.cats.length) { if (!TF.warned) { TF.warned = true; return toast(`Te faltan ${TF.cats.length - f}: sin completar todo no ganás el bonus. Tocá de nuevo para terminar.`); } } tfFinish(false); } }
   if (e.target.id === "tfQuit" && TF) modal(`<h2>¿Abandonar el duelo?</h2><p>Perdés este duelo.</p><button class="big" id="tfQuitOk">Abandonar</button><button class="link" data-close>Seguir jugando</button>`);
   if (e.target.id === "tfQuitOk" || e.target.id === "tfHomeBtn") tfExit();
+  const ok = e.target.closest("[data-tfok]");
+  if (ok && TF) {
+    const [side, i] = ok.dataset.tfok.split(":"), ap = TF.ap[TF.r] || (TF.ap[TF.r] = { a: new Set(), b: new Set() }); ap[side].add(+i);
+    if (TF.live) Net.send({ t: "tfok", r: TF.r, i: +i, own: side === "a" });
+    return tfResult();
+  }
   if (e.target.id === "tfNext" && TF) tfNext();
   if (e.target.id === "tfFinalBtn" && TF) tfFinal();
 });
@@ -125,7 +135,7 @@ function tfExit() { clearInterval(TFT); if (LIVE) { Net.send({ t: "quit" }); liv
 function tfFinish() {
   if (!TF || TF.done) return; TF.done = true; clearInterval(TFT);
   const time = Math.min(TF_LIMIT, Math.round(((Date.now() - TF.t0) / 1000) * 10) / 10);
-  const ans = [...document.querySelectorAll("#tfRows input")].map((i) => i.value.trim().replace(/[|~^;]/g, " ").slice(0, 30));
+  const ans = [...document.querySelectorAll("#tfRows input")].map((i) => i.value.trim().replace(/[|~^;]/g, " ").replace(/^\++/, "").slice(0, 30));
   TF.me = { ans, time }; TF.mine[TF.r] = TF.me; document.querySelectorAll("#tfRows input").forEach((i) => (i.disabled = true));
   if (TF.live) {
     Net.send({ t: "tfdone", ans, time, r: TF.r });
@@ -142,6 +152,7 @@ function tfMsg(m) {
     if (+m.r === TF.r) { if (!TF.done) { TF.endAt = Date.now() + TF_GRACE * 1000; toast(`¡${LIVE.opp.name || "Tu rival"} terminó! Tenés ${TF_GRACE} s`); } tfBar(); if (TF.done) tfResult(); }
     return true;
   }
+  if (m.t === "tfok") { const r = +m.r, ap = TF.ap[r] || (TF.ap[r] = { a: new Set(), b: new Set() }); ap[m.own ? "b" : "a"].add(+m.i); toast(`${LIVE.opp.name || "Tu rival"} aceptó una palabra`); if (TF.r === r && TF.scored === r && TF.done) tfResult(); return true; }
   if (m.t === "tfnext") { TF.oppReady = Math.max(TF.oppReady, +m.r); tfAdvance(); return true; }
   if (m.t === "quit") { LIVE.opp.left = true; toast("El rival abandonó el duelo"); tfBar(); tfOppGone(); return true; }
   return false;
@@ -150,18 +161,21 @@ function tfOppGone() { if (TF && TF.done && !TF.oppR[TF.r] && TF.scored < TF.r) 
 
 // ---------- Corrección y resultado ----------
 const TF_ST = { ok: ["✔", "Bien escrita", "ok"], mal: ["✏", "Mal escrita", "mal"], no: ["✖", "No existe", "no"], letra: ["✖", "No empieza con la letra", "no"], vacio: ["—", "Sin respuesta", "vac"] };
-function tfCell(x, raw, rep) {
-  const st = TF_ST[x.st], r = rep ? ["🤝", "Repetida con el rival", "rep"] : st;
-  return `<div class="tfc ${r[2]}"><b>${esc(raw || "—")}</b><small>${r[0]} ${r[1]}${x.st === "mal" ? ` · se escribe <u>${esc(x.word)}</u>` : ""}</small></div>`;
+function tfCell(x, raw, rep, side, i) {
+  const st = x.appr ? ["✔", "Aceptada (verificada en la RAE)", "ok"] : TF_ST[x.st], r = rep ? ["🤝", "Repetida con el rival", "rep"] : st;
+  const chk = !x.appr && (x.st === "no" || x.st === "mal") && raw ? `<span class="tfv"><a href="https://dle.rae.es/${encodeURIComponent(String(raw).trim().toLowerCase())}" target="_blank" rel="noopener">🔎 Ver en la RAE</a><button class="mini" data-tfok="${side}:${i}">✔ Es válida</button></span>` : "";
+  return `<div class="tfc ${r[2]}"><b>${esc(raw || "—")}</b><small>${r[0]} ${r[1]}${x.st === "mal" && !x.appr ? ` · se escribe <u>${esc(x.word)}</u>` : ""}</small>${chk}</div>`;
 }
 const tfOppOf = (r) => (TF.live ? TF.oppR[r] : TF.from && TF.from.rounds[r]) || null;
 function tfResult(again) {
   if (!TF) return; const r = TF.r, o = tfOppOf(r), hasOpp = !!o, name = esc((TF.live ? oppName() : TF.from && TF.from.name) || "Rival");
-  const sc = tfScore(TF.cats, TF.letter, TF.me, o);
-  if (TF.scored < r) { TF.scored = r; TF.tot += sc.total; if (hasOpp) TF.totOpp += sc.totalOpp; TF.log[r] = { l: TF.letter, me: sc.total, opp: hasOpp ? sc.totalOpp : null }; addPts("tf", sc.total); save(); beep(SND.coin || SND.ok); }
+  const ap = TF.ap[r] || (TF.ap[r] = { a: new Set(), b: new Set() }), sc = tfScore(TF.cats, TF.letter, TF.me, o, ap);
+  const prev = TF.log[r], dMe = sc.total - (prev ? prev.me : 0), dOpp = hasOpp ? sc.totalOpp - (prev && prev.opp != null ? prev.opp : 0) : 0;
+  if (TF.scored < r) { TF.scored = r; beep(SND.coin || SND.ok); }
+  TF.tot += dMe; TF.totOpp += dOpp; TF.log[r] = { l: TF.letter, me: sc.total, opp: hasOpp ? sc.totalOpp : null }; if (dMe) addPts("tf", dMe); save();
   $("#tfCoins").textContent = SV.wal.tf || 0; $("#tfSum").textContent = `Partida ${r + 1}/${TF.rounds} · acumulado ${TF.tot}${hasOpp || TF.live || TF.from ? " vs " + TF.totOpp : ""}`;
   const last = r >= TF.rounds - 1, oppLeft = TF.live && LIVE && LIVE.opp.left;
-  const rows = sc.rows.map((x, i) => `<div class="tfrr"><h4>${TF_BY[x.id].icon} ${TF_BY[x.id].name}</h4><div class="tfpair">${tfCell(x.a, TF.me.ans[i], x.rep)}${hasOpp ? tfCell(x.b, o.ans[i], x.rep) : ""}</div><small class="pp">+${x.pts}${hasOpp ? ` · rival +${x.opts}` : ""}</small></div>`).join("");
+  const rows = sc.rows.map((x, i) => `<div class="tfrr"><h4>${TF_BY[x.id].icon} ${TF_BY[x.id].name}</h4><div class="tfpair">${tfCell(x.a, TF.me.ans[i], x.rep, "a", i)}${hasOpp ? tfCell(x.b, o.ans[i], x.rep, "b", i) : ""}</div><small class="pp">+${x.pts}${hasOpp ? ` · rival +${x.opts}` : ""}</small></div>`).join("");
   const bon = sc.bonus ? `<p class="tfbon">⚡ Fuiste más rápido (${TF.me.time} s): <b>+${TF_BONUS}</b></p>` : sc.bonusOpp ? `<p class="tfbon">⚡ ${name} fue más rápido (${o.time} s): +${TF_BONUS} para él</p>` : "";
   const vs = hasOpp ? `<div class="vs"><div><small>Vos · ${TF.me.time} s</small><b>${sc.total}</b></div><span>vs</span><div><small>${name} · ${o.time} s</small><b>${sc.totalOpp}</b></div></div><p class="tfacc">Acumulado: <b>${TF.tot}</b> vs <b>${TF.totOpp}</b></p>` : `<div class="vs"><div><small>Tu puntaje · ${TF.me.time} s</small><b>${sc.total}</b></div></div><p class="tfacc">Acumulado: <b>${TF.tot}</b></p>`;
   const btn = last || oppLeft ? '<button class="big" id="tfFinalBtn">🏁 Ver resultado final</button>' : TF.live ? `<button class="big" id="tfNext"${TF.ready >= r ? " disabled" : ""}>${TF.ready >= r ? "Esperando al rival…" : "▶ Siguiente partida"}</button>` : '<button class="big" id="tfNext">▶ Siguiente partida</button>';
@@ -193,11 +207,11 @@ function tfFinal() {
   $("#tfShare").onclick = () => { if (navigator.share) navigator.share({ title: "Juegos mentales", text, url }).catch(() => {}); else window.open("https://wa.me/?text=" + encodeURIComponent(text + "\n" + url), "_blank"); };
   $("#tfCopy").onclick = () => (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(() => toast("Link copiado"), () => prompt("Copiá el link:", url));
 }
-const tfLink = () => `${location.origin}${location.pathname}#t=${TF.seed}~${TF.cats.join("-")}~${TF.rounds}~${encodeURIComponent(SV.name)}~${encodeURIComponent(TF.mine.map((x) => x.time + ";" + x.ans.join("|")).join("^"))}`;
+const tfLink = () => `${location.origin}${location.pathname}#t=${TF.seed}~${TF.cats.join("-")}~${TF.rounds}~${encodeURIComponent(SV.name)}~${encodeURIComponent(TF.mine.map((x, r) => x.time + ";" + x.ans.map((a, i) => ((TF.ap[r] && TF.ap[r].a.has(i)) ? "+" : "") + a).join("|")).join("^"))}`;
 function tfInvite() {
   const m = /^#t=(\d+)~([a-z-]+)~(\d+)~([^~]*)~(.*)$/.exec(location.hash); if (!m) return false;
   const cats = m[2].split("-").filter((c) => TF_BY[c]), rounds = +m[3]; if (cats.length < 3 || !TF_ROUNDS.includes(rounds) || TF) return true;
-  let name = "Un amigo", rs = []; try { name = decodeURIComponent(m[4]).slice(0, 16) || name; rs = decodeURIComponent(m[5]).split("^").map((x) => { const [t, a] = x.split(";"); return { time: Math.min(TF_LIMIT, +t || TF_LIMIT), ans: (a || "").split("|").slice(0, cats.length).map((y) => y.slice(0, 30)) }; }); } catch {}
+  let name = "Un amigo", rs = []; try { name = decodeURIComponent(m[4]).slice(0, 16) || name; rs = decodeURIComponent(m[5]).split("^").map((x) => { const [t, a] = x.split(";"); const raw = (a || "").split("|").slice(0, cats.length); return { time: Math.min(TF_LIMIT, +t || TF_LIMIT), ans: raw.map((y) => y.replace(/^\+/, "").slice(0, 30)), ok: raw.map((y, i) => (y[0] === "+" ? i : -1)).filter((i) => i >= 0) }; }); } catch {}
   if (rs.length !== rounds) { modal("<h2>Desafío incompleto</h2><p>El link está cortado. Pedile que lo mande de nuevo.</p><button class=\"big\" data-close>Entendido</button>"); return true; }
   const from = { name, rounds: rs };
   modal(`<h2>⚔ ¡${esc(name)} te desafió!</h2><p><b>Tuti Frutti</b> · ${rounds} partidas · ${cats.length} categorías. Jugás las mismas letras: gana quien acumule más puntos.</p><button class="big" id="tfAccept">Aceptar el desafío</button><button class="link" data-close>Ahora no</button>`, true);

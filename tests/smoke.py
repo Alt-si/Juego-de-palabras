@@ -76,7 +76,7 @@ try:
         check(pg.evaluate("SV.lvH") == 2 and pg.evaluate("SV.level") == 1, "Escondidas: nivel 1 superado (progreso aparte)")
 
         # --- desafío por link ---
-        a = newpage(b.new_context(viewport=V)); a.goto(URL); a.click('[data-game="hid"]'); a.click("#btnDuel")
+        a = newpage(b.new_context(viewport=V)); a.goto(URL); a.evaluate("SV.srRounds=1;save()"); a.click('[data-game="hid"]'); a.click("#btnDuel")
         a.fill("#nameIn", "Ana"); a.click("#nameOk"); a.wait_for_timeout(300)
         w1 = play(a, 10)
         link = a.evaluate("duelLink(G.duel.seed, G.duel.pts, G.duel.kind)")
@@ -91,7 +91,7 @@ try:
         ctx = b.new_context(viewport=V); ctx.add_init_script(path=os.path.join(HERE, "peer-shim.js"))
         h = newpage(ctx); g = newpage(ctx)
         h.goto(URL); g.goto(URL); h.wait_for_timeout(300)
-        h.evaluate("SV.name='Ana';save()"); h.click('[data-game="ana"]'); h.click("#btnLive"); h.wait_for_timeout(500)
+        h.evaluate("SV.name='Ana';SV.srRounds=1;save()"); h.click('[data-game="ana"]'); h.click("#btnLive"); h.wait_for_timeout(500)
         check("Mandale este link" in h.inner_text("#box"), "en vivo: la sala muestra el código")
         code = h.evaluate("LIVE.code")
         g.goto(URL + f"#r={code}.ana"); g.wait_for_timeout(400)

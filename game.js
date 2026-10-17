@@ -324,11 +324,11 @@ function levelFailed() {
   G.over = true; clearInterval(timerId); save(); beep(SND.lose);
   modal(`<h2>💔 Sin vidas</h2><p>Resolviste ${G.solved} de ${PER_LEVEL} palabras. ¡Podés volver a intentarlo con palabras nuevas!</p><button class="big" id="retry">Reintentar nivel ${G.lv}</button><button class="link" id="goHome">Inicio</button>`, true);
 }
-function toHome() { if (LIVE) { Net.send({ t: "quit" }); liveReset(); } closeModal(); clearInterval(timerId); G = null; $("#game").hidden = true; $("#menu").hidden = true; $("#home").hidden = false; viewLevel = curLevel(); renderHome(); }
+function toHome() { SR = null; if (LIVE) { Net.send({ t: "quit" }); liveReset(); } closeModal(); clearInterval(timerId); G = null; $("#game").hidden = true; $("#menu").hidden = true; $("#home").hidden = false; viewLevel = curLevel(); renderHome(); }
 
 // ---------- Eventos ----------
-$("#btnDuel").onclick = () => askName(() => startDuel(Math.floor(Math.random() * 1e9), null, CUR));
-$("#btnLive").onclick = () => askName(() => liveHost(CUR));
+$("#btnDuel").onclick = () => srLaunch(CUR, false);
+$("#btnLive").onclick = () => srLaunch(CUR, true);
 $("#btnMenu").onclick = showMenu;
 document.addEventListener("click", (e) => { const c = e.target.closest("[data-game]"); if (c) openGame(c.dataset.game); });
 $("#btnPlay").onclick = () => startLevel(viewLevel);
@@ -377,6 +377,7 @@ function duelWords(seed, kind) {
   R = old; return out;
 }
 function startDuel(seed, from, kind, live) {
+  if (!SRGO) SR = null; SRGO = false;
   kind = kind || CUR; CUR = kind;
   closeModal(); history.replaceState(null, "", location.pathname);
   G = { kind, duel: { seed, from, pts: 0, kind, live: !!live }, lv: 0, queue: duelWords(seed, kind), solved: 0, n: 0, lives: 99, lostLives: 0, hints: 0, streak: 0, paused: false, over: false, busy: false };
@@ -393,6 +394,7 @@ function copyLink(seed, score) { const url = duelLink(seed, score, G && G.duel &
 function duelDone() {
   G.over = true; clearInterval(timerId);
   if (G.duel.live) return liveDone();
+  if (SR && SR.rounds > 1) return srRoundEnd(G.duel.pts);
   const d = G.duel, me = d.pts; SV.duels++;
   let head, body = "";
   if (d.from) {
@@ -411,6 +413,7 @@ function duelDone() {
   $("#dCopy").onclick = () => copyLink(d.seed, me);
 }
 function checkInvite() {
+  if (typeof srInvite === "function" && srInvite()) return;
   if (typeof tfInvite === "function" && tfInvite()) return;
   const r = /^#r=([A-Z0-9]{5})\.(ana|hid|adi|cri|qv|tf)$/.exec(location.hash);
   if (r && !G) {
@@ -490,6 +493,7 @@ function handlers(role) {
     onMsg(m) {
       if (!m || !LIVE) return;
       if (typeof tfMsg === "function" && tfMsg(m)) return;
+      if (typeof srMsg === "function" && srMsg(m)) return;
       if (typeof dxMsg === "function" && dxMsg(m, role)) return;
       if (m.t === "hello") { LIVE.opp.name = String(m.name || "Rival").slice(0, 16); if (role === "host" && !LIVE.started) sendStart(); }
       else if (m.t === "start" && role === "guest") runStart(m.seed, m.kind, m.cats, m.rounds);
@@ -542,9 +546,10 @@ function runStart(seed, kind, cats, rounds) {
   LIVE.started = true; LIVE.kind = kind; LIVE.opp.n = 0; LIVE.opp.pts = 0; LIVE.opp.done = false; LIVE.opp.left = false; clearTimeout(LIVE.to);
   clearInterval(timerId); G = null;
   if (kind === "tf") { LIVE.cats = (cats || []).filter((c) => TF_BY[c]); LIVE.rounds = [5, 10, 15, 20].includes(+rounds) ? +rounds : 5; return tfCountdown(seed, LIVE.cats, LIVE.rounds); }
-  if (DXG[kind]) return dxCountdown(seed, kind);
+  const s0 = srStart(seed, kind, rounds);
+  if (DXG[kind]) return dxCountdown(s0, kind);
   let n = 3; modal(`<h2>⚔ ${oppName()}</h2><p>${NAMES[kind]} · 10 palabras</p><p class="big2" id="cd">${n}</p>`, true);
-  const iv = setInterval(() => { n--; if (!LIVE) return clearInterval(iv); if (n <= 0) { clearInterval(iv); startDuel(seed, null, kind, true); } else $("#cd").textContent = n; }, 1000);
+  const iv = setInterval(() => { n--; if (!LIVE) return clearInterval(iv); if (n <= 0) { clearInterval(iv); SRGO = !!SR; startDuel(s0, null, kind, true); } else $("#cd").textContent = n; }, 1000);
 }
 function liveDone() {
   const me = G.duel.pts; Net.send({ t: "done", pts: me });
@@ -554,6 +559,7 @@ function liveDone() {
 function showLiveResult() {
   if (!LIVE || !G || !G.duel || !G.duel.live) return;
   const me = G.duel.pts, o = LIVE.opp, w = me > o.pts ? 1 : me < o.pts ? -1 : 0;
+  if (SR && SR.rounds > 1) return srRoundEnd(me, o.pts);
   if (!G.paid) { G.paid = true; SV.duels++; if (w > 0) { SV.duelWins++; SV.coins += 50; } save(); checkAch(); beep(SND.win); }
   modal(`<h2>${w > 0 ? "🏆 ¡Ganaste!" : w < 0 ? "😮 Perdiste" : "🤝 ¡Empate!"}</h2><div class="vs"><div><small>Vos</small><b>${me}</b></div><span>vs</span><div><small>${oppName()}</small><b>${o.pts}</b></div></div>${o.left && !o.done ? "<p>Tu rival abandonó antes de terminar.</p>" : ""}${w > 0 ? '<p class="big2">+50 🪙</p>' : ""}${o.left ? "" : '<button class="big" id="lvRe">🔁 Revancha</button>'}<button class="link" id="goHome">Inicio</button>`, true);
   const re = $("#lvRe"); if (re) re.onclick = () => { if (LIVE.role === "host") sendStart(); else { Net.send({ t: "rematch" }); re.textContent = "Pedido enviado…"; re.disabled = true; } };
@@ -707,7 +713,7 @@ const HELP = {
 document.addEventListener("click", (e) => {
   const b = e.target.closest("[data-help]"); if (!b) return;
   let k = b.dataset.help; if (k === "cur") k = CUR;
-  const h = HELP[k] || HELP.all; const paused = typeof G !== "undefined" && G && !G.paused && !$("#game").hidden;
+  const h0 = HELP[k] || HELP.all, h = ["ana", "hid", "adi", "cri", "qv"].includes(k) ? [h0[0], h0[1].concat("⚔ Duelos: elegí si la partida dura 1, 3, 5 o 10 duelos. Los puntos se acumulan y gana quien más suma al final. Se juega en vivo o por link.")] : h0; const paused = typeof G !== "undefined" && G && !G.paused && !$("#game").hidden;
   if (paused) G.paused = true;
   modal(`<div class="helpbox"><h2>${h[0]}</h2>${h[1].map((t) => `<p class="hl">• ${t}</p>`).join("")}${k !== "all" ? `<p class="hg">Dificultad</p><p class="hl">Fácil, Medio, Difícil o Experto: cuanto más difícil, menos ayuda y más puntos.</p>` : ""}<button class="big" id="helpOk">¡Entendido!</button></div>`, true);
   $("#helpOk").onclick = () => { closeModal(); if (paused && G) G.paused = false; };
