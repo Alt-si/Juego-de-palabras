@@ -566,6 +566,23 @@ const adTitle = (L) => AD_TITLES.filter((t) => L >= t[0]).pop()[1];
 const adMax = () => difOf("adi").clues;
 const adPts = (shown) => 110 - 10 * shown;
 const plain = (s) => letters(s).replace(/[^A-ZÑ]/g, "");
+// Corrector de ortografía: distancia de edición (con letras intercambiadas) para aceptar errores de tipeo.
+function editDist(a, b) {
+  const m = a.length, n = b.length; if (!m) return n; if (!n) return m;
+  const d = Array.from({ length: m + 1 }, (_, i) => [i, ...Array(n).fill(0)]); for (let j = 0; j <= n; j++) d[0][j] = j;
+  for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) {
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+  }
+  return d[m][n];
+}
+function isSwap(a, b) { if (a.length !== b.length) return false; const x = []; for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) x.push(i); return x.length === 2 && x[1] === x[0] + 1 && a[x[0]] === b[x[1]] && a[x[1]] === b[x[0]]; }
+// ¿"g" es la palabra "a" con un error de tipeo? (palabras cortas: solo letras intercambiadas, para no confundir "gato" con "pato")
+function spellOk(g, a) {
+  if (g === a) return true; const n = a.length;
+  if (n < 4) return false; if (n <= 5) return isSwap(g, a);
+  return editDist(g, a) <= (n >= 11 ? 2 : 1);
+}
 const plainText = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 function showAdHome() {
   buildAdivina(); SCENES.apply(SCENES.mystery(SV.adLevel));
@@ -623,7 +640,9 @@ function adAnswers() { const w = AD.cur.w; return [plain(w), ...(ALIAS[w] || [])
 function adGuess() {
   if (AD.busy) return;
   const g = plain($("#adIn").value); if (!g) return;
-  if (adAnswers().includes(g)) return adWin();
+  const ans = adAnswers();
+  if (ans.includes(g)) return adWin();
+  if (ans.some((a) => spellOk(g, a))) { AD.fixed = true; return adWin(); }
   beep(SND.bad); vib([60, 40, 60]); $("#adIn").classList.add("shake"); setTimeout(() => $("#adIn").classList.remove("shake"), 400);
   if (AD.shown >= adMax()) return adLose();
   adFloat("No es. ¡Otra pista!", "bad"); $("#adIn").value = ""; AD.shown++; adRender();
@@ -638,7 +657,7 @@ function adFinish(pts, msg, good) {
   const ul = $("#adClues"); ul.scrollTop = ul.scrollHeight;
   setTimeout(() => { AD.i++; AD.i >= AD_ROUND ? adEnd() : adNext(); }, 1600);
 }
-function adWin() { const p = adPts(AD.shown); adFinish(p, `+${p} 🪙`, true); }
+function adWin() { const p = adPts(AD.shown); const fx = AD.fixed; AD.fixed = false; adFinish(p, `+${p} 🪙${fx ? " · se escribe " + AD.cur.w : ""}`, true); }
 function adLose() { adFinish(0, "Era esa palabra…", false); }
 $("#adGo").onclick = adGuess;
 $("#adIn").addEventListener("keydown", (e) => { if (e.key === "Enter") adGuess(); });
@@ -670,7 +689,7 @@ document.addEventListener("click", (e) => {
 const HELP = {
   ana: ["🔤 Anagrama", ["Ordená las letras mezcladas y armá la palabra antes de que se acabe el tiempo.", "Tocá las letras en orden. Si te equivocás o se acaba el tiempo perdés una vida ❤.", "10 palabras = subís de nivel.", "Ayudas: 🔀 mezclar, 💡 pista (revela una letra), ⏱ tiempo extra."]],
   hid: ["🔍 Palabras escondidas", ["Hay más letras que las que necesita la palabra: usá la frase-pista para descubrirla.", "Armala solo con las letras justas. A los 10 s finales se marcan las letras correctas.", "3 vidas ❤ y 10 palabras por nivel."]],
-  adi: ["🕵️ Adivina", ["Elegí una categoría y descubrí la palabra oculta.", "Arrancás con 1 pista; cada error o \"otra pista\" abre una más.", "Cuantas menos pistas uses, más puntos ganás (hasta 100 por palabra).", "Juntá los puntos de la meta del nivel para pasar."]],
+  adi: ["🕵️ Adivina", ["Elegí una categoría y descubrí la palabra oculta.", "Arrancás con 1 pista; cada error o \"otra pista\" abre una más.", "Cuantas menos pistas uses, más puntos ganás (hasta 100 por palabra).", "Hay corrector de ortografía: si te equivocás en una letra, igual te la aceptamos.", "Juntá los puntos de la meta del nivel para pasar."]],
   cri: ["🔐 Frases encriptadas", ["Cada letra se esconde detrás de un número, un objeto o un color, y se repite en toda la frase.", "Tocá un casillero y elegí la letra: se completa en todos los que tienen el mismo símbolo.", "En las citas célebres también tenés que completar al autor.", "💡 regala una letra (−15 pts) y ✔ Revisar marca los errores (−10 pts cada vez). Mirá cuánto vale la frase."]],
   qv: ["🖼️ ¿Qué ves?", ["Mirá la imagen y completá las letras que faltan de la palabra.", "10 imágenes por nivel, 3 vidas ❤ y tiempo límite.", "Cuanto más subís o más difícil elegís, menos letras de ayuda te damos."]],
   all: ["❓ Cómo se juega", ["Elegí un juego y una dificultad: cuanto más difícil, más puntos ganás.", "Cada juego tiene sus propios niveles, puntos y monedas.", "La suma de tus puntos sube tu rango global, de Novato a Leyenda.", "Tocá el ❓ dentro de cada juego para ver sus reglas."]]
