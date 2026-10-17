@@ -41,3 +41,4 @@ Publicar: Settings → Pages → Branch `main` / root.
 
 ## Respuesta por voz
 - Adivina y ¿Qué ves? tienen un botón 🎤 para decir la palabra en vez de tipearla (`voz.js`, Web Speech API, es-AR). Requiere Chrome/Safari, HTTPS, permiso de micrófono e internet. En ¿Qué ves? una palabra errada no quita vidas.
+- **Palabras aprendidas**: si decís por voz en Adivina una palabra que el juego no conoce (4 a 12 letras, no parecida por un solo error a una existente), se guarda en tu dispositivo y suma a la categoría «✨ Aprendidas» (se juega con 5 o más). No entra en los duelos para que ambos jugadores vean las mismas palabras (`aprende.js`).

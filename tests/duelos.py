@@ -143,6 +143,17 @@ try:
         check(vp.evaluate("Q.solved") == 0 and vp.evaluate("Q.lives") == 3, "voz: palabra incorrecta no quita vidas")
         vp.evaluate("window.__say=[Q.it.w]"); vp.click("#qvMic"); vp.wait_for_timeout(400)
         check(vp.evaluate("Q.solved") == 1, "voz: ¿Qué ves? completa la palabra dicha")
+        # palabras aprendidas por voz
+        vp.evaluate("localStorage.removeItem('palabras-aprendidas')"); vp.reload(); vp.wait_for_timeout(500)
+        vp.evaluate("SV.name='Ana';save()")
+        for w in ["chimango","carancho","ñandubay","zorzal","tornasol"]:
+            vp.evaluate("showAdHome()"); vp.click('[data-game="adi"]') if False else None
+            vp.evaluate("adStart('Animal')" if False else "showAdHome(), adStart(ADI.cats[0].name)"); vp.wait_for_timeout(150)
+            vp.evaluate("window.__say=['%s']" % w); vp.click("#adMic"); vp.wait_for_timeout(250)
+        res = vp.evaluate("[Apr.list.length, Apr.add('perro'), Apr.add('chimangoo'), Apr.add('xx'), !!ADI.cats.find(c=>c.name==='✨ Aprendidas')]")
+        check(res == [5, False, False, False, True], f"aprendidas: se suman nuevas por voz, no repetidas ni typos ({res})")
+        vp.reload(); vp.wait_for_timeout(500)
+        check(vp.evaluate("buildAdivina().cats.some(c=>c.name==='✨ Aprendidas' && c.words.length===5)"), "aprendidas: persisten y forman categoría")
         nov = np(b.new_context(viewport=V)); nov.goto(URL); nov.evaluate("delete window.SpeechRecognition; delete window.webkitSpeechRecognition")
         check(True, "voz: sin soporte no se rompe")
         # duelos de otros juegos (en vivo)

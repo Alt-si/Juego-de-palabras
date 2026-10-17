@@ -670,6 +670,8 @@ function adGuess() {
   const ans = adAnswers();
   if (ans.includes(g)) return adWin();
   if (ans.some((a) => spellOk(g, a))) { AD.fixed = true; return adWin(); }
+  const said = AD.said; AD.said = false;
+  if (said && !AD.duel && typeof Apr !== "undefined" && Apr.add($("#adIn").value)) toast("✨ «" + Apr.norm($("#adIn").value) + "» es nueva: la sumamos al juego");
   beep(SND.bad); vib([60, 40, 60]); $("#adIn").classList.add("shake"); setTimeout(() => $("#adIn").classList.remove("shake"), 400);
   if (AD.shown >= adMax()) return adLose();
   adFloat("No es. ¡Otra pista!", "bad"); $("#adIn").value = ""; AD.shown++; adRender();

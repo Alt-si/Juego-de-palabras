@@ -21,7 +21,7 @@ const Voz = {
 $("#adMic").onclick = () => Voz.listen($("#adMic"), (alts) => {
   if (AD.busy) return;
   const ans = adAnswers(), pick = alts.find((a) => ans.includes(plain(a))) || alts.find((a) => ans.some((x) => spellOk(plain(a), x))) || alts[0];
-  $("#adIn").value = pick; if (!ans.includes(plain(pick)) && !ans.some((x) => spellOk(plain(pick), x))) toast(`Escuché «${pick}»`); adGuess();
+  $("#adIn").value = pick; if (!ans.includes(plain(pick)) && !ans.some((x) => spellOk(plain(pick), x))) toast(`Escuché «${pick}»`); AD.said = true; adGuess();
 });
 // ¿Qué ves?: si dice la palabra correcta se completa sola; si no, muestra lo que entendió (sin quitar vidas)
 $("#qvMic").onclick = () => Voz.listen($("#qvMic"), (alts) => {
