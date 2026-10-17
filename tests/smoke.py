@@ -161,6 +161,16 @@ try:
         pg.evaluate("() => { qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); }"); pg.wait_for_timeout(900)
         check(pg.evaluate("Q.lives") <= 2, "respuesta incorrecta resta vida")
 
+        # --- mezclar no cambia las letras ---
+        pg = newpage(b.new_context(viewport=V)); pg.goto(URL); pg.wait_for_timeout(300)
+        pg.click('[data-game="ana"]'); pg.click("#btnPlay"); pg.wait_for_timeout(500)
+        pg.evaluate("G.lockUntil = 0")
+        before = pg.evaluate("[...document.querySelectorAll('#gPool .tile')].map(t => t.textContent).sort().join('')")
+        pg.click("#tShuffle"); pg.click("#tShuffle")
+        after = pg.evaluate("[...document.querySelectorAll('#gPool .tile')].map(t => t.textContent).sort().join('')")
+        ok = pg.evaluate("(() => { const b = document.querySelector('#gPool .tile'); const t = b.textContent; b.click(); return document.querySelector('#gSlots .slot').textContent === t; })()")
+        check(before == after and ok, "Mezclar mantiene las letras y al tocar entra la letra correcta")
+
         check(not errs, f"sin errores de JavaScript {errs}")
         b.close()
 finally:

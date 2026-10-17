@@ -181,7 +181,7 @@ function nextWord() {
   G.w = w; G.target = w.L; G.len = w.L.length;
   G.hl = null; G.hinted = false;
   G.tiles = (w.scr || makeScr(w.L, G.kind, G.lv || 5)).map((ch, id) => ({ ch, id }));
-  G.ans = Array(G.len).fill(null); G.locked = Array(G.len).fill(false);
+  G.ans = Array(G.len).fill(null); G.locked = Array(G.len).fill(false); G.order = null;
   G.total = G.left = timerTotal(); G.wordHints = 0; G.busy = false; G.lockUntil = performance.now() + 350; $("#gAnswer").textContent = "";
   renderGame(); startTimer();
 }
@@ -228,7 +228,7 @@ function livesUI() { costLabels(); $("#gLives").innerHTML = G.duel ? `<span clas
 function renderTiles() {
   const used = new Set(G.ans.filter((x) => x !== null));
   $("#gSlots").innerHTML = G.ans.map((id, i) => `<button class="tile slot ${id !== null ? "fill" : ""} ${G.locked[i] ? "lock" : ""}" data-slot="${i}" ${G.locked[i] ? "disabled" : ""}>${id !== null ? G.tiles[id].ch : ""}</button>`).join("");
-  $("#gPool").innerHTML = G.tiles.map((t) => `<button class="tile ${used.has(t.id) ? "gone" : ""} ${G.hl && G.hl.has(t.id) ? "hl" : ""}" data-tile="${t.id}" ${used.has(t.id) ? "disabled" : ""}>${t.ch}</button>`).join("");
+  $("#gPool").innerHTML = (G.order || G.tiles.map((t) => t.id)).map((i) => G.tiles[i]).map((t) => `<button class="tile ${used.has(t.id) ? "gone" : ""} ${G.hl && G.hl.has(t.id) ? "hl" : ""}" data-tile="${t.id}" ${used.has(t.id) ? "disabled" : ""}>${t.ch}</button>`).join("");
 }
 function renderTime() {
   const pct = Math.max(0, G.left / G.total);
@@ -339,7 +339,7 @@ $("#btnHome").onclick = () => { if (!G) return; if (G.duel && G.duel.live) { if 
 $("#btnPause").onclick = () => pause(true);
 $("#gPool").onclick = (e) => { const b = e.target.closest("[data-tile]"); if (b) place(+b.dataset.tile); };
 $("#gSlots").onclick = (e) => { const b = e.target.closest("[data-slot]"); if (b) takeBack(+b.dataset.slot); };
-$("#tShuffle").onclick = () => { if (G && !G.busy && !G.paused) { G.tiles = shuffle(G.tiles); G.tiles.forEach((t) => (t.id = t.id)); const map = new Map(G.tiles.map((t, i) => [t.id, i])); renderTiles(); } };
+$("#tShuffle").onclick = () => { if (G && !G.busy && !G.paused) { G.order = shuffle(G.tiles.map((t) => t.id)); renderTiles(); } };
 $("#tHint").onclick = hint; $("#tTime").onclick = moreTime;
 $("#tSkip").onclick = () => { if (G && !G.busy && !G.paused) failWord("skip"); };
 document.addEventListener("click", (e) => {
