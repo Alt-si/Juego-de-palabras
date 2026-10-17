@@ -1,10 +1,10 @@
 "use strict";
 // Frases encriptadas: cada letra se oculta tras un número, un objeto o un color.
 const CR_DIFF = {
-  f: { name: "Fácil", icon: "🌱", min: 0, max: 24, reveal: 5, base: 40 },
-  m: { name: "Medio", icon: "🌿", min: 20, max: 34, reveal: 4, base: 70 },
-  d: { name: "Difícil", icon: "🔥", min: 30, max: 46, reveal: 3, base: 110 },
-  e: { name: "Experto", icon: "💀", min: 40, max: 99, reveal: 2, base: 160 },
+  f: { name: "Fácil", icon: "🌱", min: 0, max: 24, reveal: 5, base: 40, hint: 10 },
+  m: { name: "Medio", icon: "🌿", min: 20, max: 34, reveal: 4, base: 70, hint: 10 },
+  d: { name: "Difícil", icon: "🔥", min: 30, max: 46, reveal: 2, base: 150, hint: 20 },
+  e: { name: "Experto", icon: "💀", min: 40, max: 99, reveal: 1, base: 300, hint: 40 },
 };
 const CR_ABC = "ABCDEFGHIJKLMNOÑPQRSTUVWXYZ";
 const CR_OBJ = ["🍎", "🐟", "🔑", "⭐", "🎈", "🌙", "🍄", "🔔", "🎩", "🐢", "🍋", "🚲", "🎸", "🌵", "🍕", "🐝", "🎁", "🦋", "🍇", "🚀", "🧲", "🌻", "🍒", "🍩", "🦉", "🎯", "🐙"];
@@ -63,7 +63,7 @@ function crPhrase() {
   $("#crDots").innerHTML = CR.list.map((_, i) => `<i class="${i < CR.i ? "done" : i === CR.i ? "cur" : ""}"></i>`).join("");
   const o = ph.o, plain = o === "Refrán" || o === "Dicho popular";
   $("#crTag").textContent = plain ? (o === "Refrán" ? "📜 Es un refrán" : "💬 Es un dicho popular") : "🎓 Es una cita célebre · ¿de quién será?";
-  $("#crAuth").hidden = plain; $("#crAuth").querySelector("small").textContent = "Autor · −10";
+  $("#crHint small").textContent = `Letra · ${CR_DIFF[d].hint}🪙`; $("#crAuth").hidden = plain; $("#crAuth").querySelector("small").textContent = "Autor · −10";
   crDraw();
 }
 function crSymHtml(s) {
@@ -133,11 +133,11 @@ function crEnd() {
 // ---------- Herramientas ----------
 $("#crHint").onclick = () => {
   if (!P || P.over) return;
-  if (SV.coins < 10) { toast("Te faltan monedas para la pista"); vib(40); return; }
+  if (SV.coins < CR_DIFF[CR.d].hint) { toast("Te faltan monedas para la pista"); vib(40); return; }
   const open = Object.keys(P.bySym).filter((s) => !P.lock[s]); if (!open.length) return;
   const s = P.sel != null && !P.lock[P.sel] ? P.sel : +open[Math.floor(Math.random() * open.length)], L = P.bySym[s];
   const other = Object.keys(P.guess).find((k) => P.guess[k] === L && +k !== s); if (other != null) { delete P.guess[other]; delete P.wrong[other]; }
-  SV.coins -= 10; P.hints++; P.guess[s] = L; P.lock[s] = L; delete P.wrong[s]; save(); $("#crTotal").textContent = SV.coins; beep(SND.coin);
+  SV.coins -= CR_DIFF[CR.d].hint; P.hints++; P.guess[s] = L; P.lock[s] = L; delete P.wrong[s]; save(); $("#crTotal").textContent = SV.coins; beep(SND.coin);
   crNext(s); crDraw(); crComplete();
 };
 $("#crCheck").onclick = () => {

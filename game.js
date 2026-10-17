@@ -26,10 +26,10 @@ const TITLES = [[1, "Novato"], [3, "Aprendiz"], [5, "Curioso"], [8, "Palabrero"]
 const titleOf = (lv) => TITLES.filter((t) => lv >= t[0]).pop()[1];
 // Dificultad elegible (Anagrama, Escondidas, Adivina): modifica tiempo, largo, letras de más, tier de palabras y puntos.
 const DIF = {
-  f: { name: "Fácil", icon: "🌱", time: 1.4, len: -1, extra: -2, tier: -1, mult: 0.8 },
-  m: { name: "Medio", icon: "🌿", time: 1, len: 0, extra: 0, tier: 0, mult: 1 },
-  d: { name: "Difícil", icon: "🔥", time: 0.8, len: 1, extra: 2, tier: 1, mult: 1.3 },
-  e: { name: "Experto", icon: "💀", time: 0.65, len: 2, extra: 3, tier: 2, mult: 1.6 },
+  f: { name: "Fácil", icon: "🌱", time: 1.5, len: -1, extra: -2, tier: -1, mult: 0.7, hint: 10, lives: 0, clues: 10 },
+  m: { name: "Medio", icon: "🌿", time: 1, len: 0, extra: 0, tier: 0, mult: 1, hint: 10, lives: 0, clues: 10 },
+  d: { name: "Difícil", icon: "🔥", time: 0.7, len: 1, extra: 3, tier: 1, mult: 1.6, hint: 20, lives: 0, clues: 8 },
+  e: { name: "Experto", icon: "💀", time: 0.45, len: 3, extra: 6, tier: 3, mult: 3, hint: 40, lives: -1, clues: 6 },
 };
 const difOf = (k) => DIF[(SV.dif && SV.dif[k]) || "m"];
 const gameDif = () => (typeof G !== "undefined" && G && G.duel ? DIF.m : difOf(CUR));
@@ -48,7 +48,9 @@ const KS = () => KSk(CUR);
 const curLevel = () => SV[KS().lv];
 const topLevel = () => Math.max(SV.level, SV.lvH);
 const NAMES = { ana: "Anagrama", hid: "Palabras escondidas" };
-const maxLives = () => (SV.owned.includes("vida") ? LIVES + 1 : LIVES);
+const maxLives = (k) => Math.max(1, (SV.owned.includes("vida") ? LIVES + 1 : LIVES) + difOf(k || CUR).lives);
+const hintCost = (k) => difOf(k).hint, timeCost = (k) => Math.round((difOf(k).hint * 1.5) / 5) * 5;
+function costLabels() { const k = typeof G !== "undefined" && G ? G.kind : CUR, d = G && G.duel; $("#tHint small").textContent = `Pista · ${d ? 10 : hintCost(k)}🪙`; $("#tTime small").textContent = `+15 s · ${timeCost(k)}🪙`; }
 
 const THEMES = [["claro", "Claro", 0], ["oscuro", "Oscuro", 80], ["oceano", "Océano", 150], ["bosque", "Bosque", 150], ["atardecer", "Atardecer", 200]];
 const ACH = [
@@ -168,7 +170,7 @@ function pickWords(lv) {
 function startLevel(lv) {
   closeModal();
   SV.played++; save();
-  CUR = CUR; G = { kind: CUR, lv, queue: pickWords(lv), solved: 0, lives: maxLives(), lostLives: 0, hints: 0, streak: 0, paused: false, over: false, busy: false };
+  CUR = CUR; G = { kind: CUR, lv, queue: pickWords(lv), solved: 0, lives: maxLives(CUR), lostLives: 0, hints: 0, streak: 0, paused: false, over: false, busy: false };
   SCENES.apply(SCENES.world(lv)); $("#home").hidden = true; $("#game").hidden = false;
   nextWord();
 }
@@ -222,7 +224,7 @@ function renderGame() {
   $("#gStreak").textContent = G.streak >= 2 ? `🔥 Racha x${G.streak}` : "";
   renderTiles(); renderTime();
 }
-function livesUI() { $("#gLives").innerHTML = G.duel ? `<span class="on" style="font-size:16px;color:var(--ac)">⚔ ${G.duel.pts} pts</span>` : Array.from({ length: maxLives() }, (_, i) => `<span class="${i < G.lives ? "on" : ""}">❤</span>`).join(""); }
+function livesUI() { costLabels(); $("#gLives").innerHTML = G.duel ? `<span class="on" style="font-size:16px;color:var(--ac)">⚔ ${G.duel.pts} pts</span>` : Array.from({ length: maxLives(G.kind) }, (_, i) => `<span class="${i < G.lives ? "on" : ""}">❤</span>`).join(""); }
 function renderTiles() {
   const used = new Set(G.ans.filter((x) => x !== null));
   $("#gSlots").innerHTML = G.ans.map((id, i) => `<button class="tile slot ${id !== null ? "fill" : ""} ${G.locked[i] ? "lock" : ""}" data-slot="${i}" ${G.locked[i] ? "disabled" : ""}>${id !== null ? G.tiles[id].ch : ""}</button>`).join("");
@@ -288,18 +290,18 @@ function renderGame2() { livesUI(); $("#gStreak").textContent = ""; }
 function hint() {
   if (G.busy || G.paused) return;
   if (G.duel) return toast("En los duelos no hay pistas");
-  if (SV.coins < 10) { toast("Te faltan monedas para la pista"); vib(40); return; }
+  if (SV.coins < hintCost(G.kind)) { toast("Te faltan monedas para la pista"); vib(40); return; }
   const i = G.locked.findIndex((l) => !l); if (i < 0) return;
   const ch = G.target[i];
   const used = new Set(G.ans.filter((x) => x !== null));
   let t = G.tiles.find((x) => x.ch === ch && !used.has(x.id));
   if (!t) { const j = G.ans.findIndex((id, k) => id !== null && !G.locked[k] && G.tiles[id].ch === ch); t = G.tiles[G.ans[j]]; G.ans[j] = null; }
   if (G.ans[i] !== null) G.ans[i] = null;
-  G.ans[i] = t.id; G.locked[i] = true; SV.coins -= 10; G.hints++; G.wordHints++; save();
+  G.ans[i] = t.id; G.locked[i] = true; SV.coins -= hintCost(G.kind); G.hints++; G.wordHints++; save();
   $("#gCoins").textContent = SV.coins; renderTiles(); beep(SND.coin);
   if (G.ans.every((x) => x !== null)) checkAnswer();
 }
-function moreTime() { if (G.busy || G.paused) return; if (G.duel) return toast("En los duelos no hay tiempo extra"); if (SV.coins < 15) { toast("Te faltan monedas"); vib(40); return; } SV.coins -= 15; G.left += 15; G.total = Math.max(G.total, G.left); save(); $("#gCoins").textContent = SV.coins; renderTime(); beep(SND.coin); float("+15 s", "good"); }
+function moreTime() { if (G.busy || G.paused) return; if (G.duel) return toast("En los duelos no hay tiempo extra"); if (SV.coins < timeCost(G.kind)) { toast("Te faltan monedas"); vib(40); return; } SV.coins -= timeCost(G.kind); G.left += 15; G.total = Math.max(G.total, G.left); save(); $("#gCoins").textContent = SV.coins; renderTime(); beep(SND.coin); float("+15 s", "good"); }
 function pause(on) {
   if (!G || G.over || (G.duel && G.duel.live)) return; G.paused = on;
   $("#game").classList.toggle("paused", on);
@@ -556,6 +558,7 @@ const adTier = (L) => Math.min(4, 1 + Math.floor((L - 1) / 6));
 const adPass = (L) => Math.min(350, 120 + 12 * L);
 const AD_TITLES = [[1, "Curioso"], [3, "Aprendiz de detective"], [6, "Rastreador"], [10, "Detective"], [15, "Sabueso"], [20, "Inspector"], [30, "Comisario"], [40, "Maestro de la intriga"], [60, "Leyenda del misterio"]];
 const adTitle = (L) => AD_TITLES.filter((t) => L >= t[0]).pop()[1];
+const adMax = () => difOf("adi").clues;
 const adPts = (shown) => 110 - 10 * shown;
 const plain = (s) => letters(s).replace(/[^A-ZÑ]/g, "");
 const plainText = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -603,21 +606,21 @@ function adNext() {
 function adRender(fresh) {
   $("#adDots").innerHTML = Array.from({ length: AD_ROUND }, (_, i) => `<i class="${i < AD.i ? "done" : i === AD.i ? "cur" : ""}"></i>`).join("");
   $("#adGoal").textContent = `Nivel ${AD.lv} · Meta ${adPass(AD.lv)} pts · Llevás ${AD.total}`;
-  $("#adWorth").textContent = `Pista ${AD.shown}/10 · Vale ${adPts(AD.shown)} pts`;
+  $("#adWorth").textContent = `Pista ${AD.shown}/${adMax()} · Vale ${adPts(AD.shown)} pts`;
   $("#adClues").innerHTML = AD.clues.slice(0, AD.shown).map((c, i) => `<li class="${c[1] ? "auto" : ""} ${i === AD.shown - 1 ? "new" : ""}"><b>${i + 1}</b><span>${esc(c[0])}</span></li>`).join("");
   const ul = $("#adClues"); ul.scrollTop = ul.scrollHeight;
-  $("#adMore").disabled = AD.shown >= 10;
+  $("#adMore").disabled = AD.shown >= adMax();
   if (fresh) $("#adIn").focus({ preventScroll: true });
 }
 function adFloat(t, cls) { const f = $("#adFloat"); f.className = "float " + (cls || ""); f.textContent = t; void f.offsetWidth; f.classList.add("go"); }
-function adMore() { if (AD.busy || AD.shown >= 10) return; AD.shown++; adRender(); beep(SND.coin); }
+function adMore() { if (AD.busy || AD.shown >= adMax()) return; AD.shown++; adRender(); beep(SND.coin); }
 function adAnswers() { const w = AD.cur.w; return [plain(w), ...(ALIAS[w] || []).map(plain)]; }
 function adGuess() {
   if (AD.busy) return;
   const g = plain($("#adIn").value); if (!g) return;
   if (adAnswers().includes(g)) return adWin();
   beep(SND.bad); vib([60, 40, 60]); $("#adIn").classList.add("shake"); setTimeout(() => $("#adIn").classList.remove("shake"), 400);
-  if (AD.shown >= 10) return adLose();
+  if (AD.shown >= adMax()) return adLose();
   adFloat("No es. ¡Otra pista!", "bad"); $("#adIn").value = ""; AD.shown++; adRender();
 }
 function adFinish(pts, msg, good) {

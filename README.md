@@ -22,3 +22,5 @@ Publicar: Settings → Pages → Branch `main` / root.
 
 ## ¿Qué ves?
 ~285 imágenes (emojis) con la palabra incompleta: te damos 2–3 letras de ayuda y completás el resto. Con el nivel y la dificultad hay menos letras de ayuda, menos tiempo y palabras más largas. Mismas reglas que Anagrama: 10 imágenes por nivel, 3 vidas, tiempo, estrellas, puntos y monedas propios.
+
+**Ilustraciones propias:** las imágenes de ¿Qué ves? son dibujos originales (SVG hechos con formas simples, en `iconos-*.js`), sin derechos de terceros. Dificultad: Experto da 3× los puntos, tiempo ×0,45, palabras mucho más largas, una vida menos, pistas a 40 monedas y (en Adivina) solo 6 pistas.

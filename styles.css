@@ -151,3 +151,5 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 .qvimg.pop{animation:qvpop .45s ease}@keyframes qvpop{0%{transform:scale(.6) rotate(-8deg);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
 #qvSlots{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}#qvSlots .bad{background:#fecaca;color:var(--bad)}
 #qvGame .tools{margin-top:0}
+
+.qvimg svg{width:132px;height:132px;display:block;margin:0 auto}

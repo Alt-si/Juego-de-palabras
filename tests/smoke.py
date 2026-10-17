@@ -144,7 +144,8 @@ try:
         check(pg.evaluate("SV.dif.ana") == "e" and pg.is_visible("#hDiffs"), "Anagrama: dificultad elegida desde el menú")
         pg.click("#btnPlay"); pg.wait_for_timeout(300)
         te = pg.evaluate("timerTotal()"); pg.evaluate("SV.dif.ana = 'f'"); tf = pg.evaluate("timerTotal()")
-        check(tf > te, f"Fácil da más tiempo que Experto ({tf} > {te})")
+        check(tf > te * 2, f"Fácil da mucho más tiempo que Experto ({tf} vs {te})")
+        check(pg.evaluate("maxLives('ana')") == 3 and pg.evaluate("SV.dif.ana = 'e'; maxLives('ana')") == 2 and pg.evaluate("hintCost('ana')") == 40, "Experto: 1 vida menos y pistas a 40 monedas")
 
         # --- ¿Qué ves? ---
         pg = newpage(b.new_context(viewport=V)); pg.goto(URL); pg.wait_for_timeout(300)

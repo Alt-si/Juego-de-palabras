@@ -1,9 +1,9 @@
 "use strict";
 // ¿Qué ves?: una imagen y la palabra incompleta; hay que completar las letras que faltan.
-const QV = IMAGENES_RAW.map((x) => { const [e, w] = x.split("|"); return { e, w, L: [...w].map(crLetter).join("") }; });
+const QV = Object.keys(ICONS).map((w) => ({ w, L: [...w].map(crLetter).join("") }));
 const qvTier = (n) => (n <= 4 ? 1 : n <= 6 ? 2 : n <= 8 ? 3 : 4);
 const qvHelp = (lv) => Math.max(0, 3 - Math.floor((lv - 1) / 3) + gameDifQ().help);
-const qvDifs = { f: 1, m: 0, d: -1, e: -2 };
+const qvDifs = { f: 1, m: 0, d: -1, e: -3 };
 const gameDifQ = () => ({ help: qvDifs[(SV.dif && SV.dif.qv) || "m"] });
 const qvTime = (lv) => Math.round(Math.max(20, 45 - Math.min(lv, 20)) * difOf("qv").time);
 let Q = null, QT = 0;
@@ -31,10 +31,10 @@ $("#qvPlay").onclick = () => qvStart();
 
 function qvStart() {
   const lv = SV.qvLv;
-  Q = { lv, list: qvPick(lv), i: 0, solved: 0, lives: maxLives(), lost: 0, hints: 0, streak: 0, over: false };
+  Q = { lv, list: qvPick(lv), i: 0, solved: 0, lives: maxLives("qv"), lost: 0, hints: 0, streak: 0, over: false };
   $("#qvHome").hidden = true; $("#qvGame").hidden = false; SCENES.apply(SCENES.world(lv)); qvImage();
 }
-function qvLives() { $("#qvLives").innerHTML = Array.from({ length: maxLives() }, (_, i) => `<span class="${i < Q.lives ? "on" : ""}">❤</span>`).join(""); }
+function qvLives() { $("#qvLives").innerHTML = Array.from({ length: maxLives("qv") }, (_, i) => `<span class="${i < Q.lives ? "on" : ""}">❤</span>`).join(""); }
 function qvImage() {
   clearInterval(QT);
   const it = Q.list[Q.i]; const n = it.L.length;
@@ -44,8 +44,8 @@ function qvImage() {
   Q.total = qvTime(Q.lv); Q.left = Q.total;
   $("#qvTotal").textContent = SV.coins; qvLives();
   $("#qvDots").innerHTML = Q.list.map((_, i) => `<i class="${i < Q.i ? "done" : i === Q.i ? "cur" : ""}"></i>`).join("");
-  const im = $("#qvImg"); im.textContent = it.e; im.classList.remove("pop"); void im.offsetWidth; im.classList.add("pop");
-  qvDraw(); qvTimeUI();
+  const im = $("#qvImg"); im.innerHTML = iconSvg(it.w); im.classList.remove("pop"); void im.offsetWidth; im.classList.add("pop");
+  $("#qvHint small").textContent = `Letra · ${hintCost("qv")}🪙`; qvDraw(); qvTimeUI();
   QT = setInterval(() => { if (Q.busy || !$("#modal").hidden) return; Q.left -= 0.1; qvTimeUI(); if (Q.left <= 0) qvFail("¡Se acabó el tiempo!"); }, 100);
 }
 function qvTimeUI() { const p = Math.max(0, Q.left / Q.total); $("#qvBar").style.width = p * 100 + "%"; $("#qvBar").className = p < 0.25 ? "low" : p < 0.5 ? "mid" : ""; $("#qvTime").textContent = Math.ceil(Math.max(0, Q.left)) + " s"; }
@@ -105,10 +105,10 @@ function qvEnd() {
 }
 $("#qvHint").onclick = () => {
   if (!Q || Q.busy) return;
-  if (SV.coins < 10) { toast("Te faltan monedas para la pista"); vib(40); return; }
+  if (SV.coins < hintCost("qv")) { toast("Te faltan monedas para la pista"); vib(40); return; }
   const open = Q.ans.map((c, i) => (c ? -1 : i)).filter((i) => i >= 0 && !Q.given.has(i)); const empty = Q.ans.map((c, i) => (!c ? i : -1)).filter((i) => i >= 0);
   if (!empty.length) return;
-  const i = empty[0]; Q.ans[i] = Q.it.L[i]; Q.given.add(i); SV.coins -= 10; Q.hints++; Q.wordHints++; save(); $("#qvTotal").textContent = SV.coins; beep(SND.coin); qvDraw();
+  const i = empty[0]; Q.ans[i] = Q.it.L[i]; Q.given.add(i); SV.coins -= hintCost("qv"); Q.hints++; Q.wordHints++; save(); $("#qvTotal").textContent = SV.coins; beep(SND.coin); qvDraw();
   if (Q.ans.every(Boolean)) { if (Q.ans.join("") === Q.it.L) qvWin(); else qvWrong(); }
 };
 $("#qvSkip").onclick = () => { if (!Q || Q.busy) return; qvFail("Pasaste (−1 ❤)."); };

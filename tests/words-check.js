@@ -62,17 +62,16 @@ console.log("Adivina: " + cats + " categorías, " + words + " palabras (" + uniq
   console.log("Frases encriptadas: " + F.length + " frases", JSON.stringify(cnt));
 }
 
-// ---- ¿Qué ves? ----
+// ---- ¿Qué ves? (ilustraciones propias) ----
 {
-  const src = require("fs").readFileSync(require("path").join(__dirname, "..", "imagenes.js"), "utf8");
-  const F = new Function(src + "; return IMAGENES_RAW;")();
-  const w = new Set(), e = new Set();
-  for (const x of F) {
-    const p = x.split("|"); if (p.length !== 2 || !p[0] || !p[1]) throw new Error("Imágenes: formato incorrecto: " + x);
-    if (!/^[a-záéíóúüñ]{3,12}$/.test(p[1])) throw new Error("Imágenes: palabra inválida: " + p[1]);
-    if (w.has(p[1])) throw new Error("Imágenes: palabra repetida: " + p[1]); if (e.has(p[0])) throw new Error("Imágenes: emoji repetido: " + p[0]);
-    w.add(p[1]); e.add(p[0]);
+  const fs = require("fs"), path = require("path");
+  const src = ["iconos.js", "iconos-1.js", "iconos-2.js", "iconos-3.js", "iconos-4.js"].map((f) => fs.readFileSync(path.join(__dirname, "..", f), "utf8")).join("\n");
+  const I = new Function(src + "; return ICONS;")();
+  const keys = Object.keys(I);
+  for (const w of keys) {
+    if (!/^[a-záéíóúüñ]{3,12}$/.test(w)) throw new Error("Imágenes: palabra inválida: " + w);
+    if (!I[w] || I[w].length < 40 || /NaN|undefined/.test(I[w])) throw new Error("Imágenes: dibujo roto: " + w);
   }
-  if (F.length < 250) throw new Error("Imágenes: pocas (" + F.length + ")");
-  console.log("¿Qué ves?: " + F.length + " imágenes OK");
+  if (keys.length < 150) throw new Error("Imágenes: pocas (" + keys.length + ")");
+  console.log("¿Qué ves?: " + keys.length + " ilustraciones OK");
 }
