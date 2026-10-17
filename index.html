@@ -52,7 +52,7 @@
     <div class="goal" id="adGoal"></div>
     <div class="worth" id="adWorth"></div>
     <ol class="clues" id="adClues"></ol>
-    <div class="guess"><input id="adIn" placeholder="Escribí tu respuesta" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="send"><button class="big" id="adGo">Adivinar</button></div>
+    <div class="guess"><input id="adIn" placeholder="Escribí tu respuesta" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="send"><button class="mic" id="adMic" aria-label="Responder con la voz">🎤</button><button class="big" id="adGo">Adivinar</button></div>
     <div class="tools two"><button id="adMore">💡<small>Otra pista</small></button><button id="adSkip">⏭<small>Pasar · 0 pts</small></button></div>
     <div class="float" id="adFloat" aria-live="polite"></div>
   </section>
@@ -101,7 +101,7 @@
     <div class="qvimg" id="qvImg"></div>
     <div class="slots" id="qvSlots"></div>
     <div class="crkeys" id="qvKeys"></div>
-    <div class="tools two"><button id="qvHint">💡<small>Letra · 10🪙</small></button><button id="qvSkip">⏭<small>Pasar · −1 ❤</small></button></div>
+    <div class="tools three"><button id="qvHint">💡<small>Letra · 10🪙</small></button><button id="qvMic" class="mic">🎤<small>Decir</small></button><button id="qvSkip">⏭<small>Pasar · −1 ❤</small></button></div>
     <div class="float" id="qvFloat" aria-live="polite"></div>
   </section>
 
@@ -186,6 +186,7 @@
 <script src="quever.js"></script>
 <script src="duelos.js"></script>
 <script src="serie.js"></script>
+<script src="voz.js"></script>
 <script src="frutti-data.js"></script>
 <script src="frutti-data2.js"></script>
 <script src="frutti.js"></script>

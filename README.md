@@ -38,3 +38,6 @@ Publicar: Settings → Pages → Branch `main` / root.
 - `progreso.js` concentra la curva: la dificultad sube de a poco durante 1000 niveles (largo de palabras, tiempo, letras de ayuda, pistas, letras de más, frases para pasar) y después el juego sigue sin fin con títulos "✦". Los puntos por palabra y el premio por nivel crecen con el nivel.
 - Rangos globales: 21 rangos hasta "Eterno" (3.500.000 pts) y una estrella ✦ más por cada millón.
 - Más contenido: `words-extra.js` (+1600 palabras para Anagrama/Escondidas) y `frases-extra.js` (refranes). En ¿Qué ves? desde el nivel 20 las imágenes aparecen espejadas, al revés, con zoom, borrosas, en silueta o muy chicas.
+
+## Respuesta por voz
+- Adivina y ¿Qué ves? tienen un botón 🎤 para decir la palabra en vez de tipearla (`voz.js`, Web Speech API, es-AR). Requiere Chrome/Safari, HTTPS, permiso de micrófono e internet. En ¿Qué ves? una palabra errada no quita vidas.

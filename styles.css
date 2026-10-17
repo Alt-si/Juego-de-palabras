@@ -235,3 +235,9 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 .lvnav{display:flex;gap:4px}.lvnav .ib{width:36px;height:36px}
 .qvimg{position:relative;overflow:hidden}.qvtw{position:absolute;right:8px;top:8px;font-size:12px;background:#0006;color:#fff;border-radius:99px;padding:3px 9px}
 .qvw{transition:transform .2s,filter .2s}
+
+/* ---- voz ---- */
+.mic{background:var(--panel);border-radius:14px;box-shadow:0 1px 3px #0002;font-size:22px;min-width:52px}
+#adMic{padding:0 12px}
+.mic.on{background:#e11d48;color:#fff;animation:micp 1s infinite}
+@keyframes micp{0%,100%{box-shadow:0 0 0 0 #e11d4866}50%{box-shadow:0 0 0 10px #e11d4800}}
