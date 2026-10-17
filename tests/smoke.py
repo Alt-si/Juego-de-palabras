@@ -146,6 +146,20 @@ try:
         te = pg.evaluate("timerTotal()"); pg.evaluate("SV.dif.ana = 'f'"); tf = pg.evaluate("timerTotal()")
         check(tf > te, f"Fácil da más tiempo que Experto ({tf} > {te})")
 
+        # --- ¿Qué ves? ---
+        pg = newpage(b.new_context(viewport=V)); pg.goto(URL); pg.wait_for_timeout(300)
+        pg.click('[data-game="qv"] [data-diff="d"]'); pg.wait_for_timeout(200)
+        check(pg.is_visible("#qvHome") and pg.evaluate("SV.dif.qv") == "d", "¿Qué ves?: dificultad desde el menú")
+        pg.click("#qvPlay"); pg.wait_for_timeout(300)
+        check(pg.evaluate("Q.given.size") >= 1 and pg.evaluate("document.querySelectorAll('#qvSlots .slot').length") >= 3, "hay letras de ayuda y huecos")
+        for i in range(10):
+            pg.evaluate("() => { [...Q.it.L].forEach((c, i) => { if (!Q.given.has(i)) qvKey(c); }); }"); pg.wait_for_timeout(1250)
+        check(pg.is_visible("#qvAgain") and pg.evaluate("SV.qvLv") == 2, "¿Qué ves?: nivel superado")
+        check(pg.evaluate("SV.pts.qv") > 0 and pg.evaluate("SV.wal.qv") > 0 and pg.evaluate("SV.wal.ana") == 0, "¿Qué ves?: puntos y monedas propios")
+        pg.click("#qvAgain"); pg.wait_for_timeout(200)
+        pg.evaluate("() => { qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); }"); pg.wait_for_timeout(900)
+        check(pg.evaluate("Q.lives") <= 2, "respuesta incorrecta resta vida")
+
         check(not errs, f"sin errores de JavaScript {errs}")
         b.close()
 finally:

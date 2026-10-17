@@ -61,3 +61,18 @@ console.log("Adivina: " + cats + " categorías, " + words + " palabras (" + uniq
   for (const k in cnt) if (cnt[k] < 25) throw new Error("Frases: pocas en dificultad " + k + ": " + cnt[k]);
   console.log("Frases encriptadas: " + F.length + " frases", JSON.stringify(cnt));
 }
+
+// ---- ¿Qué ves? ----
+{
+  const src = require("fs").readFileSync(require("path").join(__dirname, "..", "imagenes.js"), "utf8");
+  const F = new Function(src + "; return IMAGENES_RAW;")();
+  const w = new Set(), e = new Set();
+  for (const x of F) {
+    const p = x.split("|"); if (p.length !== 2 || !p[0] || !p[1]) throw new Error("Imágenes: formato incorrecto: " + x);
+    if (!/^[a-záéíóúüñ]{3,12}$/.test(p[1])) throw new Error("Imágenes: palabra inválida: " + p[1]);
+    if (w.has(p[1])) throw new Error("Imágenes: palabra repetida: " + p[1]); if (e.has(p[0])) throw new Error("Imágenes: emoji repetido: " + p[0]);
+    w.add(p[1]); e.add(p[0]);
+  }
+  if (F.length < 250) throw new Error("Imágenes: pocas (" + F.length + ")");
+  console.log("¿Qué ves?: " + F.length + " imágenes OK");
+}

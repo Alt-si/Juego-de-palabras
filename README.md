@@ -19,3 +19,6 @@ Publicar: Settings → Pages → Branch `main` / root.
 
 ## Frases encriptadas
 ~300 frases famosas (refranes, citas, cine, deporte). Cada letra se oculta tras un número, un objeto o un color (al azar en cada frase). Cuatro dificultades elegibles desde el menú (Fácil, Medio, Difícil, Experto): cambia el largo de las frases y cuántas letras te regalan; en cada nivel la ronda de 5 frases se vuelve más exigente. Puntaje propio del juego.
+
+## ¿Qué ves?
+~285 imágenes (emojis) con la palabra incompleta: te damos 2–3 letras de ayuda y completás el resto. Con el nivel y la dificultad hay menos letras de ayuda, menos tiempo y palabras más largas. Mismas reglas que Anagrama: 10 imágenes por nivel, 3 vidas, tiempo, estrellas, puntos y monedas propios.

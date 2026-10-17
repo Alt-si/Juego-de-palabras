@@ -25,6 +25,7 @@
     <button class="gcard g3" data-game="adi"><span class="ico">🕵️</span><span><b>Adivina</b><small>100 categorías · 10 pistas: ¡cuantas menos uses, más puntos!</small></span><em><span id="mLvAdi"></span><u id="mPtsAdi"></u></em><em class="chips"><span data-diff="f">🌱 Fácil</span><span data-diff="m">🌿 Medio</span><span data-diff="d">🔥 Difícil</span><span data-diff="e">💀 Experto</span></em></button>
     <button class="gcard g4" data-game="cri"><span class="ico">🔐</span><span><b>Frases encriptadas</b><small>Descubrí la frase famosa: cada letra es un número, objeto o color</small></span>
       <em class="chips"><span data-diff="f">🌱 Fácil</span><span data-diff="m">🌿 Medio</span><span data-diff="d">🔥 Difícil</span><span data-diff="e">💀 Experto</span><u id="mPtsCri"></u></em></button>
+    <button class="gcard g5" data-game="qv"><span class="ico">🖼️</span><span><b>¿Qué ves?</b><small>Mirá la imagen y completá la palabra</small></span><em class="chips"><span data-diff="f">🌱 Fácil</span><span data-diff="m">🌿 Medio</span><span data-diff="d">🔥 Difícil</span><span data-diff="e">💀 Experto</span><u id="mPtsQv"></u></em></button>
   </section>
 
   <section id="adHome" class="screen" hidden>
@@ -65,6 +66,27 @@
     <div class="crkeys" id="crKeys"></div>
     <div class="tools" id="crTools"><button id="crHint">💡<small>Letra · 10🪙</small></button><button id="crCheck">✔<small>Revisar</small></button><button id="crAuth">👤<small>Autor</small></button><button id="crSkip">⏭<small>Pasar</small></button></div>
     <div class="float" id="crFloat" aria-live="polite"></div>
+  </section>
+
+  <section id="qvHome" class="screen" hidden>
+    <div class="topbar"><button class="ib" id="qvBack" aria-label="Menú de juegos">‹</button><span class="coins">🪙 <b id="qvCoins">0</b></span><span class="rank" id="qvRank"></span></div>
+    <div class="crlogo">🖼️<h1>¿QUÉ VES?</h1></div>
+    <p class="tag">Mirá la imagen y completá la palabra</p>
+    <div class="diffs" id="qvDiffs"></div>
+    <div class="levelcard" id="qvLvl"></div>
+    <button class="big" id="qvPlay">▶ Jugar</button>
+    <p class="how">Te damos algunas letras de ayuda. A medida que subís de nivel y de dificultad, hay menos letras para ayudarte. ¡Y cuidado con el tiempo y las vidas!</p>
+  </section>
+
+  <section id="qvGame" class="screen" hidden>
+    <div class="topbar"><button class="ib" id="qvQuit" aria-label="Salir">✕</button><span class="lives" id="qvLives"></span><span class="coins">🪙 <b id="qvTotal">0</b></span></div>
+    <div class="dots" id="qvDots"></div>
+    <div class="timer"><i id="qvBar"></i><b id="qvTime"></b></div>
+    <div class="qvimg" id="qvImg"></div>
+    <div class="slots" id="qvSlots"></div>
+    <div class="crkeys" id="qvKeys"></div>
+    <div class="tools two"><button id="qvHint">💡<small>Letra · 10🪙</small></button><button id="qvSkip">⏭<small>Pasar · −1 ❤</small></button></div>
+    <div class="float" id="qvFloat" aria-live="polite"></div>
   </section>
 
   <section id="home" class="screen" hidden>
@@ -112,8 +134,10 @@
 <script src="adivina-5.js"></script>
 <script src="scenes.js"></script>
 <script src="frases.js"></script>
+<script src="imagenes.js"></script>
 <script src="game.js"></script>
 <script src="cripto.js"></script>
+<script src="quever.js"></script>
 <script>if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});</script>
 </body>
 </html>

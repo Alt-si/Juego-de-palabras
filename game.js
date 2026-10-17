@@ -5,14 +5,14 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&
 const PER_LEVEL = 10, LIVES = 3, TICK = 100;
 
 // ---------- Guardado ----------
-const DEF = { coins: 0, adBest: {}, pts: { ana: 0, hid: 0, adi: 0, cri: 0 }, crLv: { f: 1, m: 1, d: 1, e: 1 }, crDiff: "f", dif: { ana: "m", hid: "m", adi: "m" }, crSeen: [], crSolved: 0, adQuick: 0, adAces: 0, adLevel: 1, adSeen: [], level: 1, stars: {}, lvH: 1, starsH: {}, solved: 0, bestStreak: 0, ach: {}, theme: "claro", owned: ["claro"], sound: true, lastDaily: "", dailyStreak: 0, seen: [], played: 0, fastest: 0, name: "", duels: 0, duelWins: 0 };
+const DEF = { coins: 0, adBest: {}, pts: { ana: 0, hid: 0, adi: 0, cri: 0, qv: 0 }, crLv: { f: 1, m: 1, d: 1, e: 1 }, crDiff: "f", dif: { ana: "m", hid: "m", adi: "m" }, crSeen: [], crSolved: 0, qvLv: 1, qvSeen: [], qvSolved: 0, starsQ: [], adQuick: 0, adAces: 0, adLevel: 1, adSeen: [], level: 1, stars: {}, lvH: 1, starsH: {}, solved: 0, bestStreak: 0, ach: {}, theme: "claro", owned: ["claro"], sound: true, lastDaily: "", dailyStreak: 0, seen: [], played: 0, fastest: 0, name: "", duels: 0, duelWins: 0 };
 let SV;
 try { SV = { ...DEF, ...JSON.parse(localStorage.getItem("anagrama-v1") || "{}") }; } catch { SV = { ...DEF }; }
 // Monedas individuales por juego: SV.coins apunta a la billetera del juego en pantalla.
 {
   const old = SV.coins || 0;
-  if (!SV.wal) SV.wal = { ana: old, hid: 0, adi: 0, cri: 0 };
-  const key = () => { try { if (!$("#crHome").hidden || !$("#crGame").hidden) return "cri"; if (adOn) return "adi"; } catch {} return CUR === "hid" ? "hid" : "ana"; };
+  if (!SV.wal) SV.wal = { ana: old, hid: 0, adi: 0, cri: 0, qv: 0 };
+  const key = () => { try { if (!$("#crHome").hidden || !$("#crGame").hidden) return "cri"; if (!$("#qvHome").hidden || !$("#qvGame").hidden) return "qv"; if (adOn) return "adi"; } catch {} return CUR === "hid" ? "hid" : "ana"; };
   Object.defineProperty(SV, "coins", { enumerable: false, configurable: true, get() { return SV.wal[key()] || 0; }, set(v) { SV.wal[key()] = v; } });
 }
 const walletTotal = () => Object.values(SV.wal).reduce((a, b) => a + b, 0);
@@ -41,7 +41,7 @@ let CUR = "ana"; // juego elegido en el menú: "ana" (Anagrama) o "hid" (Palabra
 const GRANKS = [[0, "Novato"], [300, "Aprendiz"], [1000, "Curioso"], [2500, "Ingenioso"], [5000, "Astuto"], [9000, "Erudito"], [15000, "Genio"], [25000, "Maestro mental"], [40000, "Leyenda"]];
 function addPts(k, n) { SV.pts = SV.pts || { ana: 0, hid: 0, adi: 0, cri: 0 }; SV.pts[k] = (SV.pts[k] || 0) + n; SV.wal[k] = (SV.wal[k] || 0) + n; }
 const ptsOf = (k) => (SV.pts && SV.pts[k]) || 0;
-const totalPts = () => ptsOf("ana") + ptsOf("hid") + ptsOf("adi") + ptsOf("cri");
+const totalPts = () => ptsOf("ana") + ptsOf("hid") + ptsOf("adi") + ptsOf("cri") + ptsOf("qv");
 function globalRank() { const t = totalPts(); let i = 0; GRANKS.forEach((r, j) => { if (t >= r[0]) i = j; }); const n = GRANKS[i + 1]; return { name: GRANKS[i][1], i, next: n ? n[0] : null, nextName: n ? n[1] : null, from: GRANKS[i][0], total: t }; }
 const KSk = (k) => (k === "hid" ? { lv: "lvH", st: "starsH" } : { lv: "level", st: "stars" });
 const KS = () => KSk(CUR);
@@ -68,6 +68,8 @@ const ACH = [
   ["speed", "Rayo", "Resolvé una palabra con más del 75 % del tiempo sobrando", () => SV.fastest >= 0.75, 20],
   ["cr10", "Descifrador", "Resolvé 10 frases encriptadas", () => SV.crSolved >= 10, 40],
   ["cr50", "Criptógrafo", "Resolvé 50 frases encriptadas", () => SV.crSolved >= 50, 150],
+  ["qv10", "Ojo de águila", "Descubrí 10 imágenes en ¿Qué ves?", () => SV.qvSolved >= 10, 40],
+  ["qv100", "Ojo clínico", "Descubrí 100 imágenes en ¿Qué ves?", () => SV.qvSolved >= 100, 150],
   ["rich", "Ahorrista", "Juntá 500 monedas", () => SV.coins >= 500, 50],
   ["duel1", "Competidor", "Ganale un duelo a un amigo", () => SV.duelWins >= 1, 40],
   ["daily3", "Constante", "Entrá 3 días seguidos", () => SV.dailyStreak >= 3, 30],
@@ -423,17 +425,17 @@ window.addEventListener("hashchange", checkInvite);
 // ---------- Menú ----------
 function showMenu() {
   SCENES.apply(null);
-  $("#adHome").hidden = true; $("#adGame").hidden = true; adOn = false; $("#crHome").hidden = true; $("#crGame").hidden = true;
+  $("#adHome").hidden = true; $("#adGame").hidden = true; adOn = false; $("#crHome").hidden = true; $("#crGame").hidden = true; $("#qvHome").hidden = true; $("#qvGame").hidden = true;
   $("#home").hidden = true; $("#game").hidden = true; $("#menu").hidden = false;
   $("#mCoins").textContent = walletTotal(); applyTheme();
   const gr = globalRank(); $("#mRank").textContent = gr.name;
   $("#mTotal").textContent = gr.total.toLocaleString("es-AR") + " pts";
   $("#mBar").style.width = (gr.next ? Math.min(100, ((gr.total - gr.from) / (gr.next - gr.from)) * 100) : 100) + "%";
   $("#mNext").textContent = gr.next ? `Próximo rango: ${gr.nextName} (${(gr.next - gr.total).toLocaleString("es-AR")} pts)` : "¡Rango máximo!";
-  $("#mPtsAna").textContent = ptsOf("ana") + " pts"; $("#mPtsHid").textContent = ptsOf("hid") + " pts"; $("#mPtsAdi").textContent = ptsOf("adi") + " pts"; $("#mPtsCri").textContent = ptsOf("cri") + " pts"; if (typeof crMenu === "function") crMenu(); document.querySelectorAll("#menu [data-game]").forEach((c) => { const k = c.dataset.game; if (k !== "cri") c.querySelectorAll("[data-diff]").forEach((x) => x.classList.toggle("on", x.dataset.diff === SV.dif[k])); });
+  $("#mPtsAna").textContent = ptsOf("ana") + " pts"; $("#mPtsHid").textContent = ptsOf("hid") + " pts"; $("#mPtsAdi").textContent = ptsOf("adi") + " pts"; $("#mPtsCri").textContent = ptsOf("cri") + " pts"; if (typeof crMenu === "function") crMenu(); if (typeof qvMenu === "function") qvMenu(); document.querySelectorAll("#menu [data-game]").forEach((c) => { const k = c.dataset.game; if (k !== "cri" && k !== "qv") c.querySelectorAll("[data-diff]").forEach((x) => x.classList.toggle("on", x.dataset.diff === SV.dif[k])); });
   $("#mLvAna").textContent = `Nivel ${SV.level}`; $("#mLvHid").textContent = `Nivel ${SV.lvH}`; $("#mLvAdi").textContent = `Nivel ${SV.adLevel}`;
 }
-function openGame(k) { if (k === "adi") return showAdHome(); if (k === "cri") return crOpen(); CUR = k; viewLevel = curLevel(); $("#menu").hidden = true; $("#home").hidden = false; renderHome(); }
+function openGame(k) { if (k === "adi") return showAdHome(); if (k === "cri") return crOpen(); if (k === "qv") return qvOpen(); CUR = k; viewLevel = curLevel(); $("#menu").hidden = true; $("#home").hidden = false; renderHome(); }
 
 // ---------- Duelo en vivo ----------
 // Conexión directa entre los dos celulares (WebRTC) usando PeerJS; no hay servidor propio.

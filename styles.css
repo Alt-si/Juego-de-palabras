@@ -145,3 +145,9 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 .crkeys .used{opacity:.4}.crkeys .del{background:var(--tileb)}
 .crq{font-size:18px;font-weight:700;margin:6px 0}.crau{color:var(--mut);margin:0 0 6px}
 #crGame .tools{margin-top:0}
+/* ---- ¿Qué ves? ---- */
+.g5{background:linear-gradient(135deg,#7c3aed,#0ea5e9)}
+.qvimg{font-size:112px;line-height:1.1;text-align:center;background:var(--panel);border-radius:22px;padding:18px 0;box-shadow:0 2px 8px #0002;user-select:none}
+.qvimg.pop{animation:qvpop .45s ease}@keyframes qvpop{0%{transform:scale(.6) rotate(-8deg);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+#qvSlots{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}#qvSlots .bad{background:#fecaca;color:var(--bad)}
+#qvGame .tools{margin-top:0}
