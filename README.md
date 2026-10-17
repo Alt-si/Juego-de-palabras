@@ -24,3 +24,9 @@ Publicar: Settings → Pages → Branch `main` / root.
 ~285 imágenes (emojis) con la palabra incompleta: te damos 2–3 letras de ayuda y completás el resto. Con el nivel y la dificultad hay menos letras de ayuda, menos tiempo y palabras más largas. Mismas reglas que Anagrama: 10 imágenes por nivel, 3 vidas, tiempo, estrellas, puntos y monedas propios.
 
 **Ilustraciones propias:** las imágenes de ¿Qué ves? son dibujos originales (SVG hechos con formas simples, en `iconos-*.js`), sin derechos de terceros. Dificultad: Experto da 3× los puntos, tiempo ×0,45, palabras mucho más largas, una vida menos, pistas a 40 monedas y (en Adivina) solo 6 pistas.
+
+## Duelos y Tuti Frutti
+- **Duelos en todos los juegos**: Adivina (5 palabras), Frases encriptadas (3 frases) y ¿Qué ves? (10 imágenes) tienen "Duelo en vivo" y "Desafío por link" (`duelos.js`).
+- **Tuti Frutti** (`frutti.js`, `frutti-data.js`): solo duelos. Se eligen de 3 a 8 categorías, sale una letra y gana quien sume más: bien escrita 10, repetida con el rival 5, mal escrita 5 (se muestra cómo se escribe), no existe 0, más 10 de bonus para quien termina todo en menos tiempo.
+- La validación usa listas de palabras por categoría (`frutti-data.js`): una palabra real que no esté en la lista cuenta como "no existe". Se pueden ampliar agregando palabras.
+- Pruebas: `python3 tests/smoke.py` y `python3 tests/duelos.py`.

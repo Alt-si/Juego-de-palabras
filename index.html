@@ -31,6 +31,7 @@
     <button class="gcard g4" data-game="cri"><span class="ico">🔐</span><span><b>Frases encriptadas</b><small>Descubrí la frase famosa: cada letra es un número, objeto o color</small></span>
       <em class="chips"><span data-diff="f">🌱 Fácil</span><span data-diff="m">🌿 Medio</span><span data-diff="d">🔥 Difícil</span><span data-diff="e">💀 Experto</span><u id="mPtsCri"></u></em></button>
     <button class="gcard g5" data-game="qv"><span class="ico">🖼️</span><span><b>¿Qué ves?</b><small>Mirá la imagen y completá la palabra</small></span><em class="chips"><span data-diff="f">🌱 Fácil</span><span data-diff="m">🌿 Medio</span><span data-diff="d">🔥 Difícil</span><span data-diff="e">💀 Experto</span><u id="mPtsQv"></u></em></button>
+    <button class="gcard g6" data-game="tf"><span class="ico">📝</span><span><b>Tuti Frutti</b><small>Duelo por letra y categorías: ¡el más rápido y original gana!</small></span><em class="chips"><span>⚔ Solo duelos</span><u id="mPtsTf"></u></em></button>
   </section>
 
   <section id="adHome" class="screen" hidden>
@@ -101,6 +102,25 @@
     <div class="float" id="qvFloat" aria-live="polite"></div>
   </section>
 
+  <section id="tfHome" class="screen" hidden>
+    <div class="topbar"><button class="ib" id="tfBack" aria-label="Menú de juegos">‹</button><span class="coins">🪙 <b id="tfCoins">0</b></span><span class="rank" id="tfRank"></span><button class="ib help" data-help="tf" aria-label="Cómo se juega">?</button></div>
+    <div class="crlogo">📝<h1>TUTI<br>FRUTTI</h1></div>
+    <p class="tag">Elegí las categorías y desafiá a un amigo</p>
+    <div class="tfcats" id="tfCats"></div>
+    <p class="how" id="tfCount"></p>
+    <button class="mini wide" id="tfRand">🎲 Elegir 5 al azar</button>
+    <div class="duelrow"><button class="big" data-tf="live">⚔ Duelo en vivo</button><button class="big" data-tf="link">📨 Desafío por link</button></div>
+    <p class="how">Sale una letra: escribí una palabra de cada categoría. Terminá antes que tu rival para sumar puntos extra.</p>
+  </section>
+
+  <section id="tfGame" class="screen" hidden>
+    <div class="topbar"><button class="ib" id="tfQuit" aria-label="Salir">✕</button><span class="rank">Tuti Frutti</span><span class="coins">🪙 <b id="tfTotal">0</b></span><button class="ib help" data-help="tf" aria-label="Cómo se juega">?</button></div>
+    <div class="rival" id="tfRival" hidden></div>
+    <div class="tfhead"><div class="tfl" id="tfLetter"></div><div class="timer"><i id="tfBar"></i><b id="tfTime"></b></div></div>
+    <div class="tfrows" id="tfRows"></div>
+    <button class="big basta" id="tfBasta">¡BASTA!</button>
+  </section>
+
   <section id="home" class="screen" hidden>
     <div class="topbar"><button class="ib" id="btnMenu" aria-label="Menú de juegos">‹</button><span class="coins">🪙 <b id="hCoins">0</b></span><span class="rank" id="hRank"></span><button class="ib" id="btnSound" aria-label="Sonido">🔊</button><button class="ib help" data-help="cur" aria-label="Cómo se juega">?</button></div>
     <div class="logo" id="hLogo" aria-hidden="true"></div>
@@ -156,6 +176,8 @@
 <script src="cripto.js"></script>
 <script src="quever.js"></script>
 <script src="duelos.js"></script>
+<script src="frutti-data.js"></script>
+<script src="frutti.js"></script>
 <script>if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});</script>
 </body>
 </html>

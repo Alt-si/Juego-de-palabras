@@ -188,3 +188,22 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 .streak{height:22px}
 #game .pool{min-height:120px;align-content:flex-start}
 .duelrow{display:flex;gap:8px;margin:10px 0}.duelrow .mini{flex:1}
+
+.g6{background:linear-gradient(135deg,#f97316,#e11d48)}
+.tfcats{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.tfcats .chip{border:1px solid var(--line,#0003);background:var(--panel);color:inherit;border-radius:99px;padding:6px 10px;font-size:13px;cursor:pointer}
+.tfcats .chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.tfhead{display:flex;align-items:center;gap:12px;margin:8px 0}
+.tfl{font-size:56px;font-weight:900;line-height:1;background:var(--panel);border-radius:16px;padding:6px 18px;color:var(--ac);box-shadow:0 2px 6px #0003}
+.tfhead .timer{flex:1}
+.tfrows{display:flex;flex-direction:column;gap:8px;margin:8px 0}
+.tfrow{display:flex;flex-direction:column;gap:2px;font-size:13px;font-weight:700}
+.tfrow input{font-size:18px;padding:10px 12px;border-radius:10px;border:2px solid var(--line,#0003);background:var(--panel);color:inherit;text-transform:capitalize}
+.basta{background:#e11d48;margin-top:6px}
+.tfres{max-height:84vh;display:flex;flex-direction:column}
+.tfscroll{overflow:auto;max-height:42vh;margin:6px 0;text-align:left}
+.tfrr{border-top:1px solid #0002;padding:6px 0}.tfrr h4{margin:0 0 4px;font-size:13px}
+.tfpair{display:flex;gap:6px}.tfc{flex:1;border-radius:8px;padding:5px 7px;font-size:13px;background:#0001;min-width:0}
+.tfc b{display:block;overflow-wrap:anywhere}.tfc small{display:block;font-size:11px}
+.tfc.ok{background:#16a34a33}.tfc.mal{background:#f59e0b44}.tfc.rep{background:#3b82f644}.tfc.no{background:#dc262633}
+.pp{opacity:.8}.tfbon{font-weight:700;margin:2px 0}.tfhint{font-size:12px;opacity:.8;margin:2px 0}
