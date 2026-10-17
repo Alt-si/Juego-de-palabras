@@ -182,7 +182,7 @@ function nextWord() {
   G.hl = null; G.hinted = false;
   G.tiles = (w.scr || makeScr(w.L, G.kind, G.lv || 5)).map((ch, id) => ({ ch, id }));
   G.ans = Array(G.len).fill(null); G.locked = Array(G.len).fill(false);
-  G.total = G.left = timerTotal(); G.wordHints = 0; G.busy = false;
+  G.total = G.left = timerTotal(); G.wordHints = 0; G.busy = false; G.lockUntil = performance.now() + 350; $("#gAnswer").textContent = "";
   renderGame(); startTimer();
 }
 const timerTotal = () => Math.round(timeFor(G.duel ? 5 : G.lv, G.len) * (G.duel ? 1 : difOf(G.kind).time)) + (G.kind === "hid" ? 10 : 0);
@@ -220,7 +220,7 @@ function renderGame() {
   $("#gDots").innerHTML = Array.from({ length: PER_LEVEL }, (_, i) => `<i class="${i < dn ? "done" : i === dn ? "cur" : ""}"></i>`).join("");
   $("#gCat").textContent = G.w.c; $("#gLen").textContent = G.kind === "hid" ? `${G.len} letras · sobran ${G.tiles.length - G.len}` : `${G.len} letras`;
   const cl = G.kind === "hid" && hidClue(G.w.w);
-  $("#gClue").hidden = !cl; $("#gClue").textContent = cl ? "💬 " + cl : "";
+  $("#gClue").hidden = G.kind !== "hid"; $("#gClue").textContent = cl ? "💬 " + cl : " ";
   $("#gStreak").textContent = G.streak >= 2 ? `🔥 Racha x${G.streak}` : "";
   renderTiles(); renderTime();
 }
@@ -247,7 +247,7 @@ function startTimer() {
   }, TICK);
 }
 function place(id) {
-  const i = G.ans.indexOf(null); if (i < 0 || G.busy || G.paused) return;
+  const i = G.ans.indexOf(null); if (i < 0 || G.busy || G.paused || performance.now() < (G.lockUntil || 0)) return;
   G.ans[i] = id; renderTiles(); beep([[500 + i * 40, 0.05]]);
   if (G.ans.every((x) => x !== null)) checkAnswer();
 }
@@ -282,7 +282,8 @@ function failWord(msg) {
   G.ans = sol.map((ch) => { const t = G.tiles.find((x) => x.ch === ch && !taken.has(x.id)); taken.add(t.id); return t.id; });
   G.locked = Array(G.len).fill(true); renderTiles(); $("#gSlots").classList.add("reveal");
   float(msg === "skip" ? (G.duel ? "Pasaste" : "Pasaste: −❤") : msg, "bad"); renderGame2();
-  setTimeout(() => { $("#gSlots").classList.remove("reveal"); G.duel ? (G.n >= PER_LEVEL ? duelDone() : nextWord()) : G.lives <= 0 ? levelFailed() : nextWord(); }, 1700);
+  $("#gAnswer").innerHTML = `La palabra era: <b>${esc((G.w && G.w.w ? G.w.w : G.target).toUpperCase())}</b>`;
+  setTimeout(() => { $("#gSlots").classList.remove("reveal"); G.duel ? (G.n >= PER_LEVEL ? duelDone() : nextWord()) : G.lives <= 0 ? levelFailed() : nextWord(); }, 2300);
 }
 function renderGame2() { livesUI(); $("#gStreak").textContent = ""; }
 
@@ -379,7 +380,7 @@ function startDuel(seed, from, kind, live) {
   kind = kind || CUR; CUR = kind;
   closeModal(); history.replaceState(null, "", location.pathname);
   G = { kind, duel: { seed, from, pts: 0, kind, live: !!live }, lv: 0, queue: duelWords(seed, kind), solved: 0, n: 0, lives: 99, lostLives: 0, hints: 0, streak: 0, paused: false, over: false, busy: false };
-  $("#home").hidden = true; $("#menu").hidden = true; $("#game").hidden = false; liveBar(); SCENES.apply(SCENES.world(7)); nextWord();
+  $("#home").hidden = true; $("#menu").hidden = true; $("#game").hidden = false; if (live) { $("#gRival").hidden = false; $("#gRival").textContent = "⚔ Conectando con el rival…"; } liveBar(); SCENES.apply(SCENES.world(7)); nextWord();
 }
 const duelLink = (seed, score, kind) => `${location.origin}${location.pathname}#d=${seed}.${score}.${kind || CUR}.${encodeURIComponent(SV.name)}`;
 function shareDuel(seed, score, text) {

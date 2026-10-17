@@ -5,7 +5,7 @@ from playwright.sync_api import sync_playwright
 HERE = os.path.dirname(os.path.abspath(__file__))
 PORT = 8771
 URL = f"http://localhost:{PORT}/"
-SOLVE = """()=>{const u=new Set();for(const ch of G.target){const t=G.tiles.find(x=>x.ch===ch&&!u.has(x.id));u.add(t.id);document.querySelector('[data-tile="'+t.id+'"]').click();}}"""
+SOLVE = """()=>{G.lockUntil=0;const u=new Set();for(const ch of G.target){const t=G.tiles.find(x=>x.ch===ch&&!u.has(x.id));u.add(t.id);document.querySelector('[data-tile="'+t.id+'"]').click();}}"""
 
 def check(cond, msg):
     print(("OK   " if cond else "FAIL ") + msg)
@@ -17,7 +17,7 @@ def play(page, n_ok, wait=1100):
     for i in range(10):
         words.append(page.evaluate("G.target"))
         if i < n_ok: page.evaluate(SOLVE); page.wait_for_timeout(wait)
-        else: page.click("#tSkip"); page.wait_for_timeout(1900)
+        else: page.click("#tSkip"); page.wait_for_timeout(2500)
     return words
 
 srv = subprocess.Popen([sys.executable, "-m", "http.server", str(PORT)], cwd=os.path.dirname(HERE), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -109,7 +109,7 @@ try:
         play(h, 10)
         check("Esperando" in h.inner_text("#box"), "en vivo: espera al rival")
         for _ in range(7):
-            g.click("#tSkip"); g.wait_for_timeout(1900)
+            g.click("#tSkip"); g.wait_for_timeout(2500)
         g.wait_for_timeout(500)
         check("Perdiste" in g.inner_text("#box") and "Ganaste" in h.inner_text("#box"), "en vivo: resultado para los dos")
         # revancha

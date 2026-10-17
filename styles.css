@@ -179,3 +179,11 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 .ib.help{font-weight:900;color:var(--ac)}
 .helpbox h2{margin:0 0 6px}.helpbox .hl{text-align:left;margin:6px 0;font-size:15px;line-height:1.35}.helpbox .hl b{color:var(--ac)}
 .helpbox .hg{margin:10px 0 2px;font-weight:800;text-align:left}
+
+/* Evita saltos de diseño que hacían tocar otra letra */
+.answerline{min-height:26px;text-align:center;font-weight:600;color:var(--bad)}.answerline b{letter-spacing:2px}
+.rival{height:32px;line-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cat{min-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.clue{min-height:44px}
+.streak{height:22px}
+#game .pool{min-height:120px;align-content:flex-start}
