@@ -39,11 +39,13 @@
     <div class="levelcard" id="adLvl"></div>
     <p class="tag">Descubrí la palabra oculta con la menor cantidad de pistas</p>
     <input class="search" id="adSearch" placeholder="🔎 Buscar entre las 100 categorías" autocomplete="off">
+    <div class="duelrow"><button class="mini wide" data-dxk="adi" data-dx="live">⚔ Duelo en vivo</button><button class="mini wide" data-dxk="adi" data-dx="link">📨 Desafío por link</button></div>
     <div class="cats" id="adCats"></div>
   </section>
 
   <section id="adGame" class="screen" hidden>
     <div class="topbar"><button class="ib" id="adQuit" aria-label="Salir">✕</button><span class="rank" id="adCatName"></span><span class="coins">🪙 <b id="adTotal">0</b></span><button class="ib help" data-help="adi" aria-label="Cómo se juega">?</button></div>
+    <div class="rival dxbar" hidden></div>
     <div class="dots" id="adDots"></div>
     <div class="goal" id="adGoal"></div>
     <div class="worth" id="adWorth"></div>
@@ -60,11 +62,13 @@
     <div class="diffs" id="crDiffs"></div>
     <div class="levelcard" id="crLvl"></div>
     <button class="big" id="crPlay">▶ Jugar</button>
+    <div class="duelrow"><button class="mini wide" data-dxk="cri" data-dx="live">⚔ Duelo en vivo</button><button class="mini wide" data-dxk="cri" data-dx="link">📨 Desafío por link</button></div>
     <p class="how">Cada letra se esconde detrás de un <b>número</b>, un <b>objeto</b> o un <b>color</b>, y se repite en toda la frase. Tocá un casillero, elegí la letra y, si descubrís una palabra, vas a ver aparecer letras en las demás.</p>
   </section>
 
   <section id="crGame" class="screen" hidden>
     <div class="topbar"><button class="ib" id="crQuit" aria-label="Salir">✕</button><span class="rank" id="crTitle"></span><span class="coins">🪙 <b id="crTotal">0</b></span><button class="ib help" data-help="cri" aria-label="Cómo se juega">?</button></div>
+    <div class="rival dxbar" hidden></div>
     <div class="dots" id="crDots"></div>
     <div class="goal" id="crTag"></div>
     <div class="crworth" id="crWorth"></div>
@@ -81,11 +85,13 @@
     <div class="diffs" id="qvDiffs"></div>
     <div class="levelcard" id="qvLvl"></div>
     <button class="big" id="qvPlay">▶ Jugar</button>
+    <div class="duelrow"><button class="mini wide" data-dxk="qv" data-dx="live">⚔ Duelo en vivo</button><button class="mini wide" data-dxk="qv" data-dx="link">📨 Desafío por link</button></div>
     <p class="how">Te damos algunas letras de ayuda. A medida que subís de nivel y de dificultad, hay menos letras para ayudarte. ¡Y cuidado con el tiempo y las vidas!</p>
   </section>
 
   <section id="qvGame" class="screen" hidden>
     <div class="topbar"><button class="ib" id="qvQuit" aria-label="Salir">✕</button><span class="lives" id="qvLives"></span><span class="coins">🪙 <b id="qvTotal">0</b></span><button class="ib help" data-help="qv" aria-label="Cómo se juega">?</button></div>
+    <div class="rival dxbar" hidden></div>
     <div class="dots" id="qvDots"></div>
     <div class="timer"><i id="qvBar"></i><b id="qvTime"></b></div>
     <div class="qvimg" id="qvImg"></div>
@@ -149,6 +155,7 @@
 <script src="game.js"></script>
 <script src="cripto.js"></script>
 <script src="quever.js"></script>
+<script src="duelos.js"></script>
 <script>if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});</script>
 </body>
 </html>

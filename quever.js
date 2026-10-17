@@ -4,8 +4,8 @@ const QV = Object.keys(ICONS).map((w) => ({ w, L: [...w].map(crLetter).join("") 
 const qvTier = (n) => (n <= 4 ? 1 : n <= 6 ? 2 : n <= 8 ? 3 : 4);
 const qvHelp = (lv) => Math.max(0, 3 - Math.floor((lv - 1) / 3) + gameDifQ().help);
 const qvDifs = { f: 1, m: 0, d: -1, e: -3 };
-const gameDifQ = () => ({ help: qvDifs[(SV.dif && SV.dif.qv) || "m"] });
-const qvTime = (lv) => Math.round(Math.max(20, 45 - Math.min(lv, 20)) * difOf("qv").time);
+const gameDifQ = () => ({ help: Q && Q.duel ? 0 : qvDifs[(SV.dif && SV.dif.qv) || "m"] });
+const qvTime = (lv) => Math.round(Math.max(20, 45 - Math.min(lv, 20)) * (Q && Q.duel ? 1 : difOf("qv").time));
 let Q = null, QT = 0;
 
 function qvPick(lv) {
@@ -31,10 +31,10 @@ $("#qvPlay").onclick = () => qvStart();
 
 function qvStart() {
   const lv = SV.qvLv;
-  Q = { lv, list: qvPick(lv), i: 0, solved: 0, lives: maxLives("qv"), lost: 0, hints: 0, streak: 0, over: false };
+  Q = { lv, list: qvPick(lv), i: 0, solved: 0, lives: maxLives("qv"), lost: 0, hints: 0, streak: 0, over: false, duel: false, pts: 0 };
   $("#qvHome").hidden = true; $("#qvGame").hidden = false; SCENES.apply(SCENES.world(lv)); qvImage();
 }
-function qvLives() { $("#qvLives").innerHTML = Array.from({ length: maxLives("qv") }, (_, i) => `<span class="${i < Q.lives ? "on" : ""}">❤</span>`).join(""); }
+function qvLives() { if (Q.duel) { $("#qvLives").innerHTML = `<span class="on" style="font-size:16px;color:var(--ac)">⚔ ${Q.pts} pts</span>`; return; } $("#qvLives").innerHTML = Array.from({ length: maxLives("qv") }, (_, i) => `<span class="${i < Q.lives ? "on" : ""}">❤</span>`).join(""); }
 function qvImage() {
   clearInterval(QT);
   const it = Q.list[Q.i]; const n = it.L.length;
@@ -67,7 +67,7 @@ function qvKey(L) {
   if (Q.ans.every(Boolean)) { if (Q.ans.join("") === Q.it.L) qvWin(); else qvWrong(); }
 }
 function qvWrong() {
-  Q.busy = true; Q.lives--; Q.lost++; Q.streak = 0; beep(SND.bad); vib(60); qvLives(); qvDraw(true);
+  Q.busy = true; if (!Q.duel) Q.lives--; Q.lost++; Q.streak = 0; beep(SND.bad); vib(60); qvLives(); qvDraw(true);
   if (Q.lives <= 0) return setTimeout(() => qvOver(), 600);
   setTimeout(() => { Q.ans = [...Q.it.L].map((c, i) => (Q.given.has(i) ? c : null)); Q.busy = false; qvDraw(); }, 700);
 }
@@ -75,18 +75,19 @@ function qvFloat(t, cls) { const f = $("#qvFloat"); f.className = "float " + (cl
 function qvWin() {
   Q.busy = true; clearInterval(QT); Q.solved++; Q.streak++; SV.qvSolved++;
   const ratio = Q.left / Q.total, len = Q.it.L.length;
-  const gain = Math.round(Math.max(5, 10 + len + Math.ceil(10 * ratio) + Math.min(Q.streak, 10) * 2 - 5 * Q.wordHints) * difOf("qv").mult);
-  addPts("qv", gain); SV.qvSeen.push(Q.it.w); save(); checkAch(); $("#qvTotal").textContent = SV.coins;
+  const gain = Math.round(Math.max(5, 10 + len + Math.ceil(10 * ratio) + Math.min(Q.streak, 10) * 2 - 5 * Q.wordHints) * (Q.duel ? 1 : difOf("qv").mult));
+  if (Q.duel) { Q.pts += gain; dxProg(Q.i + 1, Q.pts); } else { addPts("qv", gain); SV.qvSeen.push(Q.it.w); } save(); checkAch(); $("#qvTotal").textContent = SV.coins;
   $("#qvSlots").classList.add("win"); qvFloat(`+${gain} 🪙${Q.streak >= 2 ? "  🔥x" + Q.streak : ""}`, "good"); beep(SND.ok); vib(25);
   setTimeout(() => { $("#qvSlots").classList.remove("win"); qvNext(); }, 1100);
 }
 function qvFail(msg) {
-  if (Q.busy) return; Q.busy = true; clearInterval(QT); Q.lives--; Q.lost++; Q.streak = 0; qvLives(); beep(SND.lose);
+  if (Q.busy) return; Q.busy = true; clearInterval(QT); if (!Q.duel) Q.lives--; Q.lost++; Q.streak = 0; qvLives(); beep(SND.lose);
   Q.ans = [...Q.it.L]; qvDraw(); qvFloat(msg + " Era: " + Q.it.w, "bad");
   if (Q.lives <= 0) return setTimeout(qvOver, 1500);
+  if (Q.duel) dxProg(Q.i + 1, Q.pts);
   setTimeout(qvNext, 1600);
 }
-function qvNext() { Q.i++; if (Q.i >= Q.list.length) qvEnd(); else qvImage(); }
+function qvNext() { Q.i++; if (Q.duel && Q.i >= Q.list.length) { clearInterval(QT); return dxFinish(Q.pts); } if (Q.i >= Q.list.length) qvEnd(); else qvImage(); }
 function qvOver() {
   clearInterval(QT); Q.over = true;
   modal(`<h2>Sin vidas 💔</h2><p>Descubriste <b>${Q.solved}</b> de ${Q.list.length} imágenes.</p><button class="big" id="qvRetry">Reintentar nivel</button><button class="mini" id="qvOut">Volver</button>`, true);
@@ -105,6 +106,7 @@ function qvEnd() {
 }
 $("#qvHint").onclick = () => {
   if (!Q || Q.busy) return;
+  if (Q.duel) return toast("En los duelos no hay pistas");
   if (SV.coins < hintCost("qv")) { toast("Te faltan monedas para la pista"); vib(40); return; }
   const open = Q.ans.map((c, i) => (c ? -1 : i)).filter((i) => i >= 0 && !Q.given.has(i)); const empty = Q.ans.map((c, i) => (!c ? i : -1)).filter((i) => i >= 0);
   if (!empty.length) return;
@@ -112,4 +114,4 @@ $("#qvHint").onclick = () => {
   if (Q.ans.every(Boolean)) { if (Q.ans.join("") === Q.it.L) qvWin(); else qvWrong(); }
 };
 $("#qvSkip").onclick = () => { if (!Q || Q.busy) return; qvFail("Pasaste (−1 ❤)."); };
-$("#qvQuit").onclick = () => { if (confirm("¿Salir del nivel?")) { clearInterval(QT); $("#qvGame").hidden = true; $("#qvHome").hidden = false; qvHome(); } };
+$("#qvQuit").onclick = () => { if (confirm("¿Salir del nivel?")) { clearInterval(QT); if (Q.duel) { dxAbort(); showMenu(); return; } $("#qvGame").hidden = true; $("#qvHome").hidden = false; qvHome(); } };

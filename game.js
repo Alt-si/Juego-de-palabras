@@ -47,7 +47,7 @@ const KSk = (k) => (k === "hid" ? { lv: "lvH", st: "starsH" } : { lv: "level", s
 const KS = () => KSk(CUR);
 const curLevel = () => SV[KS().lv];
 const topLevel = () => Math.max(SV.level, SV.lvH);
-const NAMES = { ana: "Anagrama", hid: "Palabras escondidas" };
+const NAMES = { ana: "Anagrama", hid: "Palabras escondidas", adi: "Adivina", cri: "Frases encriptadas", qv: "¿Qué ves?", tf: "Tuti Frutti" };
 const maxLives = (k) => Math.max(1, (SV.owned.includes("vida") ? LIVES + 1 : LIVES) + difOf(k || CUR).lives);
 const hintCost = (k) => difOf(k).hint, timeCost = (k) => Math.round((difOf(k).hint * 1.5) / 5) * 5;
 function costLabels() { const k = typeof G !== "undefined" && G ? G.kind : CUR, d = G && G.duel; $("#tHint small").textContent = `Pista · ${d ? 10 : hintCost(k)}🪙`; $("#tTime small").textContent = `+15 s · ${timeCost(k)}🪙`; }
@@ -411,17 +411,17 @@ function duelDone() {
   $("#dCopy").onclick = () => copyLink(d.seed, me);
 }
 function checkInvite() {
-  const r = /^#r=([A-Z0-9]{5})\.(ana|hid)$/.exec(location.hash);
+  const r = /^#r=([A-Z0-9]{5})\.(ana|hid|adi|cri|qv|tf)$/.exec(location.hash);
   if (r && !G) {
     modal(`<h2>⚔ Duelo en vivo</h2><p>Te invitaron a jugar <b>${NAMES[r[2]]}</b> en tiempo real.</p><button class="big" id="liveEnter">Entrar al duelo</button><button class="link" data-close>Ahora no</button>`, true);
     $("#liveEnter").onclick = () => askName(() => liveJoin(r[1], r[2]));
     return;
   }
-  const m = /^#d=(\d+)\.(\d+)\.(?:(ana|hid)\.)?(.*)$/.exec(location.hash); if (!m) return;
+  const m = /^#d=(\d+)\.(\d+)\.(?:(ana|hid|adi|cri|qv)\.)?(.*)$/.exec(location.hash); if (!m) return;
   const seed = +m[1], score = +m[2], kind = m[3] || "ana"; let name = "Un amigo"; try { name = decodeURIComponent(m[4]).slice(0, 16) || name; } catch {}
   if (G) return;
-  modal(`<h2>⚔ ¡${esc(name)} te desafió!</h2><p>Hizo <b>${score} puntos</b> en 10 palabras de <b>${NAMES[kind]}</b>. Jugás las mismas palabras: si lo superás, ganás.</p><button class="big" id="accept">Aceptar el desafío</button><button class="link" data-close>Ahora no</button>`, true);
-  $("#accept").onclick = () => askName(() => startDuel(seed, { name, score }, kind));
+  modal(`<h2>⚔ ¡${esc(name)} te desafió!</h2><p>Hizo <b>${score} puntos</b> en <b>${NAMES[kind]}</b>. Jugás lo mismo: si lo superás, ganás.</p><button class="big" id="accept">Aceptar el desafío</button><button class="link" data-close>Ahora no</button>`, true);
+  $("#accept").onclick = () => askName(() => (DXG[kind] ? dxBegin(kind, seed, { name, score }, false) : startDuel(seed, { name, score }, kind)));
 }
 window.addEventListener("hashchange", checkInvite);
 
@@ -481,23 +481,25 @@ function liveBar() {
   const o = LIVE.opp; b.hidden = false;
   b.textContent = `⚔ ${o.name || "Rival"}: ${o.n}/${PER_LEVEL} · ${o.pts} pts${o.left ? " (se fue)" : o.done ? " ✔" : ""}`;
 }
+const afterOpp = () => { if (G && G.over) showLiveResult(); else if (typeof D !== "undefined" && D && D.over) dxResult(); };
 function handlers(role) {
   return {
     onReady() { if (role === "host") showLobby(); },
     onPeer() { Net.send({ t: "hello", name: SV.name }); },
     onMsg(m) {
       if (!m || !LIVE) return;
+      if (typeof dxMsg === "function" && dxMsg(m, role)) return;
       if (m.t === "hello") { LIVE.opp.name = String(m.name || "Rival").slice(0, 16); if (role === "host" && !LIVE.started) sendStart(); }
       else if (m.t === "start" && role === "guest") runStart(m.seed, m.kind);
       else if (m.t === "prog") { LIVE.opp.n = +m.n || 0; LIVE.opp.pts = +m.pts || 0; liveBar(); }
-      else if (m.t === "done") { LIVE.opp.pts = +m.pts || 0; LIVE.opp.n = PER_LEVEL; LIVE.opp.done = true; liveBar(); if (G && G.over) showLiveResult(); }
+      else if (m.t === "done") { LIVE.opp.pts = +m.pts || 0; LIVE.opp.n = PER_LEVEL; LIVE.opp.done = true; liveBar(); afterOpp(); }
       else if (m.t === "rematch" && role === "host") sendStart();
-      else if (m.t === "quit") { LIVE.opp.left = true; toast("El rival abandonó el duelo"); liveBar(); if (G && G.over) showLiveResult(); }
+      else if (m.t === "quit") { LIVE.opp.left = true; toast("El rival abandonó el duelo"); liveBar(); afterOpp(); }
     },
     onClose() {
       if (!LIVE) return;
       if (!LIVE.started) return liveFail("Se cortó la conexión con tu rival.");
-      LIVE.opp.left = true; toast("Se desconectó el rival"); liveBar(); if (G && G.over) showLiveResult();
+      LIVE.opp.left = true; toast("Se desconectó el rival"); liveBar(); afterOpp();
     },
     onError(type) {
       if (!LIVE) return;
@@ -537,6 +539,7 @@ function sendStart() { const seed = Math.floor(Math.random() * 1e9); Net.send({ 
 function runStart(seed, kind) {
   LIVE.started = true; LIVE.kind = kind; LIVE.opp.n = 0; LIVE.opp.pts = 0; LIVE.opp.done = false; LIVE.opp.left = false; clearTimeout(LIVE.to);
   clearInterval(timerId); G = null;
+  if (DXG[kind]) return dxCountdown(seed, kind);
   let n = 3; modal(`<h2>⚔ ${oppName()}</h2><p>${NAMES[kind]} · 10 palabras</p><p class="big2" id="cd">${n}</p>`, true);
   const iv = setInterval(() => { n--; if (!LIVE) return clearInterval(iv); if (n <= 0) { clearInterval(iv); startDuel(seed, null, kind, true); } else $("#cd").textContent = n; }, 1000);
 }
@@ -563,7 +566,7 @@ const adTier = (L) => Math.min(4, 1 + Math.floor((L - 1) / 6));
 const adPass = (L) => Math.min(350, 120 + 12 * L);
 const AD_TITLES = [[1, "Curioso"], [3, "Aprendiz de detective"], [6, "Rastreador"], [10, "Detective"], [15, "Sabueso"], [20, "Inspector"], [30, "Comisario"], [40, "Maestro de la intriga"], [60, "Leyenda del misterio"]];
 const adTitle = (L) => AD_TITLES.filter((t) => L >= t[0]).pop()[1];
-const adMax = () => difOf("adi").clues;
+const adMax = () => (AD.duel ? 10 : difOf("adi").clues);
 const adPts = (shown) => 110 - 10 * shown;
 const plain = (s) => letters(s).replace(/[^A-ZÑ]/g, "");
 // Corrector de ortografía: distancia de edición (con letras intercambiadas) para aceptar errores de tipeo.
@@ -613,7 +616,7 @@ function adPick(pool, L) {
   return shuffle(pool).map((e) => ({ e, s: Math.abs(e.t - T) + Math.random() * 0.9 + (seen.has(e.w) ? 3 : 0) })).sort((a, b) => a.s - b.s).slice(0, AD_ROUND).map((x) => x.e);
 }
 function adStart(cat) {
-  buildAdivina(); AD.cat = cat; AD.lv = SV.adLevel; AD.i = 0; AD.total = 0; AD.results = [];
+  buildAdivina(); AD.duel = false; AD.cat = cat; AD.lv = SV.adLevel; AD.i = 0; AD.total = 0; AD.results = [];
   const pool = cat === "Mezcla" ? ADI.all : ADI.cats.find((c) => c.name === cat).words;
   AD.words = adPick(pool, AD.lv);
   SV.adSeen.push(...AD.words.map((e) => e.w)); if (SV.adSeen.length > 400) SV.adSeen.splice(0, SV.adSeen.length - 400); save();
@@ -627,13 +630,14 @@ function adNext() {
 }
 function adRender(fresh) {
   $("#adDots").innerHTML = Array.from({ length: AD_ROUND }, (_, i) => `<i class="${i < AD.i ? "done" : i === AD.i ? "cur" : ""}"></i>`).join("");
-  $("#adGoal").textContent = `Nivel ${AD.lv} · Meta ${adPass(AD.lv)} pts · Llevás ${AD.total}`;
+  adGoalUI();
   $("#adWorth").textContent = `Pista ${AD.shown}/${adMax()} · Vale ${adPts(AD.shown)} pts`;
   $("#adClues").innerHTML = AD.clues.slice(0, AD.shown).map((c, i) => `<li class="${c[1] ? "auto" : ""} ${i === AD.shown - 1 ? "new" : ""}"><b>${i + 1}</b><span>${esc(c[0])}</span></li>`).join("");
   const ul = $("#adClues"); ul.scrollTop = ul.scrollHeight;
   $("#adMore").disabled = AD.shown >= adMax();
   if (fresh) $("#adIn").focus({ preventScroll: true });
 }
+function adGoalUI() { $("#adGoal").textContent = AD.duel ? `⚔ Duelo · Llevás ${AD.total} pts` : `Nivel ${AD.lv} · Meta ${adPass(AD.lv)} pts · Llevás ${AD.total}`; }
 function adFloat(t, cls) { const f = $("#adFloat"); f.className = "float " + (cls || ""); f.textContent = t; void f.offsetWidth; f.classList.add("go"); }
 function adMore() { if (AD.busy || AD.shown >= adMax()) return; AD.shown++; adRender(); beep(SND.coin); }
 function adAnswers() { const w = AD.cur.w; return [plain(w), ...(ALIAS[w] || []).map(plain)]; }
@@ -648,12 +652,13 @@ function adGuess() {
   adFloat("No es. ¡Otra pista!", "bad"); $("#adIn").value = ""; AD.shown++; adRender();
 }
 function adFinish(pts, msg, good) {
-  AD.busy = true; AD.results.push({ w: AD.cur.w, pts, shown: AD.shown }); AD.total += pts; addPts("adi", Math.round(pts * difOf("adi").mult));
-  if (pts) { SV.solved++; if (AD.shown <= 3) SV.adQuick++; if (AD.shown === 1) SV.adAces++; }
+  AD.busy = true; AD.results.push({ w: AD.cur.w, pts, shown: AD.shown }); AD.total += pts; if (!AD.duel) addPts("adi", Math.round(pts * difOf("adi").mult));
+  if (AD.duel) dxProg(AD.i + 1, AD.total);
+  if (pts && !AD.duel) { SV.solved++; if (AD.shown <= 3) SV.adQuick++; if (AD.shown === 1) SV.adAces++; }
   save(); checkAch(); $("#adTotal").textContent = SV.coins;
   adFloat(msg, good ? "good" : "bad"); beep(good ? SND.ok : SND.lose);
   $("#adClues").insertAdjacentHTML("beforeend", `<li class="new"><b>${good ? "✔" : "✖"}</b><span class="reveal-msg">${esc(AD.cur.w.toUpperCase())}</span></li>`);
-  $("#adGoal").textContent = `Nivel ${AD.lv} · Meta ${adPass(AD.lv)} pts · Llevás ${AD.total}`;
+  adGoalUI();
   const ul = $("#adClues"); ul.scrollTop = ul.scrollHeight;
   setTimeout(() => { AD.i++; AD.i >= AD_ROUND ? adEnd() : adNext(); }, 1600);
 }
@@ -663,8 +668,9 @@ $("#adGo").onclick = adGuess;
 $("#adIn").addEventListener("keydown", (e) => { if (e.key === "Enter") adGuess(); });
 $("#adMore").onclick = adMore;
 $("#adSkip").onclick = () => { if (!AD.busy) adLose(); };
-$("#adQuit").onclick = () => { if (confirm("¿Salir de la ronda?")) showAdHome(); };
+$("#adQuit").onclick = () => { if (confirm("¿Salir de la ronda?")) { if (AD.duel) dxAbort(); showAdHome(); } };
 function adEnd() {
+  if (AD.duel) return dxFinish(AD.total);
   const rec = !SV.adBest[AD.cat] || AD.total > SV.adBest[AD.cat]; if (rec) SV.adBest[AD.cat] = AD.total;
   const bonus = AD.results.every((r) => r.pts > 0) ? 50 : 0; if (bonus) addPts("adi", bonus);
   const need = adPass(AD.lv), passed = AD.total >= need;

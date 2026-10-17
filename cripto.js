@@ -45,7 +45,7 @@ $("#crPlay").onclick = () => crRound();
 // ---------- Ronda ----------
 function crRound() {
   const d = SV.crDiff, lv = SV.crLv[d];
-  CR = { d, lv, list: crPick(d, lv), i: 0, solved: 0, pts: 0 };
+  CR = { d, lv, list: crPick(d, lv), i: 0, solved: 0, pts: 0, duel: false };
   $("#crHome").hidden = true; $("#crGame").hidden = false; SCENES.apply(SCENES.world(lv)); crPhrase();
 }
 function crPhrase() {
@@ -119,7 +119,7 @@ function crComplete() {
 function crSolve() {
   P.over = true; const d = CR.d;
   const gain = crWorth();
-  addPts("cri", gain); CR.pts += gain; CR.solved++; SV.crSolved++; SV.crSeen.push(P.ph.t); save(); checkAch(); beep(SND.win); vib([60, 40, 100]);
+  if (!CR.duel) { addPts("cri", gain); SV.crSolved++; SV.crSeen.push(P.ph.t); } CR.pts += gain; CR.solved++; if (CR.duel) dxProg(CR.i + 1, CR.pts); save(); checkAch(); beep(SND.win); vib([60, 40, 100]);
   $("#crTotal").textContent = SV.coins; P.sel = null; crDraw();
   const last = CR.i === CR.list.length - 1;
   modal(`<h2>¡Descifrada! 🔓</h2><p class="crq">“${esc(P.ph.t)}”</p><p class="crau">— ${esc(P.ph.o)}</p><p class="big2">+${gain} pts</p><button class="big" id="crNextBtn">${last ? "Terminar ronda" : "Siguiente frase ▶"}</button>`, true);
@@ -127,6 +127,7 @@ function crSolve() {
 }
 function crAdvance() { CR.i++; if (CR.i >= CR.list.length) crEnd(); else crPhrase(); }
 function crEnd() {
+  if (CR.duel) return dxFinish(CR.pts);
   const d = CR.d, up = CR.solved >= 3 && CR.lv === SV.crLv[d]; let bonus = 0;
   if (up) { bonus = 30 + 10 * CR.lv; addPts("cri", bonus); SV.crLv[d]++; save(); beep(SND.win); }
   checkAch();
@@ -138,6 +139,7 @@ function crEnd() {
 // ---------- Herramientas ----------
 $("#crHint").onclick = () => {
   if (!P || P.over) return;
+  if (CR.duel) return toast("En los duelos no hay pistas");
   if (SV.coins < CR_DIFF[CR.d].hint) { toast("Te faltan monedas para la pista"); vib(40); return; }
   const open = Object.keys(P.bySym).filter((s) => !P.lock[s]); if (!open.length) return;
   const s = P.sel != null && !P.lock[P.sel] ? P.sel : +open[Math.floor(Math.random() * open.length)], L = P.bySym[s];
@@ -157,4 +159,4 @@ $("#crSkip").onclick = () => {
   modal(`<h2>¿Pasar esta frase?</h2><p>No suma puntos.</p><button class="big" id="crYes">Pasar</button><button class="mini" data-close>Seguir</button>`);
   $("#crYes").onclick = () => { closeModal(); P.over = true; crAdvance(); };
 };
-$("#crQuit").onclick = () => { if (confirm("¿Salir de la ronda?")) { $("#crGame").hidden = true; $("#crHome").hidden = false; crHome(); } };
+$("#crQuit").onclick = () => { if (confirm("¿Salir de la ronda?")) { if (CR.duel) { dxAbort(); showMenu(); return; } $("#crGame").hidden = true; $("#crHome").hidden = false; crHome(); } };

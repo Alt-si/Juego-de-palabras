@@ -187,3 +187,4 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 .clue{min-height:44px}
 .streak{height:22px}
 #game .pool{min-height:120px;align-content:flex-start}
+.duelrow{display:flex;gap:8px;margin:10px 0}.duelrow .mini{flex:1}
