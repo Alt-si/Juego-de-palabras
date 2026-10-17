@@ -11,7 +11,8 @@ const CR_OBJ = ["🍎", "🐟", "🔑", "⭐", "🎈", "🌙", "🍄", "🔔", "
 const crLetter = (ch) => { if (/[ñÑ]/.test(ch)) return "Ñ"; const b = ch.normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase(); return /^[A-Z]$/.test(b) ? b : ""; };
 const CRP = FRASES_RAW.map((x) => { const [t, o] = x.split("|"); return { t, o, n: [...t].filter((c) => crLetter(c)).length }; });
 const crPool = (d) => CRP.filter((p) => p.n >= CR_DIFF[d].min && p.n <= CR_DIFF[d].max);
-const crReveal = (d, lv) => Math.max(1, CR_DIFF[d].reveal - Math.floor((lv - 1) / 4));
+const crReveal = (d, lv) => Math.max(1, Math.round(CR_DIFF[d].reveal - lvP(lv) * (CR_DIFF[d].reveal - 1) * 1.2));
+const crNeed = (lv) => (lv >= 600 ? 5 : lv >= 250 ? 4 : 3); // frases a descifrar para pasar de nivel
 const crShuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 let CR = null, P = null; // ronda y frase actual
 
@@ -19,7 +20,7 @@ function crPick(d, lv) {
   const pool = crPool(d).sort((a, b) => a.n - b.n || (a.t < b.t ? -1 : 1));
   let unseen = pool.filter((p) => !SV.crSeen.includes(p.t));
   if (unseen.length < 5) { SV.crSeen = SV.crSeen.filter((t) => !pool.some((p) => p.t === t)); unseen = pool; }
-  const target = Math.min(1, (lv - 1) / 14);
+  const target = lvP(lv);
   const sc = unseen.map((p) => ({ p, s: Math.abs(pool.indexOf(p) / Math.max(1, pool.length - 1) - target) + Math.random() * 0.5 }));
   return sc.sort((a, b) => a.s - b.s).slice(0, 5).map((x) => x.p);
 }
@@ -36,7 +37,7 @@ function crHome() {
   $("#crCoins").textContent = SV.coins; $("#crRank").textContent = ptsOf("cri") + " pts";
   $("#crDiffs").innerHTML = Object.entries(CR_DIFF).map(([k, v]) => `<button data-d="${k}" class="${k === d ? "on" : ""}"><span>${v.icon}</span><b>${v.name}</b><small>Nivel ${SV.crLv[k]}</small></button>`).join("");
   const n = crReveal(d, lv);
-  $("#crLvl").innerHTML = `<div class="mid"><small>${CR_DIFF[d].name} · Nivel</small><b>${lv}</b><small class="world">🌍 ${SCENES.worldName(lv)}</small><small>${n} ${n === 1 ? "letra regalada" : "letras regaladas"} por frase · 5 frases por ronda</small></div>`;
+  $("#crLvl").innerHTML = `<div class="mid"><small>${CR_DIFF[d].name} · Nivel</small><b>${lv}</b><small class="world">🌍 ${SCENES.worldName(lv)}</small><small>${n} ${n === 1 ? "letra regalada" : "letras regaladas"} por frase · pasás con ${crNeed(lv)} de 5 frases</small>${lvPath(lv)}</div>`;
 }
 $("#crDiffs").addEventListener("click", (e) => { const b = e.target.closest("[data-d]"); if (b) { SV.crDiff = b.dataset.d; save(); crHome(); } });
 $("#crBack").onclick = showMenu;
@@ -79,7 +80,7 @@ function crCells(text) {
     return `<button class="cc${P.lock[s] ? " lk" : ""}${P.sel === s ? " sel" : ""}${P.wrong[s] ? " bad" : ""}" data-s="${s}"><span class="cl">${g || ""}</span>${crSymHtml(s)}</button>`;
   }).join("")}</span>`).join("");
 }
-const crWorth = () => Math.max(10, CR_DIFF[CR.d].base + P.ph.n * 3 - P.hints * 15 - P.checks * 10 - P.mistakes * 8);
+const crWorth = () => Math.round(Math.max(10, CR_DIFF[CR.d].base + P.ph.n * 3 - P.hints * 15 - P.checks * 10 - P.mistakes * 8) * (CR.duel ? 1 : lvMult(CR.lv)));
 function crDraw() {
   $("#crPhrase").innerHTML = `<div class="crtext">${crCells(P.ph.t)}</div>` + (P.au ? `<div class="crauthor"><span class="cp dash">—</span>${crCells(P.au)}</div>` : `<div class="crorigin">— ${esc(P.ph.o)}</div>`);
   $("#crWorth").innerHTML = `Esta frase vale <b>${crWorth()} pts</b>`;
@@ -128,10 +129,10 @@ function crSolve() {
 function crAdvance() { CR.i++; if (CR.i >= CR.list.length) crEnd(); else crPhrase(); }
 function crEnd() {
   if (CR.duel) return dxFinish(CR.pts);
-  const d = CR.d, up = CR.solved >= 3 && CR.lv === SV.crLv[d]; let bonus = 0;
-  if (up) { bonus = 30 + 10 * CR.lv; addPts("cri", bonus); SV.crLv[d]++; save(); beep(SND.win); }
+  const d = CR.d, up = CR.solved >= crNeed(CR.lv) && CR.lv === SV.crLv[d]; let bonus = 0;
+  if (up) { bonus = lvPrize(CR.lv); addPts("cri", bonus); SV.crLv[d]++; save(); beep(SND.win); }
   checkAch();
-  modal(`<h2>${up ? "¡Nivel superado! 🎉" : CR.solved >= 3 ? "¡Ronda completa!" : "Ronda terminada"}</h2><p>Frases descifradas: <b>${CR.solved} de ${CR.list.length}</b></p><p class="big2">${CR.pts + bonus} pts</p>${up ? `<p>Bonus de nivel: +${bonus} 🪙 · Ahora vas por el nivel <b>${SV.crLv[d]}</b></p>` : CR.solved < 3 ? "<p>Descifrá al menos 3 para subir de nivel.</p>" : ""}<button class="big" id="crAgain">Jugar otra ronda</button><button class="mini" id="crMenuBtn">Volver</button>`, true);
+  modal(`<h2>${up ? "¡Nivel superado! 🎉" : CR.solved >= crNeed(CR.lv) ? "¡Ronda completa!" : "Ronda terminada"}</h2><p>Frases descifradas: <b>${CR.solved} de ${CR.list.length}</b></p><p class="big2">${CR.pts + bonus} pts</p>${up ? `<p>Bonus de nivel: +${bonus} 🪙 · Ahora vas por el nivel <b>${SV.crLv[d]}</b></p>` : CR.solved < 3 ? "<p>Descifrá al menos 3 para subir de nivel.</p>" : ""}<button class="big" id="crAgain">Jugar otra ronda</button><button class="mini" id="crMenuBtn">Volver</button>`, true);
   $("#crAgain").onclick = () => { closeModal(); crRound(); };
   $("#crMenuBtn").onclick = () => { closeModal(); $("#crGame").hidden = true; $("#crHome").hidden = false; crHome(); };
 }

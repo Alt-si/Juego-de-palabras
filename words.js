@@ -23,6 +23,15 @@ const RAW = {
 };
 const strip = (s) => s.replace(/ñ/g, "\u0001").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\u0001/g, "ñ");
 const letters = (w) => strip(w.toLowerCase()).toUpperCase();
+// Se suman las palabras de words-extra.js (sin repetir ni salirse de 4 a 12 letras)
+{
+  const have = new Set(Object.values(RAW).flatMap((l) => l.split(/\s+/)).map(letters));
+  if (typeof RAW_EXTRA !== "undefined") for (const [c, l] of Object.entries(RAW_EXTRA)) {
+    const out = [];
+    for (const x of l.split(/\s+/)) { const L = letters(x); if (L.length < 4 || L.length > 12 || have.has(L)) continue; have.add(L); out.push(x); }
+    const k = c.replace(/ \d+$/, ""); RAW[k] = (RAW[k] ? RAW[k] + " " : "") + out.join(" ");
+  }
+}
 const POOL = {};   // largo -> [{w, c, L}]
 const ALL = new Map();
 for (const [c, list] of Object.entries(RAW)) for (const w of list.split(/\s+/)) {

@@ -229,3 +229,9 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
   .qvimg{padding:6px 0}.qvimg svg{width:84px;height:84px}.crkeys button{padding:6px 0}.tools button{padding:6px 2px;font-size:18px}
   .levelcard b{font-size:36px}.tfl{font-size:36px;padding:2px 12px}.tfrow input{padding:6px 10px;font-size:16px}.crphrase{padding:8px 6px}.timer{height:20px}
 }
+
+/* ---- niveles largos ---- */
+.lvpath{display:block;height:8px;border-radius:99px;background:#0002;overflow:hidden;margin:8px auto 2px;max-width:220px}.lvpath i{display:block;height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:99px}
+.lvnav{display:flex;gap:4px}.lvnav .ib{width:36px;height:36px}
+.qvimg{position:relative;overflow:hidden}.qvtw{position:absolute;right:8px;top:8px;font-size:12px;background:#0006;color:#fff;border-radius:99px;padding:3px 9px}
+.qvw{transition:transform .2s,filter .2s}

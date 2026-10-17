@@ -1,7 +1,8 @@
 // Verifica que words.js cargue y no tenga palabras repetidas.
 const fs = require("fs");
 const src = fs.readFileSync(__dirname + "/../words.js", "utf8");
-const run = new Function(src + "\nreturn POOL;");
+const extra = fs.readFileSync(__dirname + "/../words-extra.js", "utf8");
+const run = new Function(extra + "\n" + src + "\nreturn POOL;");
 const POOL = run();
 const seen = new Set(); let n = 0;
 for (const k in POOL) for (const x of POOL[k]) {
@@ -13,7 +14,8 @@ console.log(n + " palabras sin repetir");
 // Cada palabra debe tener su frase-pista y no puede nombrar la palabra.
 const CLUES = new Function(fs.readFileSync(__dirname + "/../clues.js", "utf8") + "\nreturn CLUES;")();
 const norm = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-for (const k in POOL) for (const x of POOL[k]) {
+const POOL0 = new Function(src + "\nreturn POOL;")();
+for (const k in POOL0) for (const x of POOL0[k]) {
   const c = CLUES[x.w];
   if (!c) throw new Error("falta la pista de: " + x.w);
   if (norm(c).includes(norm(x.w))) throw new Error("la pista nombra la palabra: " + x.w);

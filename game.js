@@ -19,11 +19,10 @@ const walletTotal = () => Object.values(SV.wal).reduce((a, b) => a + b, 0);
 const save = () => { try { localStorage.setItem("anagrama-v1", JSON.stringify(SV)); } catch {} };
 
 // ---------- Reglas de niveles ----------
-const RANGES = [[4, 4], [4, 5], [5, 5], [5, 6], [6, 6], [6, 7], [7, 7], [7, 8], [8, 8], [8, 9], [9, 9]];
-const rangeOf = (lv) => (lv <= RANGES.length ? RANGES[lv - 1] : lv < 16 ? [9, 10] : [9, 12]);
-const timeFor = (lv, len) => Math.max(lv >= 20 ? 20 : 25, 20 + 5 * len - Math.min(lv, 15) * 2);
-const TITLES = [[1, "Novato"], [3, "Aprendiz"], [5, "Curioso"], [8, "Palabrero"], [11, "Lingüista"], [15, "Erudito"], [20, "Maestro del anagrama"], [30, "Leyenda"]];
-const titleOf = (lv) => TITLES.filter((t) => lv >= t[0]).pop()[1];
+// Largo de las palabras y tiempo: suben de a poco a lo largo de 1000 niveles.
+const rangeOf = (lv) => { const t = 4 + Math.floor(Math.pow(lvP(lv), 0.6) * 8.99); return [Math.max(4, t - 3), Math.min(12, t + 1)]; };
+const timeFor = (lv, len) => Math.max(15, Math.round((20 + 5 * len - Math.min(lv, 15) * 2) * (1 - 0.35 * lvP(lv))));
+const titleOf = (lv) => lvTitle(lv);
 // Dificultad elegible (Anagrama, Escondidas, Adivina): modifica tiempo, largo, letras de más, tier de palabras y puntos.
 const DIF = {
   f: { name: "Fácil", icon: "🌱", time: 1.5, len: -1, extra: -2, tier: -1, mult: 0.7, hint: 10, lives: 0, clues: 10 },
@@ -38,12 +37,16 @@ function difBar(el, k) {
   el.onclick = (e) => { const b = e.target.closest("[data-dg]"); if (b) { SV.dif[k] = b.dataset.dg; save(); difBar(el, k); } };
 }
 let CUR = "ana"; // juego elegido en el menú: "ana" (Anagrama) o "hid" (Palabras escondidas)
-const GRANKS = [[0, "Novato", "🥚"], [300, "Aprendiz", "🌱"], [1000, "Curioso", "🔎"], [2500, "Ingenioso", "💡"], [5000, "Astuto", "🦊"], [9000, "Erudito", "📚"], [15000, "Genio", "🧠"], [25000, "Maestro mental", "👑"], [40000, "Leyenda", "🏆"]];
 function addPts(k, n) { SV.pts = SV.pts || { ana: 0, hid: 0, adi: 0, cri: 0 }; SV.pts[k] = (SV.pts[k] || 0) + n; SV.wal[k] = (SV.wal[k] || 0) + n; }
 const duelRank = (k, n) => { SV.pts = SV.pts || {}; SV.pts[k] = (SV.pts[k] || 0) + n; }; // los duelos solo suman al rango cuando se gana
 const ptsOf = (k) => (SV.pts && SV.pts[k]) || 0;
 const totalPts = () => ptsOf("ana") + ptsOf("hid") + ptsOf("adi") + ptsOf("cri") + ptsOf("qv") + ptsOf("tf");
-function globalRank() { const t = totalPts(); let i = 0; GRANKS.forEach((r, j) => { if (t >= r[0]) i = j; }); const n = GRANKS[i + 1]; return { name: GRANKS[i][1], icon: GRANKS[i][2], nextIcon: n ? n[2] : "", i, next: n ? n[0] : null, nextName: n ? n[1] : null, from: GRANKS[i][0], total: t }; }
+function globalRank() {
+  const t = totalPts(); let i = 0; GRANKS.forEach((r, j) => { if (t >= r[0]) i = j; });
+  const last = GRANKS.length - 1, base = GRANKS[i];
+  if (i === last) { const k = Math.floor((t - base[0]) / GR_STAR); return { name: base[1] + (k ? " ✦" + k : ""), icon: base[2], nextIcon: base[2], i, next: base[0] + (k + 1) * GR_STAR, nextName: base[1] + " ✦" + (k + 1), from: base[0] + k * GR_STAR, total: t, endless: true }; }
+  const n = GRANKS[i + 1]; return { name: base[1], icon: base[2], nextIcon: n[2], i, next: n[0], nextName: n[1], from: base[0], total: t };
+}
 const KSk = (k) => (k === "hid" ? { lv: "lvH", st: "starsH" } : { lv: "level", st: "stars" });
 const KS = () => KSk(CUR);
 const curLevel = () => SV[KS().lv];
@@ -62,10 +65,17 @@ const ACH = [
   ["s10", "Imparable", "10 palabras seguidas", () => SV.bestStreak >= 10, 60],
   ["l5", "Nivel 5", "Llegá al nivel 5", () => SV.level >= 5, 50],
   ["l10", "Nivel 10", "Llegá al nivel 10", () => SV.level >= 10, 150],
+  ["l50", "Nivel 50", "Llegá al nivel 50", () => SV.level >= 50 || SV.lvH >= 50, 300],
+  ["l100", "Centenario", "Llegá al nivel 100", () => SV.level >= 100 || SV.lvH >= 100, 600],
+  ["l250", "Maratonista", "Llegá al nivel 250", () => SV.level >= 250 || SV.lvH >= 250, 1500],
+  ["l500", "Mitad del camino", "Llegá al nivel 500", () => SV.level >= 500 || SV.lvH >= 500, 3000],
+  ["l1000", "Mil niveles", "Llegá al nivel 1000: ¡y seguí, que no termina!", () => SV.level >= 1000 || SV.lvH >= 1000, 8000],
   ["perfect", "Perfecto", "3 estrellas en un nivel", () => [...Object.values(SV.stars), ...Object.values(SV.starsH)].some((n) => n >= 3), 30],
   ["ad1", "Ojo de águila", "Adiviná una palabra con la primera pista", () => SV.adAces >= 1, 50],
   ["ad3", "Detective", "Adiviná 5 palabras con 3 pistas o menos", () => SV.adQuick >= 5, 60],
   ["adl5", "Rastreador", "Llegá al nivel 5 de Adivina", () => SV.adLevel >= 5, 60],
+  ["adl50", "Inspector", "Llegá al nivel 50 de Adivina", () => SV.adLevel >= 50, 400],
+  ["adl200", "Mente maestra", "Llegá al nivel 200 de Adivina", () => SV.adLevel >= 200, 2000],
   ["adl15", "Sabueso", "Llegá al nivel 15 de Adivina", () => SV.adLevel >= 15, 200],
   ["h5", "Buscapalabras", "Llegá al nivel 5 de Palabras escondidas", () => SV.lvH >= 5, 50],
   ["speed", "Rayo", "Resolvé una palabra con más del 75 % del tiempo sobrando", () => SV.fastest >= 0.75, 20],
@@ -110,11 +120,13 @@ function renderHome() {
   difBar($("#hDiffs"), CUR === "hid" ? "hid" : "ana"); $("#hCoins").textContent = SV.coins;
   $("#hRank").textContent = titleOf(topLevel()) + " · " + ptsOf(CUR) + " pts";
   $("#btnSound").textContent = SV.sound ? "🔊" : "🔇";
-    $("#hCard").innerHTML = `<button class="ib" id="lvPrev" ${viewLevel <= 1 ? "disabled" : ""} aria-label="Nivel anterior">‹</button>
-    <div class="mid"><small>Nivel</small><b>${viewLevel}</b><div class="stars">${stars(SV[KS().st][viewLevel] || 0)}</div><small>${viewLevel === curLevel() ? "Nivel actual" : "Ya superado: mejorá tus estrellas"}</small><small class="world">🌍 ${SCENES.worldName(viewLevel)}</small></div>
-    <button class="ib" id="lvNext" ${viewLevel >= curLevel() ? "disabled" : ""} aria-label="Nivel siguiente">›</button>`;
+    $("#hCard").innerHTML = `<div class="lvnav"><button class="ib" id="lvPrev10" ${viewLevel <= 1 ? "disabled" : ""} aria-label="10 niveles atrás">«</button><button class="ib" id="lvPrev" ${viewLevel <= 1 ? "disabled" : ""} aria-label="Nivel anterior">‹</button></div>
+    <div class="mid"><small>Nivel</small><b>${viewLevel}</b><div class="stars">${stars(SV[KS().st][viewLevel] || 0)}</div><small>${viewLevel === curLevel() ? "Nivel actual" : "Ya superado: mejorá tus estrellas"}</small><small class="world">🌍 ${SCENES.worldName(viewLevel)}</small>${lvPath(viewLevel)}</div>
+    <div class="lvnav"><button class="ib" id="lvNext" ${viewLevel >= curLevel() ? "disabled" : ""} aria-label="Nivel siguiente">›</button><button class="ib" id="lvNext10" ${viewLevel >= curLevel() ? "disabled" : ""} aria-label="10 niveles adelante">»</button></div>`;
   $("#lvPrev").onclick = () => { viewLevel--; renderHome(); };
   $("#lvNext").onclick = () => { viewLevel++; renderHome(); };
+  $("#lvPrev10").onclick = () => { viewLevel = Math.max(1, viewLevel - 10); renderHome(); };
+  $("#lvNext10").onclick = () => { viewLevel = Math.min(curLevel(), viewLevel + 10); renderHome(); };
   const d = SV.lastDaily !== todayKey();
   $("#btnDaily").innerHTML = d ? `🎁 <b>Premio diario disponible</b><small>Tocá para reclamarlo</small>` : `🎁 Premio diario reclamado<small>Volvé mañana · racha de ${SV.dailyStreak} día${SV.dailyStreak === 1 ? "" : "s"}</small>`;
   $("#btnDaily").classList.toggle("ready", d);
@@ -137,7 +149,7 @@ function checkAch() {
   for (const [id, name, , test, reward] of ACH) if (!SV.ach[id] && test()) { SV.ach[id] = 1; SV.coins += reward; save(); toast(`🏅 ¡Logro: ${name}! +${reward} 🪙`); beep(SND.win); }
 }
 function showAch() {
-  modal(`<h2>🏅 Logros</h2><div class="list">${ACH.map(([id, n, d, , r]) => `<div class="li ${SV.ach[id] ? "got" : ""}"><span>${SV.ach[id] ? "🏅" : "🔒"}</span><div><b>${n}</b><small>${d}</small></div><em>+${r}🪙</em></div>`).join("")}</div><button class="big" data-close>Cerrar</button>`);
+  modal(`<h2>🏅 Logros</h2><div class="list">${ACH.map(([id, n, d, , r]) => `<div class="li ${SV.ach[id] ? "got" : ""}"><span>${SV.ach[id] ? "🏅" : "🔒"}</span><div><b>${n}</b><small>${d}</small></div><em>+${r}🪙</em></div>`).join("")}</div><p class="tag">Y después del ♾️ Eterno: una estrella ✦ por cada millón de puntos. ¡Esto no termina!</p><button class="big" data-close>Cerrar</button>`);
 }
 function showStats() {
   const stars3 = [...Object.values(SV.stars), ...Object.values(SV.starsH)].reduce((a, b) => a + b, 0);
@@ -162,8 +174,9 @@ $("#box").addEventListener("click", (e) => {
 // ---------- Juego ----------
 let G = null, timerId = null;
 function pickWords(lv) {
-  const [a0, b0] = rangeOf(lv), dl = gameDif().len, a = Math.max(4, a0 + dl), b = Math.min(12, b0 + dl);
+  const [a0, b0] = rangeOf(lv), dl = gameDif().len; let a = lvClamp(a0 + dl, 4, 12); const b = lvClamp(b0 + dl, a, 12);
   let c = []; for (let n = a; n <= b; n++) c = c.concat(POOL[n] || []);
+  while (c.length < PER_LEVEL + 15 && a > 4) { a--; c = c.concat(POOL[a] || []); }
   const fresh = c.filter((x) => !SV.seen.includes(x.L));
   const src = fresh.length >= PER_LEVEL + 5 ? fresh : c;
   return shuffle(src);
@@ -178,7 +191,7 @@ function startLevel(lv) {
 function nextWord() {
   if (!G.duel && G.queue.length < 3) G.queue = G.queue.concat(pickWords(G.lv));
   const w = G.queue.shift();
-  if (!G.duel) { SV.seen.push(w.L); if (SV.seen.length > 500) SV.seen.shift(); }
+  if (!G.duel) { SV.seen.push(w.L); if (SV.seen.length > 1500) SV.seen.shift(); }
   G.w = w; G.target = w.L; G.len = w.L.length;
   G.hl = null; G.hinted = false;
   G.tiles = (w.scr || makeScr(w.L, G.kind, G.lv || 5)).map((ch, id) => ({ ch, id }));
@@ -198,12 +211,13 @@ function extendPool() {
   }
 }
 extendPool();
-const hidClue = (w) => (typeof CLUES !== "undefined" && CLUES[w]) || (buildAdivina().byWord.get(w) || { c: [] }).c[3] || "";
+// La pista de Escondidas se vuelve más vaga a medida que subís de nivel.
+const hidClue = (w, c, lv) => { const ad = (buildAdivina().byWord.get(w) || { c: [] }).c, idx = 3 - Math.min(3, Math.floor(lvP(lv || 1) * 4)); return ((typeof CLUES !== "undefined" && lvP(lv || 1) < 0.5 && CLUES[w]) || ad[idx] || (typeof CLUES !== "undefined" && CLUES[w]) || ad[3] || (c ? "Categoría: " + c : "")); };
 // Palabras escondidas: la palabra va mezclada con letras de más (no se usan todas).
 const VOW = "AEIOU", CON = "BCDFGLMNPRSTVZ";
 function makeScr(L, kind, lv) {
   if (kind !== "hid") return scramble(L);
-  const extra = Math.max(2, Math.min(3 + Math.floor(lv / 3) + gameDif().extra, 11, 16 - L.length));
+  const extra = Math.max(2, Math.min(3 + Math.round(8 * Math.pow(lvP(lv), 0.7)) + gameDif().extra, 11, 16 - L.length));
   const a = [...L];
   for (let i = 0; i < extra; i++) a.push(rnd(5) < 2 ? VOW[rnd(5)] : CON[rnd(CON.length)]);
   return shuffle(a);
@@ -220,7 +234,7 @@ function renderGame() {
   const dn = G.duel ? G.n : G.solved;
   $("#gDots").innerHTML = Array.from({ length: PER_LEVEL }, (_, i) => `<i class="${i < dn ? "done" : i === dn ? "cur" : ""}"></i>`).join("");
   $("#gCat").textContent = G.w.c; $("#gLen").textContent = G.kind === "hid" ? `${G.len} letras · sobran ${G.tiles.length - G.len}` : `${G.len} letras`;
-  const cl = G.kind === "hid" && hidClue(G.w.w);
+  const cl = G.kind === "hid" && hidClue(G.w.w, G.w.c, G.lv);
   $("#gClue").hidden = G.kind !== "hid"; $("#gClue").textContent = cl ? "💬 " + cl : " ";
   $("#gStreak").textContent = G.streak >= 2 ? `🔥 Racha x${G.streak}` : "";
   renderTiles(); renderTime();
@@ -265,7 +279,7 @@ function float(t, cls) { const f = $("#gFloat"); f.className = "float " + (cls |
 function solveWord() {
   G.busy = true; G.solved++; G.streak++; SV.solved++; SV.bestStreak = Math.max(SV.bestStreak, G.streak);
   const ratio = G.left / G.total; if (G.wordHints === 0) SV.fastest = Math.max(SV.fastest, ratio);
-  const gain = Math.round(Math.max(5, 10 + G.len + Math.ceil(10 * ratio) + Math.min(G.streak, 10) * 2 - 5 * G.wordHints) * (G.duel ? 1 : difOf(G.kind).mult));
+  const gain = Math.round(Math.max(5, 10 + G.len + Math.ceil(10 * ratio) + Math.min(G.streak, 10) * 2 - 5 * G.wordHints) * (G.duel ? 1 : difOf(G.kind).mult * lvMult(G.lv)));
   if (G.duel) { G.duel.pts += gain; G.n++; } else addPts(G.kind, gain); save();
   liveSend();
   $("#gSlots").classList.add("win"); $("#gCoins").textContent = SV.coins;
@@ -313,7 +327,7 @@ function pause(on) {
 function levelDone() {
   G.over = true; clearInterval(timerId);
   const st = G.lostLives === 0 && G.hints === 0 ? 3 : G.lostLives <= 1 ? 2 : 1;
-  const bonus = 50 + 10 * G.lv;
+  const bonus = lvPrize(G.lv);
   const K = KSk(G.kind);
   SV[K.st][G.lv] = Math.max(SV[K.st][G.lv] || 0, st); addPts(G.kind, bonus);
   const first = G.lv === SV[K.lv]; const before = titleOf(topLevel());
@@ -437,13 +451,13 @@ function showMenu() {
   $("#home").hidden = true; $("#game").hidden = true; $("#menu").hidden = false;
   $("#mCoins").textContent = walletTotal(); applyTheme();
   const gr = globalRank(); const fmt = (n) => n.toLocaleString("es-AR");
-  $("#mRank").textContent = `Rango ${gr.i + 1}/${GRANKS.length}`;
+  $("#mRank").textContent = gr.endless ? "Rango máximo ♾️" : `Rango ${gr.i + 1}/${GRANKS.length}`;
   $("#mBadge").textContent = gr.icon; $("#mRankName").textContent = gr.name; $("#mTotal").textContent = fmt(gr.total);
   const pct = gr.next ? Math.min(100, ((gr.total - gr.from) / (gr.next - gr.from)) * 100) : 100;
   $("#mBar").style.width = Math.max(4, pct) + "%";
   $("#mFrom").textContent = fmt(gr.from); $("#mTo").textContent = gr.next ? fmt(gr.next) + " pts" : "MÁX";
   $("#mNext").innerHTML = gr.next ? `Te faltan <b>${fmt(gr.next - gr.total)} pts</b> para ser <b>${gr.nextIcon} ${gr.nextName}</b>` : "¡Llegaste al rango más alto! 🎉";
-  $("#mSteps").innerHTML = GRANKS.map((r, j) => `<i class="${j < gr.i ? "done" : j === gr.i ? "cur" : ""}" title="${r[1]}">${j <= gr.i ? r[2] : "🔒"}</i>`).join("");
+  { const lo = lvClamp(gr.i - 4, 0, GRANKS.length - 9); $("#mSteps").innerHTML = GRANKS.map((r, j) => ({ r, j })).slice(lo, lo + 9).map(({ r, j }) => `<i class="${j < gr.i ? "done" : j === gr.i ? "cur" : ""}" title="${r[1]}">${j <= gr.i ? r[2] : "🔒"}</i>`).join(""); }
   $("#mPtsAna").textContent = ptsOf("ana") + " pts"; $("#mPtsHid").textContent = ptsOf("hid") + " pts"; $("#mPtsAdi").textContent = ptsOf("adi") + " pts"; $("#mPtsCri").textContent = ptsOf("cri") + " pts"; $("#mPtsTf").textContent = ptsOf("tf") + " pts"; if (typeof crMenu === "function") crMenu(); if (typeof qvMenu === "function") qvMenu(); document.querySelectorAll("#menu [data-game]").forEach((c) => { const k = c.dataset.game; if (k !== "cri" && k !== "qv") c.querySelectorAll("[data-diff]").forEach((x) => x.classList.toggle("on", x.dataset.diff === SV.dif[k])); });
   $("#mLvAna").textContent = `Nivel ${SV.level}`; $("#mLvHid").textContent = `Nivel ${SV.lvH}`; $("#mLvAdi").textContent = `Nivel ${SV.adLevel}`;
 }
@@ -572,11 +586,10 @@ function showLiveResult() {
 let adOn = false;
 const AD = { cat: "", words: [], i: 0, shown: 0, total: 0, results: [], clues: [], cur: null, busy: false, lv: 1 };
 const AD_ROUND = 5;
-const adTier = (L) => Math.min(4, 1 + Math.floor((L - 1) / 6));
-const adPass = (L) => Math.min(350, 120 + 12 * L);
-const AD_TITLES = [[1, "Curioso"], [3, "Aprendiz de detective"], [6, "Rastreador"], [10, "Detective"], [15, "Sabueso"], [20, "Inspector"], [30, "Comisario"], [40, "Maestro de la intriga"], [60, "Leyenda del misterio"]];
-const adTitle = (L) => AD_TITLES.filter((t) => L >= t[0]).pop()[1];
-const adMax = () => (AD.duel ? 10 : difOf("adi").clues);
+const adTier = (L) => lvClamp(1 + Math.floor(Math.pow(lvP(L), 0.8) * 3.99), 1, 4);
+const adPass = (L) => Math.min(430, Math.round(120 + 310 * Math.pow(lvP(L), 0.9)));
+const adTitle = (L) => lvTitle(L, LV_TITLES_AD);
+const adMax = () => (AD.duel ? 10 : Math.max(3, difOf("adi").clues - Math.floor(lvP(AD.lv) * 4)));
 const adPts = (shown) => 110 - 10 * shown;
 const plain = (s) => letters(s).replace(/[^A-ZÑ]/g, "");
 // Corrector de ortografía: distancia de edición (con letras intercambiadas) para aceptar errores de tipeo.
@@ -601,7 +614,7 @@ function showAdHome() {
   buildAdivina(); SCENES.apply(SCENES.mystery(SV.adLevel));
   $("#menu").hidden = true; $("#home").hidden = true; $("#game").hidden = true; $("#adGame").hidden = true; $("#adHome").hidden = false; adOn = true;
   difBar($("#adDiffs"), "adi"); $("#adCoins").textContent = SV.coins;
-  $("#adLvl").innerHTML = `<div class="mid"><small>Nivel</small><b>${SV.adLevel}</b><small>${adTitle(SV.adLevel)} · ${ptsOf("adi")} pts</small><small class="world">🔍 ${SCENES.mysteryName(SV.adLevel)}</small><small>Para pasar: ${adPass(SV.adLevel)} pts de 500 en una ronda</small></div>`;
+  $("#adLvl").innerHTML = `<div class="mid"><small>Nivel</small><b>${SV.adLevel}</b><small>${adTitle(SV.adLevel)} · ${ptsOf("adi")} pts</small><small class="world">🔍 ${SCENES.mysteryName(SV.adLevel)}</small><small>Para pasar: ${adPass(SV.adLevel)} pts de 500 en una ronda</small>${lvPath(SV.adLevel)}</div>`;
   renderAdCats();
 }
 function renderAdCats() {
@@ -629,7 +642,7 @@ function adStart(cat) {
   buildAdivina(); AD.duel = false; AD.cat = cat; AD.lv = SV.adLevel; AD.i = 0; AD.total = 0; AD.results = [];
   const pool = cat === "Mezcla" ? ADI.all : ADI.cats.find((c) => c.name === cat).words;
   AD.words = adPick(pool, AD.lv);
-  SV.adSeen.push(...AD.words.map((e) => e.w)); if (SV.adSeen.length > 400) SV.adSeen.splice(0, SV.adSeen.length - 400); save();
+  SV.adSeen.push(...AD.words.map((e) => e.w)); if (SV.adSeen.length > 1100) SV.adSeen.splice(0, SV.adSeen.length - 1100); save();
   $("#adHome").hidden = true; $("#adGame").hidden = false; adOn = true;
   $("#adCatName").textContent = cat; $("#adTotal").textContent = SV.coins;
   adNext();
@@ -685,7 +698,7 @@ function adEnd() {
   const bonus = AD.results.every((r) => r.pts > 0) ? 50 : 0; if (bonus) addPts("adi", bonus);
   const need = adPass(AD.lv), passed = AD.total >= need;
   let lvBonus = 0, rank = "";
-  if (passed && AD.lv === SV.adLevel) { const before = adTitle(SV.adLevel); SV.adLevel++; lvBonus = 30 + 10 * AD.lv; addPts("adi", lvBonus); if (adTitle(SV.adLevel) !== before) rank = adTitle(SV.adLevel); }
+  if (passed && AD.lv === SV.adLevel) { const before = adTitle(SV.adLevel); SV.adLevel++; lvBonus = lvPrize(AD.lv); addPts("adi", lvBonus); if (adTitle(SV.adLevel) !== before) rank = adTitle(SV.adLevel); }
   save(); checkAch(); beep(passed ? SND.win : SND.lose); vib(passed ? [80, 50, 120] : 120);
   modal(`<h2>${passed ? "🎉 ¡Nivel " + AD.lv + " superado!" : "🕵️ Ronda terminada"}</h2><p class="big2">${AD.total} pts</p><p>${passed ? (lvBonus ? "+" + lvBonus + " 🪙 por pasar de nivel" : "Ya habías pasado este nivel") : `Te faltaron ${need - AD.total} pts para pasar de nivel (meta: ${need}).`}</p>${rank ? `<p class="rankup">Nuevo rango: <b>${rank}</b></p>` : ""}${rec ? '<p class="rankup">¡Nuevo récord de la categoría!</p>' : ""}<div class="list">${AD.results.map((r) => `<div class="li ${r.pts ? "got" : ""}"><span>${r.pts ? "✅" : "❌"}</span><div><b>${esc(r.w)}</b><small>${r.pts ? r.shown + (r.shown === 1 ? " pista" : " pistas") : "No la adivinaste"}</small></div><em>${r.pts}</em></div>`).join("")}</div>${bonus ? '<p class="big2">+50 🪙 por acertar todas</p>' : ""}<button class="big" id="adAgain">${passed && lvBonus ? "Siguiente nivel ▶" : "Jugar otra vez"}</button><button class="link" id="adCatsBtn">Elegir categoría</button>`, true);
   $("#adAgain").onclick = () => { closeModal(); adStart(AD.cat); };

@@ -122,6 +122,13 @@ try:
         check(len(set(seeds)) == 3, "series en vivo: cada duelo tiene otras palabras")
         h.wait_for_timeout(500)
         check("Ganaste la partida" in h.inner_text("#box") and "Perdiste la partida" in g.inner_text("#box") and h.evaluate("SR.tot") == 100, "series en vivo: gana el que más acumula (100 vs 60)")
+        # niveles largos (1000 y más allá)
+        r = pg.evaluate("""()=>{const o={};o.t=[1,1000,3500].map(titleOf).join(',');o.r=GRANKS.length;
+          o.w=['f','m','d','e'].every(d=>{SV.dif.ana=d;return [1,100,500,1000,2500].every(lv=>pickWords(lv).length>=10)});SV.dif.ana='m';
+          o.p=[adPass(1),adPass(1000)];o.l=[qvHelp(1),qvHelp(1000)];return o;}""")
+        check(r["t"] == "Novato,Leyenda,Eterno" and r["r"] == 21 and r["w"] and r["p"][0] < r["p"][1] and r["l"][0] > r["l"][1], "niveles: 1000 niveles de rampa y sin fin")
+        check(pg.evaluate("globalRank.call(null) && (SV.pts={ana:4700000,hid:0,adi:0,cri:0,qv:0,tf:0}, globalRank().name)") == "Eterno ✦1", "rangos: después del último, una estrella por millón")
+        pg.evaluate("SV.pts={ana:0,hid:0,adi:0,cri:0,qv:0,tf:0}")
         # duelos de otros juegos (en vivo)
         for kind, scr in (("adi", "adGame"), ("cri", "crGame"), ("qv", "qvGame")):
             ctx = b.new_context(viewport=V); ctx.add_init_script(path=os.path.join(HERE, "peer-shim.js"))

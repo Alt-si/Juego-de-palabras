@@ -2,16 +2,30 @@
 // ¿Qué ves?: una imagen y la palabra incompleta; hay que completar las letras que faltan.
 const QV = Object.keys(ICONS).map((w) => ({ w, L: [...w].map(crLetter).join("") }));
 const qvTier = (n) => (n <= 4 ? 1 : n <= 6 ? 2 : n <= 8 ? 3 : 4);
-const qvHelp = (lv) => Math.max(0, 3 - Math.floor((lv - 1) / 3) + gameDifQ().help);
+const qvHelp = (lv) => Math.max(0, Math.round(3 * (1 - Math.pow(lvP(lv), 0.6))) + gameDifQ().help);
 const qvDifs = { f: 1, m: 0, d: -1, e: -3 };
 const gameDifQ = () => ({ help: Q && Q.duel ? 0 : qvDifs[(SV.dif && SV.dif.qv) || "m"] });
-const qvTime = (lv) => Math.round(Math.max(20, 45 - Math.min(lv, 20)) * (Q && Q.duel ? 1 : difOf("qv").time));
+const qvTime = (lv) => Math.round(Math.max(18, 45 - 22 * Math.pow(lvP(lv), 0.6)) * (Q && Q.duel ? 1 : difOf("qv").time));
 let Q = null, QT = 0;
+// Variantes de la imagen (a partir del nivel 20): la misma ilustración se ve distinta y cuesta más reconocerla.
+const QV_TW = [
+  { n: "🪞 Espejo", min: 20, css: () => ({ transform: "scale(-1,1) rotate(.01deg)" }) },
+  { n: "🙃 Al revés", min: 20, css: () => ({ transform: "rotate(179.99deg)" }) },
+  { n: "🔍 Zoom", min: 40, css: () => ({ transform: `scale(2.1) translate(${(Math.random() * 28 - 14).toFixed(1)}%, ${(Math.random() * 28 - 14).toFixed(1)}%)`, filter: "blur(.01px)" }) },
+  { n: "🌫️ Borrosa", min: 150, css: () => ({ filter: "blur(4px)" }) },
+  { n: "🌑 Silueta", min: 300, css: () => ({ filter: "brightness(0) opacity(.85)" }) },
+  { n: "🔬 Muy chica", min: 500, css: () => ({ transform: "scale(.42)", filter: "blur(.01px)" }) },
+  { n: "🌀 Doble desafío", min: 700, css: () => ({ transform: "rotate(90deg) scaleX(-1)", filter: "blur(2.5px)" }) },
+];
+function qvTwist(lv) {
+  if (lv < 20 || Math.random() > Math.min(0.75, 0.1 + 0.9 * lvP(lv))) return null;
+  const ok = QV_TW.filter((t) => lv >= t.min); return ok[Math.floor(Math.random() * ok.length)];
+}
 
 function qvPick(lv) {
   let pool = QV.slice(); let un = pool.filter((p) => !SV.qvSeen.includes(p.w));
   if (un.length < 12) { SV.qvSeen = []; un = pool; }
-  const T = Math.max(1, Math.min(4, 1 + Math.floor((lv - 1) / 4) + difOf("qv").tier));
+  const T = Math.max(1, Math.min(4, 1 + Math.floor(Math.pow(lvP(lv), 0.8) * 3.99) + difOf("qv").tier));
   return crShuffle(un).map((p) => ({ p, s: Math.abs(qvTier(p.L.length) - T) + Math.random() * 1.1 })).sort((a, b) => a.s - b.s).slice(0, 10).map((x) => x.p);
 }
 function qvMenu() {
@@ -24,7 +38,7 @@ function qvHome() {
   const lv = SV.qvLv; SCENES.apply(SCENES.world(lv)); applyTheme(); difBar($("#qvDiffs"), "qv");
   $("#qvCoins").textContent = SV.coins; $("#qvRank").textContent = titleOf(lv) + " · " + ptsOf("qv") + " pts";
   const h = qvHelp(lv);
-  $("#qvLvl").innerHTML = `<div class="mid"><small>Nivel</small><b>${lv}</b><div class="stars">${stars(SV.starsQ[lv - 1] || 0)}</div><small class="world">🌍 ${SCENES.worldName(lv)}</small><small>${h} ${h === 1 ? "letra de ayuda" : "letras de ayuda"} por imagen · 10 imágenes</small></div>`;
+  $("#qvLvl").innerHTML = `<div class="mid"><small>Nivel</small><b>${lv}</b><div class="stars">${stars(SV.starsQ[lv - 1] || 0)}</div><small class="world">🌍 ${SCENES.worldName(lv)}</small><small>${h} ${h === 1 ? "letra de ayuda" : "letras de ayuda"} por imagen · 10 imágenes</small>${lvPath(lv)}</div>`;
 }
 $("#qvBack").onclick = showMenu;
 $("#qvPlay").onclick = () => qvStart();
@@ -44,7 +58,7 @@ function qvImage() {
   Q.total = qvTime(Q.lv); Q.left = Q.total;
   $("#qvTotal").textContent = SV.coins; qvLives();
   $("#qvDots").innerHTML = Q.list.map((_, i) => `<i class="${i < Q.i ? "done" : i === Q.i ? "cur" : ""}"></i>`).join("");
-  const im = $("#qvImg"); im.innerHTML = iconSvg(it.w); im.classList.remove("pop"); void im.offsetWidth; im.classList.add("pop");
+  const im = $("#qvImg"); im.innerHTML = iconSvg(it.w); const tw = Q.duel ? null : qvTwist(Q.lv); if (tw) { const w = document.createElement("div"); w.className = "qvw"; while (im.firstChild) w.appendChild(im.firstChild); im.appendChild(w); Object.assign(w.style, tw.css()); im.insertAdjacentHTML("beforeend", `<b class="qvtw">${tw.n}</b>`); } im.classList.remove("pop"); void im.offsetWidth; im.classList.add("pop");
   $("#qvHint small").textContent = `Letra · ${hintCost("qv")}🪙`; qvDraw(); qvTimeUI();
   QT = setInterval(() => { if (Q.busy || !$("#modal").hidden) return; Q.left -= 0.1; qvTimeUI(); if (Q.left <= 0) qvFail("¡Se acabó el tiempo!"); }, 100);
 }
@@ -75,7 +89,7 @@ function qvFloat(t, cls) { const f = $("#qvFloat"); f.className = "float " + (cl
 function qvWin() {
   Q.busy = true; clearInterval(QT); Q.solved++; Q.streak++; SV.qvSolved++;
   const ratio = Q.left / Q.total, len = Q.it.L.length;
-  const gain = Math.round(Math.max(5, 10 + len + Math.ceil(10 * ratio) + Math.min(Q.streak, 10) * 2 - 5 * Q.wordHints) * (Q.duel ? 1 : difOf("qv").mult));
+  const gain = Math.round(Math.max(5, 10 + len + Math.ceil(10 * ratio) + Math.min(Q.streak, 10) * 2 - 5 * Q.wordHints) * (Q.duel ? 1 : difOf("qv").mult * lvMult(Q.lv)));
   if (Q.duel) { Q.pts += gain; dxProg(Q.i + 1, Q.pts); } else { addPts("qv", gain); SV.qvSeen.push(Q.it.w); } save(); checkAch(); $("#qvTotal").textContent = SV.coins;
   $("#qvSlots").classList.add("win"); qvFloat(`+${gain} 🪙${Q.streak >= 2 ? "  🔥x" + Q.streak : ""}`, "good"); beep(SND.ok); vib(25);
   setTimeout(() => { $("#qvSlots").classList.remove("win"); qvNext(); }, 1100);
@@ -96,7 +110,7 @@ function qvOver() {
 }
 function qvEnd() {
   clearInterval(QT);
-  const st = Q.lost === 0 && Q.hints === 0 ? 3 : Q.lost <= 1 ? 2 : 1, bonus = 50 + 10 * Q.lv;
+  const st = Q.lost === 0 && Q.hints === 0 ? 3 : Q.lost <= 1 ? 2 : 1, bonus = lvPrize(Q.lv);
   SV.starsQ[Q.lv - 1] = Math.max(SV.starsQ[Q.lv - 1] || 0, st); addPts("qv", bonus);
   const first = Q.lv === SV.qvLv; const before = titleOf(SV.qvLv); if (first) SV.qvLv++; save(); checkAch(); beep(SND.win); vib([80, 50, 120]);
   const rank = titleOf(SV.qvLv) !== before ? titleOf(SV.qvLv) : "";
