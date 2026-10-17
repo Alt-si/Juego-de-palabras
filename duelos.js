@@ -71,5 +71,5 @@ function dxResult() {
   $("#dxShare").onclick = () => { if (navigator.share) navigator.share({ title: "Juegos mentales", text, url }).catch(() => {}); else window.open("https://wa.me/?text=" + encodeURIComponent(text + "\n" + url), "_blank"); };
   $("#dxCopy").onclick = () => (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(() => toast("Link copiado"), () => prompt("Copiá el link:", url));
 }
-function dxPay(w) { if (D.paid) return; D.paid = true; SV.duels++; if (w > 0) { SV.duelWins++; SV.wal[D.kind] = (SV.wal[D.kind] || 0) + 50; } save(); checkAch(); beep(SND.win); }
+function dxPay(w) { if (D.paid) return; D.paid = true; SV.duels++; if (w > 0) { SV.duelWins++; SV.wal[D.kind] = (SV.wal[D.kind] || 0) + 50; duelRank(D.kind, D.pts); } save(); checkAch(); beep(SND.win); }
 document.addEventListener("click", (e) => { if (e.target.id === "dxHome") dxExit(); });

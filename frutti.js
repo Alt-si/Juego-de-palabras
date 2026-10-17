@@ -172,7 +172,7 @@ function tfResult(again) {
   const ap = TF.ap[r] || (TF.ap[r] = { a: new Set(), b: new Set() }), sc = tfScore(TF.cats, TF.letter, TF.me, o, ap);
   const prev = TF.log[r], dMe = sc.total - (prev ? prev.me : 0), dOpp = hasOpp ? sc.totalOpp - (prev && prev.opp != null ? prev.opp : 0) : 0;
   if (TF.scored < r) { TF.scored = r; beep(SND.coin || SND.ok); }
-  TF.tot += dMe; TF.totOpp += dOpp; TF.log[r] = { l: TF.letter, me: sc.total, opp: hasOpp ? sc.totalOpp : null }; if (dMe) addPts("tf", dMe); save();
+  TF.tot += dMe; TF.totOpp += dOpp; TF.log[r] = { l: TF.letter, me: sc.total, opp: hasOpp ? sc.totalOpp : null }; save();
   $("#tfCoins").textContent = SV.wal.tf || 0; $("#tfSum").textContent = `Partida ${r + 1}/${TF.rounds} · acumulado ${TF.tot}${hasOpp || TF.live || TF.from ? " vs " + TF.totOpp : ""}`;
   const last = r >= TF.rounds - 1, oppLeft = TF.live && LIVE && LIVE.opp.left;
   const rows = sc.rows.map((x, i) => `<div class="tfrr"><h4>${TF_BY[x.id].icon} ${TF_BY[x.id].name}</h4><div class="tfpair">${tfCell(x.a, TF.me.ans[i], x.rep, "a", i)}${hasOpp ? tfCell(x.b, o.ans[i], x.rep, "b", i) : ""}</div><small class="pp">+${x.pts}${hasOpp ? ` · rival +${x.opts}` : ""}</small></div>`).join("");
@@ -193,7 +193,7 @@ function tfAdvance() {
 }
 function tfFinal() {
   if (!TF) return; const hasOpp = TF.live || !!TF.from, w = hasOpp ? (TF.tot > TF.totOpp ? 1 : TF.tot < TF.totOpp ? -1 : 0) : 0;
-  if (!TF.paidEnd) { TF.paidEnd = true; if (hasOpp) { SV.duels++; if (w > 0) { SV.duelWins++; SV.wal.tf = (SV.wal.tf || 0) + TF.rounds * 10; } } save(); checkAch(); beep(w >= 0 ? SND.win : SND.lose); }
+  if (!TF.paidEnd) { TF.paidEnd = true; if (hasOpp) { SV.duels++; if (w > 0) { SV.duelWins++; SV.wal.tf = (SV.wal.tf || 0) + TF.rounds * 10; duelRank("tf", TF.tot); } } save(); checkAch(); beep(w >= 0 ? SND.win : SND.lose); }
   $("#tfCoins").textContent = SV.wal.tf || 0;
   const oname = esc((TF.live ? oppName() : TF.from && TF.from.name) || "Rival");
   const head = !hasOpp ? "🏁 ¡Listo!" : w > 0 ? "🏆 ¡Ganaste el duelo!" : w < 0 ? "😮 Perdiste el duelo" : "🤝 ¡Empate!";

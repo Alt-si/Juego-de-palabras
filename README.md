@@ -32,3 +32,4 @@ Publicar: Settings → Pages → Branch `main` / root.
 - Pruebas: `python3 tests/smoke.py` y `python3 tests/duelos.py`.
 - **Series acumuladas** (`serie.js`): en todos los juegos se elige cuántos duelos dura la partida (1, 3, 5 o 10). Los puntos de cada duelo se suman y gana quien más acumula. En vivo se sincroniza "Siguiente duelo"; por link el desafío (`#s=`) lleva el puntaje de cada duelo.
 - **Verificación en Tutti Frutti**: la app no puede consultar la RAE sola (no tiene API pública). En la corrección, cada palabra marcada "no existe" o "mal escrita" trae un botón "Ver en la RAE" y "Es válida": si la palabra está en la RAE, el jugador la acepta y suma 10 (en vivo el rival lo ve).
+- **Puntos de rango en duelos**: jugar un duelo no suma puntos ni monedas por partida como el juego solo; al terminar, solo el ganador suma sus puntos acumulados al rango (y las monedas del premio).

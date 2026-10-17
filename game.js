@@ -40,6 +40,7 @@ function difBar(el, k) {
 let CUR = "ana"; // juego elegido en el menú: "ana" (Anagrama) o "hid" (Palabras escondidas)
 const GRANKS = [[0, "Novato", "🥚"], [300, "Aprendiz", "🌱"], [1000, "Curioso", "🔎"], [2500, "Ingenioso", "💡"], [5000, "Astuto", "🦊"], [9000, "Erudito", "📚"], [15000, "Genio", "🧠"], [25000, "Maestro mental", "👑"], [40000, "Leyenda", "🏆"]];
 function addPts(k, n) { SV.pts = SV.pts || { ana: 0, hid: 0, adi: 0, cri: 0 }; SV.pts[k] = (SV.pts[k] || 0) + n; SV.wal[k] = (SV.wal[k] || 0) + n; }
+const duelRank = (k, n) => { SV.pts = SV.pts || {}; SV.pts[k] = (SV.pts[k] || 0) + n; }; // los duelos solo suman al rango cuando se gana
 const ptsOf = (k) => (SV.pts && SV.pts[k]) || 0;
 const totalPts = () => ptsOf("ana") + ptsOf("hid") + ptsOf("adi") + ptsOf("cri") + ptsOf("qv") + ptsOf("tf");
 function globalRank() { const t = totalPts(); let i = 0; GRANKS.forEach((r, j) => { if (t >= r[0]) i = j; }); const n = GRANKS[i + 1]; return { name: GRANKS[i][1], icon: GRANKS[i][2], nextIcon: n ? n[2] : "", i, next: n ? n[0] : null, nextName: n ? n[1] : null, from: GRANKS[i][0], total: t }; }
@@ -399,7 +400,7 @@ function duelDone() {
   let head, body = "";
   if (d.from) {
     const w = me > d.from.score ? 1 : me < d.from.score ? -1 : 0;
-    if (w > 0) { SV.duelWins++; SV.coins += 50; }
+    if (w > 0) { SV.duelWins++; SV.coins += 50; duelRank(d.kind, me); }
     head = w > 0 ? "🏆 ¡Ganaste!" : w < 0 ? "😮 Perdiste" : "🤝 ¡Empate!";
     body = `<div class="vs"><div><small>Vos</small><b>${me}</b></div><span>vs</span><div><small>${esc(d.from.name)}</small><b>${d.from.score}</b></div></div>${w > 0 ? '<p class="big2">+50 🪙</p>' : ""}`;
   } else {
@@ -560,7 +561,7 @@ function showLiveResult() {
   if (!LIVE || !G || !G.duel || !G.duel.live) return;
   const me = G.duel.pts, o = LIVE.opp, w = me > o.pts ? 1 : me < o.pts ? -1 : 0;
   if (SR && SR.rounds > 1) return srRoundEnd(me, o.pts);
-  if (!G.paid) { G.paid = true; SV.duels++; if (w > 0) { SV.duelWins++; SV.coins += 50; } save(); checkAch(); beep(SND.win); }
+  if (!G.paid) { G.paid = true; SV.duels++; if (w > 0) { SV.duelWins++; SV.coins += 50; duelRank(G.duel.kind, me); } save(); checkAch(); beep(SND.win); }
   modal(`<h2>${w > 0 ? "🏆 ¡Ganaste!" : w < 0 ? "😮 Perdiste" : "🤝 ¡Empate!"}</h2><div class="vs"><div><small>Vos</small><b>${me}</b></div><span>vs</span><div><small>${oppName()}</small><b>${o.pts}</b></div></div>${o.left && !o.done ? "<p>Tu rival abandonó antes de terminar.</p>" : ""}${w > 0 ? '<p class="big2">+50 🪙</p>' : ""}${o.left ? "" : '<button class="big" id="lvRe">🔁 Revancha</button>'}<button class="link" id="goHome">Inicio</button>`, true);
   const re = $("#lvRe"); if (re) re.onclick = () => { if (LIVE.role === "host") sendStart(); else { Net.send({ t: "rematch" }); re.textContent = "Pedido enviado…"; re.disabled = true; } };
 }

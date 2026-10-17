@@ -47,7 +47,7 @@ const srLink = () => `${location.origin}${location.pathname}#s=${SR.seed}.${SR.k
 function srFinal() {
   if (!SR) return; const hasOpp = SR.live || !!SR.from, w = hasOpp ? (SR.tot > SR.totOpp ? 1 : SR.tot < SR.totOpp ? -1 : 0) : 0, kind = SR.kind;
   const prize = SR.rounds * 20;
-  if (!SR.paid) { SR.paid = true; if (hasOpp) { SV.duels++; if (w > 0) { SV.duelWins++; SV.wal[kind] = (SV.wal[kind] || 0) + prize; } } save(); checkAch(); beep(w >= 0 ? SND.win : SND.lose); }
+  if (!SR.paid) { SR.paid = true; if (hasOpp) { SV.duels++; if (w > 0) { SV.duelWins++; SV.wal[kind] = (SV.wal[kind] || 0) + prize; duelRank(kind, SR.tot); } } save(); checkAch(); beep(w >= 0 ? SND.win : SND.lose); }
   const name = esc(SR.live ? (LIVE && LIVE.opp.name) || "Rival" : SR.from ? SR.from.name : ""), left = SR.live && LIVE && LIVE.opp.left;
   const head = !hasOpp ? "🏁 ¡Listo!" : w > 0 ? "🏆 ¡Ganaste la partida!" : w < 0 ? "😮 Perdiste la partida" : "🤝 ¡Empate!";
   const rows = SR.mine.map((x, i) => `<tr><td>${i + 1}</td><td>${x}</td>${hasOpp ? `<td>${SR.opp[i] == null ? "—" : SR.opp[i]}</td>` : ""}</tr>`).join("");

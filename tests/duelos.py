@@ -81,7 +81,7 @@ try:
         L2 = t2.evaluate("TF.letter"); t2.fill('[data-tfi="0"]', L2 + "qzqzq"); t2.evaluate("tfBastaClick()"); t2.wait_for_timeout(400)
         check("No existe" in t2.inner_text("#box") and "Ver en la RAE" in t2.inner_text("#box") and t2.evaluate("TF.tot") == 0, "Tutti: palabra desconocida ofrece verificar en la RAE")
         t2.click('[data-tfok="a:0"]'); t2.wait_for_timeout(200)
-        check("Aceptada" in t2.inner_text("#box") and t2.evaluate("TF.tot") == 10, "Tutti: palabra validada suma 10")
+        check("Aceptada" in t2.inner_text("#box") and t2.evaluate("TF.tot") == 10 and t2.evaluate("(SV.pts.tf||0)") == 0, "Tutti: palabra validada suma 10 y el duelo no suma al rango hasta ganar")
         # series acumuladas por link (Adivina, 3 duelos)
         s1 = np(b.new_context(viewport=V)); s1.goto(URL); s1.evaluate("SV.name='Ana';SV.srRounds=3;save()"); s1.click('[data-game="adi"]'); s1.wait_for_timeout(200)
         check(s1.locator("#adHome .srsel .chip").count() == 4, "series: selector de cantidad de duelos")
@@ -99,6 +99,7 @@ try:
         for r, pts in enumerate((40, 40, 40)):
             s2.evaluate(f"dxFinish({pts})"); s2.wait_for_timeout(300); s2.evaluate("(document.getElementById('srNext')||document.getElementById('srFinal')).click()"); s2.wait_for_timeout(300)
         check("Ganaste la partida" in s2.inner_text("#box") and s2.evaluate("SR.tot") == 120 and s2.evaluate("SR.totOpp") == 100, "series: gana quien acumula más (120 vs 100)")
+        check(s2.evaluate("SV.pts.adi") == 120 and s1.evaluate("(SV.pts.adi||0)") == 0, "rango: solo el ganador suma puntos al terminar el duelo")
         # serie de Anagrama por link
         s3 = np(b.new_context(viewport=V)); s3.goto(URL); s3.evaluate("SV.name='Ana';SV.srRounds=3;save()"); s3.click('[data-game="ana"]'); s3.click("#btnDuel"); s3.wait_for_timeout(400)
         for r in range(3):
