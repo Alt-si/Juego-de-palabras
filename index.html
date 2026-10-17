@@ -107,6 +107,7 @@
     <div class="crlogo">📝<h1>TUTI<br>FRUTTI</h1></div>
     <p class="tag">Elegí las categorías y desafiá a un amigo</p>
     <div class="tfcats" id="tfCats"></div>
+    <div class="tfcats" id="tfRounds"></div>
     <p class="how" id="tfCount"></p>
     <button class="mini wide" id="tfRand">🎲 Elegir 5 al azar</button>
     <div class="duelrow"><button class="big" data-tf="live">⚔ Duelo en vivo</button><button class="big" data-tf="link">📨 Desafío por link</button></div>
@@ -116,6 +117,7 @@
   <section id="tfGame" class="screen" hidden>
     <div class="topbar"><button class="ib" id="tfQuit" aria-label="Salir">✕</button><span class="rank">Tuti Frutti</span><span class="coins">🪙 <b id="tfTotal">0</b></span><button class="ib help" data-help="tf" aria-label="Cómo se juega">?</button></div>
     <div class="rival" id="tfRival" hidden></div>
+    <div class="tfsum" id="tfSum"></div>
     <div class="tfhead"><div class="tfl" id="tfLetter"></div><div class="timer"><i id="tfBar"></i><b id="tfTime"></b></div></div>
     <div class="tfrows" id="tfRows"></div>
     <button class="big basta" id="tfBasta">¡BASTA!</button>
@@ -177,6 +179,7 @@
 <script src="quever.js"></script>
 <script src="duelos.js"></script>
 <script src="frutti-data.js"></script>
+<script src="frutti-data2.js"></script>
 <script src="frutti.js"></script>
 <script>if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});</script>
 </body>

@@ -27,6 +27,6 @@ Publicar: Settings → Pages → Branch `main` / root.
 
 ## Duelos y Tuti Frutti
 - **Duelos en todos los juegos**: Adivina (5 palabras), Frases encriptadas (3 frases) y ¿Qué ves? (10 imágenes) tienen "Duelo en vivo" y "Desafío por link" (`duelos.js`).
-- **Tuti Frutti** (`frutti.js`, `frutti-data.js`): solo duelos. Se eligen de 3 a 8 categorías, sale una letra y gana quien sume más: bien escrita 10, repetida con el rival 5, mal escrita 5 (se muestra cómo se escribe), no existe 0, más 10 de bonus para quien termina todo en menos tiempo.
+- **Tuti Frutti** (`frutti.js`, `frutti-data.js`, `frutti-data2.js`): solo duelos de 5, 10, 15 o 20 partidas (cada una con su letra) y los puntos se acumulan: gana quien más suma. Bien escrita 10, repetida con el rival 5, mal escrita 5, no existe 0, más 10 de bonus para quien termina todo en menos tiempo. Acepta plurales.
 - La validación usa listas de palabras por categoría (`frutti-data.js`): una palabra real que no esté en la lista cuenta como "no existe". Se pueden ampliar agregando palabras.
 - Pruebas: `python3 tests/smoke.py` y `python3 tests/duelos.py`.

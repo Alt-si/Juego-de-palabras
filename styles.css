@@ -207,3 +207,4 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 .tfc b{display:block;overflow-wrap:anywhere}.tfc small{display:block;font-size:11px}
 .tfc.ok{background:#16a34a33}.tfc.mal{background:#f59e0b44}.tfc.rep{background:#3b82f644}.tfc.no{background:#dc262633}
 .pp{opacity:.8}.tfbon{font-weight:700;margin:2px 0}.tfhint{font-size:12px;opacity:.8;margin:2px 0}
+.tfsum{text-align:center;font-weight:700;font-size:13px;margin:4px 0}.tfacc{margin:2px 0}.tft{width:100%;border-collapse:collapse;font-size:14px}.tft th,.tft td{padding:4px;border-bottom:1px solid #0002;text-align:center}

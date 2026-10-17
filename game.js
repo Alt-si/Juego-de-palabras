@@ -492,7 +492,7 @@ function handlers(role) {
       if (typeof tfMsg === "function" && tfMsg(m)) return;
       if (typeof dxMsg === "function" && dxMsg(m, role)) return;
       if (m.t === "hello") { LIVE.opp.name = String(m.name || "Rival").slice(0, 16); if (role === "host" && !LIVE.started) sendStart(); }
-      else if (m.t === "start" && role === "guest") runStart(m.seed, m.kind, m.cats);
+      else if (m.t === "start" && role === "guest") runStart(m.seed, m.kind, m.cats, m.rounds);
       else if (m.t === "prog") { LIVE.opp.n = +m.n || 0; LIVE.opp.pts = +m.pts || 0; liveBar(); }
       else if (m.t === "done") { LIVE.opp.pts = +m.pts || 0; LIVE.opp.n = PER_LEVEL; LIVE.opp.done = true; liveBar(); afterOpp(); }
       else if (m.t === "rematch" && role === "host") sendStart();
@@ -537,11 +537,11 @@ async function liveJoin(code, kind) {
   LIVE.to = setTimeout(() => { if (LIVE && !LIVE.started && !LIVE.opp.name) liveFail("No se pudo conectar con tu rival. ¿Sigue esperando en la sala?"); }, 15000);
   Net.join(code, handlers("guest"));
 }
-function sendStart() { const seed = Math.floor(Math.random() * 1e9); Net.send({ t: "start", seed, kind: LIVE.kind, cats: LIVE.cats }); runStart(seed, LIVE.kind, LIVE.cats); }
-function runStart(seed, kind, cats) {
+function sendStart() { const seed = Math.floor(Math.random() * 1e9); Net.send({ t: "start", seed, kind: LIVE.kind, cats: LIVE.cats, rounds: LIVE.rounds }); runStart(seed, LIVE.kind, LIVE.cats, LIVE.rounds); }
+function runStart(seed, kind, cats, rounds) {
   LIVE.started = true; LIVE.kind = kind; LIVE.opp.n = 0; LIVE.opp.pts = 0; LIVE.opp.done = false; LIVE.opp.left = false; clearTimeout(LIVE.to);
   clearInterval(timerId); G = null;
-  if (kind === "tf") { LIVE.cats = (cats || []).filter((c) => TF_BY[c]); return tfCountdown(seed, LIVE.cats); }
+  if (kind === "tf") { LIVE.cats = (cats || []).filter((c) => TF_BY[c]); LIVE.rounds = [5, 10, 15, 20].includes(+rounds) ? +rounds : 5; return tfCountdown(seed, LIVE.cats, LIVE.rounds); }
   if (DXG[kind]) return dxCountdown(seed, kind);
   let n = 3; modal(`<h2>⚔ ${oppName()}</h2><p>${NAMES[kind]} · 10 palabras</p><p class="big2" id="cd">${n}</p>`, true);
   const iv = setInterval(() => { n--; if (!LIVE) return clearInterval(iv); if (n <= 0) { clearInterval(iv); startDuel(seed, null, kind, true); } else $("#cd").textContent = n; }, 1000);
@@ -700,7 +700,7 @@ const HELP = {
   hid: ["🔍 Palabras escondidas", ["Hay más letras que las que necesita la palabra: usá la frase-pista para descubrirla.", "Armala solo con las letras justas. A los 10 s finales se marcan las letras correctas.", "3 vidas ❤ y 10 palabras por nivel."]],
   adi: ["🕵️ Adivina", ["Elegí una categoría y descubrí la palabra oculta.", "Arrancás con 1 pista; cada error o \"otra pista\" abre una más.", "Cuantas menos pistas uses, más puntos ganás (hasta 100 por palabra).", "Hay corrector de ortografía: si te equivocás en una letra, igual te la aceptamos.", "Juntá los puntos de la meta del nivel para pasar."]],
   cri: ["🔐 Frases encriptadas", ["Cada letra se esconde detrás de un número, un objeto o un color, y se repite en toda la frase.", "Tocá un casillero y elegí la letra: se completa en todos los que tienen el mismo símbolo.", "En las citas célebres también tenés que completar al autor.", "💡 regala una letra (−15 pts) y ✔ Revisar marca los errores (−10 pts cada vez). Mirá cuánto vale la frase."]],
-  tf: ["📝 Tuti Frutti", ["Es un juego de duelos: elegí de 3 a 8 categorías (nombres de personas, en el mercado compro, animales…) y desafiá a un amigo, en vivo o por link.", "Sale una letra al azar: escribí una palabra de cada categoría que empiece con esa letra. Tenés 120 s.", "Tocá ¡BASTA! cuando termines: se guarda tu tiempo. Si tu rival termina primero, te quedan 20 s.", "Corrección: palabra bien escrita 10 pts · repetida con el rival 5 · mal escrita 5 (te mostramos cómo se escribe) · no existe 0.", "Quien termina todo en menos tiempo suma 10 pts extra. El ganador se lleva 50 🪙."]],
+  tf: ["📝 Tuti Frutti", ["Es un juego de duelos: elegí de 3 a 8 categorías (nombres de personas, en el mercado compro, animales…) y desafiá a un amigo, en vivo o por link.", "Sale una letra al azar: escribí una palabra de cada categoría que empiece con esa letra. Tenés 120 s.", "Antes de empezar elegís 5, 10, 15 o 20 partidas: cada una tiene su letra y los puntos se acumulan, gana quien más suma al final. Tocá ¡BASTA! cuando termines: se guarda tu tiempo. Si tu rival termina primero, te quedan 20 s.", "Corrección: palabra bien escrita 10 pts · repetida con el rival 5 · mal escrita 5 (te mostramos cómo se escribe) · no existe 0.", "Quien termina todo en menos tiempo suma 10 pts extra. El ganador del duelo se lleva 10 🪙 por partida."]],
   qv: ["🖼️ ¿Qué ves?", ["Mirá la imagen y completá las letras que faltan de la palabra.", "10 imágenes por nivel, 3 vidas ❤ y tiempo límite.", "Cuanto más subís o más difícil elegís, menos letras de ayuda te damos."]],
   all: ["❓ Cómo se juega", ["Elegí un juego y una dificultad: cuanto más difícil, más puntos ganás.", "Cada juego tiene sus propios niveles, puntos y monedas.", "La suma de tus puntos sube tu rango global, de Novato a Leyenda.", "Tocá el ❓ dentro de cada juego para ver sus reglas."]]
 };
