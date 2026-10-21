@@ -20,7 +20,7 @@ function buildAdivina() {
     let cur = null;
     for (const line of blk.split("\n")) {
       const l = line.trim(); if (!l) continue;
-      if (l[0] === "#") { const [name, icon] = l.slice(1).split("|"); cur = { name: name.trim(), icon: (icon || "❓").trim(), words: [] }; cats.push(cur); continue; }
+      if (l[0] === "#") { const [name, icon] = l.slice(1).split("|"); cur = cats.find((c) => c.name === name.trim()); if (!cur) { cur = { name: name.trim(), icon: (icon || "❓").trim(), words: [] }; cats.push(cur); } continue; }
       const p = l.split("|"); if (p.length < 6 || !cur) continue;
       const e = { w: p[0], t: +p[1] || 1, c: p.slice(2, 6), cat: cur.name }; cur.words.push(e);
       if (!byWord.has(e.w)) byWord.set(e.w, e);

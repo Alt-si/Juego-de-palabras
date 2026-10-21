@@ -635,8 +635,8 @@ function adBuildClues(e) {
   return [[A[0]], [A[1]], [auto[0], 1], [A[2]], [auto[1], 1], [A[3]], [auto[2], 1], [auto[3], 1], [auto[4], 1], [auto[5], 1]];
 }
 function adPick(pool, L) {
-  const T = Math.max(1, Math.min(4, adTier(L) + difOf("adi").tier)), seen = new Set(SV.adSeen);
-  return shuffle(pool).map((e) => ({ e, s: Math.abs(e.t - T) + Math.random() * 0.9 + (seen.has(e.w) ? 3 : 0) })).sort((a, b) => a.s - b.s).slice(0, AD_ROUND).map((x) => x.e);
+  const T = Math.max(1, Math.min(4, adTier(L) + difOf("adi").tier)), seen = new Set(SV.adSeen), lastSeen = new Map(SV.adSeen.map((w, i) => [w, i]));
+  return shuffle(pool).map((e) => ({ e, s: Math.abs(e.t - T) + Math.random() * 0.9 + (seen.has(e.w) ? 8 + 4 * (lastSeen.get(e.w) / Math.max(1, SV.adSeen.length)) : 0) })).sort((a, b) => a.s - b.s).slice(0, AD_ROUND).map((x) => x.e);
 }
 function adStart(cat) {
   buildAdivina(); AD.duel = false; AD.cat = cat; AD.lv = SV.adLevel; AD.i = 0; AD.total = 0; AD.results = [];
