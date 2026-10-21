@@ -162,6 +162,19 @@ try:
         ap = np(b.new_context(viewport=V)); ap.goto(URL); ap.wait_for_timeout(400)
         check(not ap.query_selector(".instbar"), "sin desafío no hay aviso")
         check("INV" in ap.evaluate("typeof INV") or ap.evaluate("INV.includes('Google Play')"), "invitaciones mencionan Google Play y Safari")
+        # categorías completadas: no se repiten palabras
+        cp = np(b.new_context(viewport=V)); cp.goto(URL); cp.wait_for_timeout(500); cp.evaluate("SV.name='Ana';save();showAdHome()")
+        r = cp.evaluate("""(()=>{const c=ADI.cats[0],out={};const seen=new Set();let rounds=0;
+          while(adLeftOf(c.name).length&&rounds<60){adStart(c.name);AD.words.forEach(e=>{if(!adDoneSet(c.name).has(e.w)&&seen.has(e.w))out.dup=e.w;});AD.words.forEach(e=>{seen.add(e.w);adMark(e)});rounds++}
+          out.rounds=rounds;out.total=c.words.length;out.seen=seen.size;out.left=adLeftOf(c.name).length;return out})()""")
+        check(r.get("dup") is None and r["left"] == 0 and r["seen"] == r["total"], f"completar categoría sin repetir ({r})")
+        cp.evaluate("showAdHome()"); check(cp.evaluate("document.querySelector('#adCats [data-cat].full')!==null"), "categoría completa se marca ✔")
+        cp.evaluate("adStart(ADI.cats[0].name)"); cp.wait_for_timeout(200)
+        check(cp.is_visible("#adHome") and cp.evaluate("document.querySelector('#toast')?document.querySelector('#toast').textContent:''").find("completaste") >= 0, "categoría completa no se puede jugar de nuevo")
+        cp.evaluate("ADI.cats.forEach(c=>c.words.forEach(adMark));renderAdCats()")
+        check(cp.query_selector("[data-lap]") is not None, "todas completas: opción de nueva vuelta")
+        cp.once("dialog", lambda d: d.accept()); cp.click("[data-lap]"); cp.wait_for_timeout(200)
+        check(cp.evaluate("adLeftOf('Mezcla').length") == cp.evaluate("ADI.all.length"), "nueva vuelta reinicia las palabras")
         nov = np(b.new_context(viewport=V)); nov.goto(URL); nov.evaluate("delete window.SpeechRecognition; delete window.webkitSpeechRecognition")
         check(True, "voz: sin soporte no se rompe")
         # duelos de otros juegos (en vivo)

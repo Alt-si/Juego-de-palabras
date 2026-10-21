@@ -244,3 +244,5 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 /* Aviso de instalación */
 .instbar{position:fixed;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:60;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:#1e1b4b;color:#fff;font-size:.85rem;box-shadow:0 6px 20px #0006;max-width:500px;margin:0 auto}
 .instbar span{flex:1}.instbar a{background:#fbbf24;color:#1e1b4b;font-weight:800;padding:8px 12px;border-radius:10px;text-decoration:none}.instbar button{background:none;border:0;color:#fff;font-size:1.1rem}
+/* Categorías completadas */
+#adCats button.full{opacity:.55;filter:grayscale(.6)}#adCats button.lap{opacity:1;filter:none;background:linear-gradient(135deg,#f59e0b,#ec4899);color:#fff}

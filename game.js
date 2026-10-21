@@ -617,14 +617,24 @@ function showAdHome() {
   $("#adLvl").innerHTML = `<div class="mid"><small>Nivel</small><b>${SV.adLevel}</b><small>${adTitle(SV.adLevel)} · ${ptsOf("adi")} pts</small><small class="world">🔍 ${SCENES.mysteryName(SV.adLevel)}</small><small>Para pasar: ${adPass(SV.adLevel)} pts de 500 en una ronda</small>${lvPath(SV.adLevel)}</div>`;
   renderAdCats();
 }
+// Palabras ya jugadas por categoría (no se repiten hasta completar todas las categorías).
+const adDoneSet = (cat) => new Set((SV.adDone || {})[cat] || []);
+function adMark(e) { const d = (SV.adDone ||= {}), l = (d[e.cat] ||= []); if (!l.includes(e.w)) l.push(e.w); }
+function adLeftOf(cat) { buildAdivina(); return cat === "Mezcla" ? ADI.all.filter((e) => !adDoneSet(e.cat).has(e.w)) : ADI.cats.find((c) => c.name === cat).words.filter((e) => !adDoneSet(cat).has(e.w)); }
+const adTotalOf = (cat) => (cat === "Mezcla" ? ADI.all : ADI.cats.find((c) => c.name === cat).words).length;
 function renderAdCats() {
   const q = plainText($("#adSearch").value.trim());
   const cats = ADI.cats.filter((c) => !q || plainText(c.name).includes(q));
-  const mix = !q || "mezcla".includes(q) ? `<button class="mix" data-cat="Mezcla"><span class="ico">🎲</span>Mezcla de todo<small>${SV.adBest.Mezcla ? "Récord: " + SV.adBest.Mezcla : "Las 100 categorías juntas"}</small></button>` : "";
-  $("#adCats").innerHTML = mix + cats.map((c) => `<button data-cat="${esc(c.name)}"><span class="ico">${c.icon}</span>${esc(c.name)}<small>${SV.adBest[c.name] ? "Récord: " + SV.adBest[c.name] : "Sin jugar"}</small></button>`).join("") || '<p class="tag">No hay categorías con ese nombre.</p>';
+  const left = adLeftOf("Mezcla").length, allDone = ADI.cats.every((c) => adLeftOf(c.name).length === 0);
+  const lap = allDone ? `<button class="mix lap" data-lap="1"><span class="ico">🏁</span>¡Completaste todas las categorías!<small>Tocá para empezar una nueva vuelta (se reinician las palabras)</small></button>` : "";
+  const mix = !q || "mezcla".includes(q) ? `<button class="mix ${left ? "" : "full"}" data-cat="Mezcla"><span class="ico">🎲</span>Mezcla de todo<small>${SV.adBest.Mezcla ? "Récord: " + SV.adBest.Mezcla + " · " : ""}${left ? left + " palabras sin jugar" : "✔ Completada"}</small></button>` : "";
+  $("#adCats").innerHTML = lap + mix + cats.map((c) => { const t = c.words.length, l = adLeftOf(c.name).length, full = l === 0; return `<button class="${full ? "full" : ""}" data-cat="${esc(c.name)}"><span class="ico">${c.icon}</span>${esc(c.name)}<small>${full ? "✔ Completada" : t - l + "/" + t + (SV.adBest[c.name] ? " · Récord: " + SV.adBest[c.name] : "")}</small></button>`; }).join("") || '<p class="tag">No hay categorías con ese nombre.</p>';
 }
 $("#adSearch").addEventListener("input", renderAdCats);
-$("#adCats").addEventListener("click", (e) => { const b = e.target.closest("[data-cat]"); if (b) adStart(b.dataset.cat); });
+$("#adCats").addEventListener("click", (e) => {
+  if (e.target.closest("[data-lap]")) { if (confirm("¿Empezar una nueva vuelta? Se reinician todas las categorías.")) { SV.adDone = {}; SV.adLap = (SV.adLap || 0) + 1; save(); renderAdCats(); toast("🔄 ¡Nueva vuelta!"); } return; }
+  const b = e.target.closest("[data-cat]"); if (b) adStart(b.dataset.cat);
+});
 $("#adBack").onclick = showMenu;
 function adBuildClues(e) {
   const A = e.c, T = [...e.w.toUpperCase()], L = T.length;
@@ -640,8 +650,14 @@ function adPick(pool, L) {
 }
 function adStart(cat) {
   buildAdivina(); AD.duel = false; AD.cat = cat; AD.lv = SV.adLevel; AD.i = 0; AD.total = 0; AD.results = [];
-  const pool = cat === "Mezcla" ? ADI.all : ADI.cats.find((c) => c.name === cat).words;
-  AD.words = adPick(pool, AD.lv);
+  const left = adLeftOf(cat);
+  if (!left.length) { closeModal(); toast("✔ Ya completaste «" + cat + "». ¡Elegí otra categoría!"); return showAdHome(); }
+  AD.words = adPick(left, AD.lv);
+  if (AD.words.length < AD_ROUND) { // quedan pocas: se completa la ronda con las menos recientes de la misma categoría
+    const have = new Set(AD.words.map((e) => e.w)), all = cat === "Mezcla" ? ADI.all : ADI.cats.find((c) => c.name === cat).words;
+    const order = new Map(SV.adSeen.map((w, i) => [w, i]));
+    AD.words.push(...all.filter((e) => !have.has(e.w)).sort((a, b) => (order.get(a.w) ?? -1) - (order.get(b.w) ?? -1)).slice(0, AD_ROUND - AD.words.length));
+  }
   SV.adSeen.push(...AD.words.map((e) => e.w)); if (SV.adSeen.length > 1100) SV.adSeen.splice(0, SV.adSeen.length - 1100); save();
   $("#adHome").hidden = true; $("#adGame").hidden = false; adOn = true;
   $("#adCatName").textContent = cat; $("#adTotal").textContent = SV.coins;
@@ -652,7 +668,7 @@ function adNext() {
   $("#adIn").value = ""; adRender(true);
 }
 function adRender(fresh) {
-  $("#adDots").innerHTML = Array.from({ length: AD_ROUND }, (_, i) => `<i class="${i < AD.i ? "done" : i === AD.i ? "cur" : ""}"></i>`).join("");
+  $("#adDots").innerHTML = Array.from({ length: (AD.words || []).length || AD_ROUND }, (_, i) => `<i class="${i < AD.i ? "done" : i === AD.i ? "cur" : ""}"></i>`).join("");
   adGoalUI();
   $("#adWorth").textContent = `Pista ${AD.shown}/${adMax()} · Vale ${adPts(AD.shown)} pts`;
   $("#adClues").innerHTML = AD.clues.slice(0, AD.shown).map((c, i) => `<li class="${c[1] ? "auto" : ""} ${i === AD.shown - 1 ? "new" : ""}"><b>${i + 1}</b><span>${esc(c[0])}</span></li>`).join("");
@@ -677,7 +693,7 @@ function adGuess() {
   adFloat("No es. ¡Otra pista!", "bad"); $("#adIn").value = ""; AD.shown++; adRender();
 }
 function adFinish(pts, msg, good) {
-  AD.busy = true; AD.results.push({ w: AD.cur.w, pts, shown: AD.shown }); AD.total += pts; if (!AD.duel) addPts("adi", Math.round(pts * difOf("adi").mult));
+  AD.busy = true; AD.results.push({ w: AD.cur.w, pts, shown: AD.shown }); if (!AD.duel) adMark(AD.cur); AD.total += pts; if (!AD.duel) addPts("adi", Math.round(pts * difOf("adi").mult));
   if (AD.duel) dxProg(AD.i + 1, AD.total);
   if (pts && !AD.duel) { SV.solved++; if (AD.shown <= 3) SV.adQuick++; if (AD.shown === 1) SV.adAces++; }
   save(); checkAch(); $("#adTotal").textContent = SV.coins;
@@ -685,7 +701,7 @@ function adFinish(pts, msg, good) {
   $("#adClues").insertAdjacentHTML("beforeend", `<li class="new"><b>${good ? "✔" : "✖"}</b><span class="reveal-msg">${esc(AD.cur.w.toUpperCase())}</span></li>`);
   adGoalUI();
   const ul = $("#adClues"); ul.scrollTop = ul.scrollHeight;
-  setTimeout(() => { AD.i++; AD.i >= AD_ROUND ? adEnd() : adNext(); }, 1600);
+  setTimeout(() => { AD.i++; AD.i >= (AD.words || []).length ? adEnd() : adNext(); }, 1600);
 }
 function adWin() { const p = adPts(AD.shown); const fx = AD.fixed; AD.fixed = false; adFinish(p, `+${p} 🪙${fx ? " · se escribe " + AD.cur.w : ""}`, true); }
 function adLose() { adFinish(0, "Era esa palabra…", false); }
