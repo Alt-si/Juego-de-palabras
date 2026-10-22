@@ -29,7 +29,7 @@ guaraníes|4|Pueblo originario del nordeste argentino.|Su lengua se habla aún e
 
 # Edad Media y castillos|⚔️
 castillo|1|Es una construcción antigua.|Tiene torres y murallas.|Vivían reyes y nobles.|Tiene un foso y un puente levadizo.
-caballero|1|Usaba armadura.|Montaba a caballo.|Servía a un rey.|Peleaba con espada y escudo.
+caballero|1|Es un personaje medieval.|Usaba armadura y escudo.|Servía a un rey y peleaba con espada.|Montaba un animal de cuatro patas.
 dragón|1|Es un animal fantástico.|Escupe fuego.|Vive en una cueva.|Los caballeros lo enfrentan para salvar a una princesa.
 rey|1|Es el que manda en un reino.|Usa corona.|Se sienta en un trono.|Es el monarca.
 armadura|2|Es de metal.|Protege el cuerpo.|Pesa mucho.|La usaban los caballeros.
@@ -171,7 +171,7 @@ espiral|4|Es una línea.|Se enrolla sobre sí misma.|Se ve en los caracoles.|Va 
 metro|1|Es una unidad de longitud.|Equivale a cien partes de otra unidad más pequeña.|Se mide con una cinta.|Es la medida estándar de distancia.
 kilo|1|Se usa en la balanza.|Equivale a mil gramos.|Se compra en la verdulería.|Es una medida de peso.
 litro|1|Se usa para líquidos.|Es el contenido de una botella grande.|Se mide en jarras.|Es una medida de capacidad.
-docena|1|Es un conjunto de objetos.|Se usa para huevos.|Son doce.|Son doce unidades.
+docena|1|Es una cantidad exacta.|Se usa mucho para vender huevos o facturas.|Es más que diez y menos que quince.|Son doce unidades.
 centímetro|2|Es muy pequeño.|Se usa en reglas.|Es la centésima parte de otra medida.|Es la unidad de largo más común en las reglas.
 kilómetro|2|Es una gran distancia.|Equivale a mil metros.|Se usa en las rutas.|Es lo que marca el cartel en la carretera.
 gramo|2|Es una unidad pequeña.|Es la milésima parte de un kilo.|Se usa en recetas.|Se usa para medir ingredientes.
@@ -408,7 +408,7 @@ campanada|4|Es un sonido.|Suena a medianoche.|Se cuenta en la última noche del 
 # Mascotas|🐕
 cachorro|1|Es un animal joven.|Juega mucho.|Hay que educarlo.|Es un perrito.
 correa|1|Se usa para pasear.|Une al perro con su dueño.|Es de cuero o nylon.|Se engancha al collar.
-pecera|1|Es de vidrio.|Contiene agua.|Allí viven los peces.|Es la casa de los peces.
+pecera|1|Es un recipiente transparente.|Contiene agua y a veces plantas y piedritas.|Se le pone un filtro y una lucecita.|Es la casa de los animales que nadan.
 hamster|1|Es un roedor.|Es chiquito.|Corre en una rueda.|Es una mascota de jaula.
 canario|2|Es un ave.|Es amarillo.|Canta.|Vive en una jaula.
 tortuga|2|Es un reptil.|Tiene caparazón.|Se mueve lento.|Vive muchos años.

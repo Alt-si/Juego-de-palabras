@@ -154,6 +154,23 @@ try:
         check(res == [5, False, False, False, True], f"aprendidas: se suman nuevas por voz, no repetidas ni typos ({res})")
         vp.reload(); vp.wait_for_timeout(500)
         check(vp.evaluate("buildAdivina().cats.some(c=>c.name==='✨ Aprendidas' && c.words.length===5)"), "aprendidas: persisten y forman categoría")
+        # ¿Cuántas ves?
+        cp = np(vctx); cp.goto(URL); cp.evaluate("SV.name='Ana';save()"); cp.click('[data-game="cv"]'); cp.wait_for_timeout(200); cp.click("#cvPlay"); cp.wait_for_timeout(800)
+        check(cp.is_visible("#cvGame") and cp.is_visible("#cvMic"), "cuántas: arranca con micrófono")
+        ws = cp.evaluate("[...CV.it.A].sort()"); check(len(ws) >= 30 and cp.evaluate("CV.goal") >= 3, "cuántas: hay palabras y meta")
+        cp.evaluate("cvSel=[];cvTry('zzzz')"); check(cp.evaluate("CV.found.length") == 0, "cuántas: palabra inválida no suma")
+        w0 = ws[0]; cp.evaluate("cvTry(%r)" % w0); cp.evaluate("cvTry(%r)" % w0)
+        check(cp.evaluate("CV.found.length") == 1 and cp.evaluate("SV.cvSolved") == 1, "cuántas: palabra válida suma una sola vez")
+        cp.evaluate("window.__say=[%r]" % (" ".join(ws[1:4]) + " zzz")); cp.click("#cvMic"); cp.wait_for_timeout(250)
+        check(cp.evaluate("CV.found.length") == 4, "cuántas: el micrófono acepta varias palabras seguidas")
+        w = cp.evaluate("CV.it.L"); cp.keyboard.type(ws[5] if len(ws) > 5 else ws[0]); cp.keyboard.press("Enter"); cp.wait_for_timeout(100)
+        check(cp.evaluate("CV.found.length") >= 5, "cuántas: teclado físico + Enter")
+        cp.evaluate("CV.goal=1"); cp.click("#cvDone"); cp.wait_for_timeout(200)
+        check("Meta cumplida" in cp.inner_text("#box") and cp.evaluate("ptsOf('cv')") > 0, "cuántas: fin de ronda con resumen y puntos")
+        cp.click("#cvNext"); cp.wait_for_timeout(200); cp.evaluate("CV.goal=99"); cp.click("#cvDone"); cp.wait_for_timeout(200)
+        check(cp.evaluate("CV.lives") == 2, "cuántas: no llegar a la meta quita una vida")
+        cp.click("#cvNext"); cp.wait_for_timeout(200); cp.evaluate("CV.goal=0"); cp.click("#cvDone"); cp.click("#cvNext"); cp.wait_for_timeout(300)
+        check(cp.evaluate("SV.cvLv") == 2, "cuántas: tres palabras completan el nivel")
         # aviso de instalación según plataforma
         ioc = b.new_context(viewport=V, user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1")
         ip = np(ioc); ip.goto(URL + "#d=123.40.adi.Ana"); ip.wait_for_timeout(600)
@@ -178,7 +195,7 @@ try:
         nov = np(b.new_context(viewport=V)); nov.goto(URL); nov.evaluate("delete window.SpeechRecognition; delete window.webkitSpeechRecognition")
         check(True, "voz: sin soporte no se rompe")
         # duelos de otros juegos (en vivo)
-        for kind, scr in (("adi", "adGame"), ("cri", "crGame"), ("qv", "qvGame")):
+        for kind, scr in (("adi", "adGame"), ("cri", "crGame"), ("qv", "qvGame"), ("cv", "cvGame")):
             ctx = b.new_context(viewport=V); ctx.add_init_script(path=os.path.join(HERE, "peer-shim.js"))
             h = np(ctx); g = np(ctx); h.goto(URL); g.goto(URL); h.evaluate("SV.name='Ana';save()"); h.wait_for_timeout(300)
             h.evaluate(f"liveHost('{kind}')"); h.wait_for_timeout(600); code = h.evaluate("LIVE.code")

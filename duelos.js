@@ -1,6 +1,6 @@
 "use strict";
 // Duelos para Adivina, Frases encriptadas y ¿Qué ves? (en vivo y por link). Usa la misma conexión (Net/LIVE) que Anagrama.
-const DXG = { adi: { n: 5, label: "5 palabras" }, cri: { n: 3, label: "3 frases" }, qv: { n: 10, label: "10 enigmas" } };
+const DXG = { adi: { n: 5, label: "5 palabras" }, cri: { n: 3, label: "3 frases" }, qv: { n: 10, label: "10 enigmas" }, cv: { n: 3, label: "3 palabras" } };
 let D = null; // duelo en curso: { kind, seed, live, from, total, pts, over, paid }
 const dxSeedPick = (arr, seed, n) => { const r = mulberry(seed), a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a.slice(0, n); };
 
@@ -17,6 +17,8 @@ function dxBegin(kind, seed, from, live) {
   } else if (kind === "cri") {
     const pool = crPool("m"); CR = { d: "m", lv: 5, list: dxSeedPick(pool.sort((a, b) => (a.t < b.t ? -1 : 1)), seed, n), i: 0, solved: 0, pts: 0, duel: true };
     SCENES.apply(SCENES.world(7)); $("#crGame").hidden = false; crPhrase();
+  } else if (kind === "cv") {
+    cvLoad().then((all) => { CV = { lv: 5, list: dxSeedPick(all.filter((p) => p.L.length >= 7 && p.L.length <= 9).sort((a, b) => (a.w < b.w ? -1 : 1)), seed, n), i: 0, lives: 99, lost: 0, passed: 0, strong: 0, over: false, duel: true, pts: 0, found: [], streak: 0, busy: false }; SCENES.apply(SCENES.world(7)); $("#cvGame").hidden = false; cvRound(); }, () => dxExit());
   } else if (kind === "qv") {
     Q = { lv: 5, list: dxSeedPick(QV.slice().sort((a, b) => (a.w < b.w ? -1 : 1)), seed, n), i: 0, solved: 0, lives: 99, lost: 0, hints: 0, streak: 0, over: false, duel: true, pts: 0 };
     SCENES.apply(SCENES.world(7)); $("#qvGame").hidden = false; qvImage();

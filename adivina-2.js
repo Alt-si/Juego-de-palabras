@@ -271,7 +271,7 @@ colador|2|Tiene agujeritos.|Se usa para escurrir.|Retiene lo sólido.|Se usa con
 rallador|2|Tiene agujeros con filo.|Se usa con queso.|Hay de varios tipos.|Sirve para desmenuzar alimentos.
 espátula|2|Es plana.|Se usa para dar vuelta.|Es de madera o de silicona.|Se usa para mover comida en la sartén.
 batidor|2|Tiene varillas de alambre.|Se usa para mezclar.|Se usa para claras.|Bate los huevos.
-cucharón|3|Es una cuchara grande.|Se usa con sopa.|Tiene mango largo.|Sirve la comida del puchero.
+cucharón|2|Es un utensilio de cocina con mango largo.|Se usa con sopa.|Parece una cuchara, pero mucho más grande.|Sirve la comida del puchero.
 abrelatas|3|Es una herramienta pequeña.|Se usa con conservas.|Corta tapas de metal.|Abre latas.
 mortero|4|Es antiguo.|Se usa con una maza.|Se muelen especias.|Sirve para triturar ajo.
 descorchador|4|Se usa en las celebraciones.|Es de metal y de forma espiralada.|Se enrosca.|Saca el corcho de la botella.

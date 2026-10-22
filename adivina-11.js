@@ -72,7 +72,7 @@ jugador|1|Es quien participa del juego.|Puede ser solo o en equipo.|Controla un 
 multijugador|3|Es un modo para jugar con otras personas.|Se puede jugar en línea.|Puede ser en equipo.|Es lo contrario de jugar solo.
 servidor|3|Es la computadora que conecta a los jugadores.|Si se cae, no se puede jugar.|Aloja una partida en línea.|Mantiene el juego funcionando.
 trofeo|2|Es un premio por lograr un objetivo.|Se obtiene al completar desafíos.|Aparece en el perfil.|Es un logro especial.
-puntaje|1|Es el total de puntos.|Se muestra en la pantalla.|Sirve para comparar jugadores.|Aumenta al hacer cosas bien.
+puntaje|1|Es un número que crece al jugar bien.|Se muestra en la pantalla.|Sirve para comparar jugadores.|Aumenta al hacer cosas bien.
 atari|3|Fue una consola famosa de los años 70 y 80.|Su logo es parecido a una montaña.|Fue pionera en los videojuegos.|Fue la gran rival de Sega.
 nintendo|2|Es una empresa japonesa de videojuegos.|Creó a Mario.|Fabrica una consola con un nombre que contiene «Switch».|Su sede está en Kioto.
 playstation|2|Es una consola de videojuegos.|Es de Sony.|Su control tiene círculos, cruces y triángulos.|Su abreviatura es PS.

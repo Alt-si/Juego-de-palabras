@@ -43,3 +43,6 @@ Dificultad: Experto da 3× los puntos, tiempo ×0,45, palabras mucho más largas
 - Adivina y ¿Qué ves? tienen un botón 🎤 para decir la palabra en vez de tipearla (`voz.js`, Web Speech API, es-AR). Requiere Chrome/Safari, HTTPS, permiso de micrófono e internet. En ¿Qué ves? una palabra errada no quita vidas.
 - **Palabras aprendidas**: si decís por voz en Adivina una palabra que el juego no conoce (4 a 12 letras, no parecida por un solo error a una existente), se guarda en tu dispositivo y suma a la categoría «✨ Aprendidas» (se juega con 5 o más). No entra en los duelos para que ambos jugadores vean las mismas palabras (`aprende.js`).
 - **Adivina sin repetir**: cada categoría se puede completar; las palabras ya jugadas no vuelven. Al terminar una categoría aparece ✔ Completada y hay que elegir otra; cuando se completan todas, se ofrece una nueva vuelta.
+
+## ¿Cuántas ves?
+Aparece una palabra y hay que armar todas las que se puedan con sus letras (3 o más, existentes en el diccionario). Sin pistas; se escribe, se tocan letras o se dice con el micrófono. Datos: `cuantas-data.js` (800 palabras base, generado a partir del listado de palabras de la RAE de https://github.com/JorgeDuenasLerin/diccionario-espanol-txt; los plurales regulares se generan por regla). Se carga recién al abrir el juego.

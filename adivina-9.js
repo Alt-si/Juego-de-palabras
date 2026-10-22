@@ -123,9 +123,9 @@ cedro|3|Es un árbol de madera aromática.|Es alto y fuerte.|Se usa en muebles.|
 olmo|3|Es un árbol grande de hojas ovaladas.|Da buena sombra.|Se planta en plazas.|Peras y manzanas no se piden a él.
 álamo|2|Es un árbol alto y esbelto.|Se planta en filas.|Sus hojas tiemblan con el viento.|Se usa para cortinas de viento.
 fresno|3|Es un árbol de madera resistente.|Se usa para hacer bates.|Crece en bosques y calles.|Sus hojas son compuestas.
-nogal|2|Es un árbol que da nueces.|Su madera es oscura.|Se usa en muebles finos.|Es grande y de copa ancha.
+nogal|2|Es una planta grande y de copa ancha.|Da frutos con cáscara dura.|Su madera es oscura y se usa en muebles finos.|Su fruto es seco y se parte con un cascanueces.
 olivo|2|Da aceitunas.|Sus hojas son verdes y plateadas.|Es un símbolo de paz.|Se cultiva en Mendoza y el Mediterráneo.
-cerezo|2|Es un árbol que da cerezas.|Florece en primavera.|Sus flores son rosadas.|En Japón se celebra su floración.
+cerezo|2|Es una planta de flores rosadas en primavera.|Da frutos pequeños, rojos y con carozo.|En Japón se celebra su floración.|Sus frutos son redondos y suelen venir de a pares.
 araucaria|3|Es un árbol de la Patagonia.|Da piñones.|Tiene forma de paraguas.|También se llama pehuén.
 lapacho|3|Es un árbol de flores rosadas.|Florece en invierno.|Su madera es muy dura.|Se lo conoce en el norte argentino.
 quebracho|3|Es un árbol de madera muy dura.|Crece en el Chaco.|Se usa para postes y taninos.|Su nombre significa que quiebra el hacha.
@@ -134,7 +134,7 @@ aguaribay|4|Es un árbol de hojas colgantes.|Se llama también molle.|Tiene frut
 ciprés|3|Es un árbol alto y delgado.|Se planta en cementerios y jardines.|Tiene forma de llama verde.|Es de hoja perenne.
 abedul|3|Es un árbol de corteza blanca.|Crece en regiones frías.|Tiene hojas pequeñas.|Es muy común en Rusia.
 haya|3|Es un árbol de bosques europeos.|Tiene tronco liso y gris.|Su madera se usa en muebles.|En Argentina hay una especie en la Patagonia.
-castaño|2|Es un árbol que da castañas.|Su fruto está en una cáscara con púas.|Se asa en invierno.|Es de color de pelo oscuro.
+castaño|2|Es una planta alta de bosques templados.|Da un fruto marrón dentro de una cáscara con púas.|Su fruto se asa en invierno.|Es también el nombre de un color de pelo oscuro.
 laurel|2|Es un árbol de hojas aromáticas.|Se usa en la cocina.|Con sus hojas se hacían coronas.|Simboliza el triunfo.
 magnolia|3|Es un árbol de flores grandes.|Sus flores son blancas o rosadas.|Tiene un olor suave.|Es de hojas brillantes.
 tilo|2|Es un árbol de flores aromáticas.|Se usa para hacer infusiones.|Da buena sombra.|Calma los nervios.
@@ -142,9 +142,9 @@ arce|3|Es un árbol cuyas hojas se vuelven rojas.|Tiene un jarabe dulce.|Es el s
 caoba|3|Es un árbol de madera rojiza.|Es muy valiosa.|Se usa en muebles de lujo.|Crece en selvas americanas.
 ébano|4|Es un árbol de madera negra.|Es muy dura y pesada.|Se usa en pianos.|Es símbolo del color negro.
 bonsái|2|Es un árbol en miniatura.|Se cultiva en una maceta.|Requiere poda y cuidados.|Es un arte japonés.
-higuera|2|Es un árbol que da higos.|Tiene hojas grandes.|Se cultiva en patios.|Su fruto crece en el tronco o las ramas.
-limonero|2|Es un árbol que da limones.|Tiene flores blancas.|Es perfumado.|Crece en patios y huertas.
-manzano|1|Es un árbol que da manzanas.|Florece en primavera.|Se cultiva en el Valle de Río Negro.|Newton estaba debajo de uno.
+higuera|2|Es una planta de hojas grandes y ásperas.|Es común en los patios de las casas.|Da frutos dulces con muchas semillitas, verdes o violetas.|Su fruto crece pegado a las ramas, sin flor visible.
+limonero|2|Es una planta de hojas verdes brillantes y flores blancas.|Da frutos amarillos y ácidos.|Es perfumado y crece en patios y huertas.|Su fruto se exprime sobre el pescado.
+manzano|1|Es una planta que florece en primavera.|Da frutos rojos, verdes o amarillos.|Se cultiva en el Valle de Río Negro.|Newton estaba sentado debajo de uno.
 tronco|1|Es la parte gruesa de un árbol.|Sostiene las ramas.|Tiene anillos que indican su edad.|Está cubierto por la corteza.
 # Clima|⛈️
 sol|1|Brilla en el cielo.|Da luz y calor.|Sale por el este.|Se usa protector en verano.

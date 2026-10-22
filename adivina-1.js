@@ -33,7 +33,7 @@ silla|1|Hay en las escuelas, oficinas y casas.|Tiene respaldo.|Se usa para desca
 cocina|1|Es el corazón de muchas casas.|Allí hay hornallas y heladera.|Los chefs trabajan en ella.|Huele a guiso y a pan caliente.
 ventana|1|Deja entrar algo que viene de afuera.|Puede tener persiana o cortina.|Está hecha de vidrio.|Se abre para ventilar.
 cuchara|2|Es parte de la vajilla.|Tiene un extremo hondo y redondeado.|Se usa con el postre, el yogur o la sopa.|Hay una chica para el café y una grande para el guiso.
-escalera|2|Sirve para llegar a otro nivel.|Está formada por varios escalones.|Los bomberos usan una muy larga.|También hay mecánicas en los shoppings.
+escalera|2|Sirve para llegar a otro nivel.|Está formada por peldaños.|Los bomberos usan una muy larga.|También hay mecánicas en los shoppings.
 escritorio|2|Es el mueble de los estudiantes y oficinistas.|Suele tener cajones.|Sobre él hay una lámpara y una computadora.|Ahí se hacen los deberes.
 refrigerador|2|Funciona con electricidad todo el día.|Se enchufa y hace un zumbido.|Ahí se guardan la leche y la manteca.|En la Argentina también se lo llama heladera.
 aspiradora|3|Es un electrodoméstico que hace ruido al usarse.|Limpia sin usar agua.|Chupa el polvo de las alfombras.|Tiene una manguera y una bolsa o recipiente.
@@ -73,7 +73,7 @@ catamarán|4|Es muy estable en el agua.|Se usa en el Río de la Plata para cruza
 reloj|1|Hay de pulsera, de pared y de arena.|Tiene números del 1 al 12.|Tiene agujas que giran.|Hace tic tac y marca el tiempo.
 libro|1|Contiene historias o conocimientos.|Tiene tapa, lomo y hojas.|Se guarda en bibliotecas.|Lo escribe un autor y se lee.
 teléfono|1|Alexander Graham Bell lo patentó.|Hoy casi todos tienen uno en el bolsillo.|Hay fijos, celulares y satelitales.|Suena cuando alguien llama.
-teclado|1|Tiene muchas teclas con letras y números.|Está conectado a una computadora.|También hay uno en el piano.|Se escribe presionando sus botones.
+teclado|1|Es un periférico con muchos botones cuadrados.|Está conectado a una computadora.|También hay uno en el piano.|Se escribe presionando sus botones.
 calendario|2|Cuelga de la pared en muchas casas.|Tiene doce hojas.|Marca feriados y cumpleaños.|Muestra cuántos días tiene cada mes.
 telescopio|2|Lo usó Galileo hace siglos.|Tiene lentes muy potentes.|Se apunta al cielo de noche.|Acerca la Luna y los planetas.
 mochila|2|Es útil para viajar y para ir a clases.|Tiene cierres y bolsillos.|Se carga colgada de los hombros.|Los chicos llevan en ella los útiles.
@@ -87,7 +87,7 @@ microscopio|4|Es indispensable en los laboratorios.|Tiene lentes y una platina p
 escuela|1|Vas casi todos los días de marzo a diciembre.|Hay pupitres, pizarrón y recreo.|Los guardapolvos blancos son típicos de la Argentina.|Allí enseñan las maestras.
 hospital|1|Funciona las 24 horas.|Hay camas, quirófanos y guardias.|Trabajan médicos y enfermeras.|Allí se curan los enfermos.
 biblioteca|1|Se pide silencio.|Tiene estanterías enormes.|Con un carnet te llevás cosas prestadas.|Está llena de libros.
-farmacia|1|Tiene una cruz verde en la puerta.|Atiende un farmacéutico.|Se entra con una receta.|Venden remedios y vitaminas.
+farmacia|1|Tiene una cruz verde en la puerta.|Atiende alguien con título universitario de salud.|Se entra con una receta.|Venden remedios y vitaminas.
 mercado|2|Hay puestos y vendedores que gritan precios.|A veces se regatea.|Hay frutas, verduras y carnes frescas.|Ahí se hace la compra del barrio.
 plaza|2|Hay palomas, bancos y gente paseando.|Es un espacio verde en el centro del barrio.|Tiene hamacas y toboganes.|Suele haber una estatua o fuente.
 cine|2|Está oscuro y hay butacas.|Se vende pochoclo en la entrada.|Se compra una entrada para entrar.|Se proyectan películas.
