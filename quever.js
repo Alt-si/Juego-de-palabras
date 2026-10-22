@@ -67,6 +67,7 @@ function qvTimeUI() { const p = Math.max(0, Q.left / Q.total); $("#qvBar").style
 function qvDraw(bad) {
   let pos = 0;
   $("#qvSlots").innerHTML = Q.it.wl.map((k) => { const h = Q.ans.slice(pos, pos + k).map((c, j) => { const i = pos + j; return `<span class="tile slot ${c ? "fill" : ""} ${Q.given.has(i) ? "lock" : ""} ${bad && !Q.given.has(i) ? "bad" : ""}">${c || ""}</span>`; }).join(""); pos += k; return `<span class="qvword">${h}</span>`; }).join("");
+  qvFit();
   const used = new Set(); $("#qvKeys").innerHTML = [...CR_ABC].map((L) => `<button data-k="${L}">${L}</button>`).join("") + `<button data-k="DEL" class="del">⌫</button>`;
 }
 $("#qvKeys").addEventListener("click", (e) => { const k = e.target.closest("[data-k]"); if (k) qvKey(k.dataset.k); });
@@ -131,3 +132,13 @@ $("#qvHint").onclick = () => {
 };
 $("#qvSkip").onclick = () => { if (!Q || Q.busy) return; qvFail("Pasaste (−1 ❤)."); };
 $("#qvQuit").onclick = () => { if (confirm("¿Salir del nivel?")) { clearInterval(QT); if (Q.duel) { dxAbort(); showMenu(); return; } $("#qvGame").hidden = true; $("#qvHome").hidden = false; qvHome(); } };
+
+// Ajusta el tamaño de las casillas para que ninguna palabra se salga de la pantalla (si aun así no entra, sigue en la línea de abajo).
+function qvFit() {
+  const el = $("#qvSlots"); if (!el || !Q || !Q.it) return;
+  const W = el.clientWidth || (el.parentElement && el.parentElement.clientWidth) || 320, n = Math.max(...Q.it.wl), gap = 5;
+  const base = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--qvtile")) || 0;
+  let tw = Math.floor((W - 4 - (n - 1) * gap) / n); tw = tw < 28 ? 32 : Math.min(tw, window.innerWidth >= 700 ? 52 : 44); // si no entra en una línea, la palabra sigue abajo con casillas de tamaño legible
+  el.style.setProperty("--tw", tw + "px");
+}
+window.addEventListener("resize", () => { if (typeof Q !== "undefined" && Q && !$("#qvGame").hidden) qvFit(); });

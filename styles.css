@@ -254,3 +254,7 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 #qvSlots{gap:6px 18px}.qvword{display:inline-flex;gap:5px}
 @media (max-width:360px){.qvc{font-size:46px}.qvcards.c2 .qvc{font-size:60px}}
 @media (min-width:700px){.qvc{font-size:84px}.qvcards.c2 .qvc{font-size:104px}}
+
+/* ¿Qué ves?: casillas que se adaptan al ancho */
+#qvSlots .tile{width:var(--tw,44px);height:calc(var(--tw,44px)*1.18);font-size:calc(var(--tw,44px)*.52);min-width:0}
+.qvword{max-width:100%;flex-wrap:wrap;justify-content:center}
