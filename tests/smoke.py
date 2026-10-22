@@ -158,7 +158,7 @@ try:
         check(pg.is_visible("#qvAgain") and pg.evaluate("SV.qvLv") == 2, "¿Qué ves?: nivel superado")
         check(pg.evaluate("SV.pts.qv") > 0 and pg.evaluate("SV.wal.qv") > 0 and pg.evaluate("SV.wal.ana") == 0, "¿Qué ves?: puntos y monedas propios")
         pg.click("#qvAgain"); pg.wait_for_timeout(200)
-        pg.evaluate("() => { qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); qvKey('Z'); }"); pg.wait_for_timeout(900)
+        pg.evaluate("() => { for (let i = 0; i < 30; i++) qvKey('Z'); }"); pg.wait_for_timeout(900)
         check(pg.evaluate("Q.lives") <= 2, "respuesta incorrecta resta vida")
 
         # --- mezclar no cambia las letras ---
