@@ -26,7 +26,7 @@ $("#adMic").onclick = () => Voz.listen($("#adMic"), (alts) => {
 // ¿Qué ves?: si dice la palabra correcta se completa sola; si no, muestra lo que entendió (sin quitar vidas)
 $("#qvMic").onclick = () => Voz.listen($("#qvMic"), (alts) => {
   if (!Q || Q.busy) return;
-  const hit = alts.find((a) => plain(a) === Q.it.L);
+  const hit = alts.find((a) => qvNorm(a) === Q.it.L);
   if (hit) { Q.ans = [...Q.it.L]; qvDraw(); return qvWin(); }
   toast(`Escuché «${alts[0]}»: no es. Probá de nuevo`); beep(SND.bad);
 });

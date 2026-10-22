@@ -246,3 +246,11 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 .instbar span{flex:1}.instbar a{background:#fbbf24;color:#1e1b4b;font-weight:800;padding:8px 12px;border-radius:10px;text-decoration:none}.instbar button{background:none;border:0;color:#fff;font-size:1.1rem}
 /* Categorías completadas */
 #adCats button.full{opacity:.55;filter:grayscale(.6)}#adCats button.lap{opacity:1;filter:none;background:linear-gradient(135deg,#f59e0b,#ec4899);color:#fff}
+/* ¿Qué ves? con varias imágenes */
+.qvrubro{text-align:center;font-size:14px;opacity:.9;margin:2px 0 6px}
+.qvcards{display:flex;justify-content:center;align-items:stretch;gap:10px;padding:0 10px}
+.qvc{flex:1 1 0;max-width:34%;display:flex;align-items:center;justify-content:center;background:#ffffff80;border-radius:16px;padding:10px 0;font-size:64px;line-height:1.1}
+.qvcards.c2 .qvc{font-size:80px;max-width:40%}
+#qvSlots{gap:6px 18px}.qvword{display:inline-flex;gap:5px}
+@media (max-width:360px){.qvc{font-size:46px}.qvcards.c2 .qvc{font-size:60px}}
+@media (min-width:700px){.qvc{font-size:84px}.qvcards.c2 .qvc{font-size:104px}}

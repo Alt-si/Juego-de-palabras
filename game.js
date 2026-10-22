@@ -81,8 +81,8 @@ const ACH = [
   ["speed", "Rayo", "Resolvé una palabra con más del 75 % del tiempo sobrando", () => SV.fastest >= 0.75, 20],
   ["cr10", "Descifrador", "Resolvé 10 frases encriptadas", () => SV.crSolved >= 10, 40],
   ["cr50", "Criptógrafo", "Resolvé 50 frases encriptadas", () => SV.crSolved >= 50, 150],
-  ["qv10", "Ojo de águila", "Descubrí 10 imágenes en ¿Qué ves?", () => SV.qvSolved >= 10, 40],
-  ["qv100", "Ojo clínico", "Descubrí 100 imágenes en ¿Qué ves?", () => SV.qvSolved >= 100, 150],
+  ["qv10", "Ojo de águila", "Resolvé 10 enigmas en ¿Qué ves?", () => SV.qvSolved >= 10, 40],
+  ["qv100", "Ojo clínico", "Resolvé 100 enigmas en ¿Qué ves?", () => SV.qvSolved >= 100, 150],
   ["rich", "Ahorrista", "Juntá 500 monedas", () => SV.coins >= 500, 50],
   ["duel1", "Competidor", "Ganale un duelo a un amigo", () => SV.duelWins >= 1, 40],
   ["daily3", "Constante", "Entrá 3 días seguidos", () => SV.dailyStreak >= 3, 30],
@@ -739,7 +739,7 @@ const HELP = {
   adi: ["🕵️ Adivina", ["Elegí una categoría y descubrí la palabra oculta.", "Arrancás con 1 pista; cada error o \"otra pista\" abre una más.", "Cuantas menos pistas uses, más puntos ganás (hasta 100 por palabra).", "Hay corrector de ortografía: si te equivocás en una letra, igual te la aceptamos.", "Juntá los puntos de la meta del nivel para pasar."]],
   cri: ["🔐 Frases encriptadas", ["Cada letra se esconde detrás de un número, un objeto o un color, y se repite en toda la frase.", "Tocá un casillero y elegí la letra: se completa en todos los que tienen el mismo símbolo.", "En las citas célebres también tenés que completar al autor.", "💡 regala una letra (−15 pts) y ✔ Revisar marca los errores (−10 pts cada vez). Mirá cuánto vale la frase."]],
   tf: ["📝 Tutti Frutti", ["Es un juego de duelos: elegí de 3 a 8 categorías (nombres de personas, en el mercado compro, animales…) y desafiá a un amigo, en vivo o por link.", "Sale una letra al azar: escribí una palabra de cada categoría que empiece con esa letra. Tenés 120 s.", "Antes de empezar elegís 5, 10, 15 o 20 partidas: cada una tiene su letra y los puntos se acumulan, gana quien más suma al final. Tocá ¡BASTA! cuando termines: se guarda tu tiempo. Si tu rival termina primero, te quedan 20 s.", "Corrección: palabra bien escrita 10 pts · repetida con el rival 5 · mal escrita 5 (te mostramos cómo se escribe) · no existe 0.", "Quien termina todo en menos tiempo suma 10 pts extra. El ganador del duelo se lleva 10 🪙 por partida."]],
-  qv: ["🖼️ ¿Qué ves?", ["Mirá la imagen y completá las letras que faltan de la palabra.", "10 imágenes por nivel, 3 vidas ❤ y tiempo límite.", "Cuanto más subís o más difícil elegís, menos letras de ayuda te damos."]],
+  qv: ["🖼️ ¿Qué ves?", ["Mirá las 2 o 3 imágenes: tienen algo en común. Descubrí la palabra o frase (puede tener 1, 2 o 3 palabras) y escribila.", "Arriba ves el rubro y cuántas palabras son; los huecos te muestran cuántas letras tiene cada una.", "10 enigmas por nivel, 3 vidas ❤ y tiempo límite. Cuanto más subís o más difícil elegís, menos letras de ayuda te damos."]],
   all: ["❓ Cómo se juega", ["Elegí un juego y una dificultad: cuanto más difícil, más puntos ganás.", "Cada juego tiene sus propios niveles, puntos y monedas.", "La suma de tus puntos sube tu rango global, de Novato a Leyenda.", "Tocá el ❓ dentro de cada juego para ver sus reglas."]]
 };
 document.addEventListener("click", (e) => {

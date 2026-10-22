@@ -1,11 +1,11 @@
 "use strict";
-// ¿Qué ves?: una imagen y la palabra incompleta; hay que completar las letras que faltan.
-const QV = Object.keys(ICONS).map((w) => ({ w, L: [...w].map(crLetter).join("") }));
-const qvTier = (n) => (n <= 4 ? 1 : n <= 6 ? 2 : n <= 8 ? 3 : 4);
+// ¿Qué ves?: 2 o 3 imágenes que se relacionan; hay que descubrir la palabra o frase (1 a 3 palabras) y escribirla.
+const qvNorm = (s) => [...String(s)].map(crLetter).join("");
+const QV = ENIG.map((e) => ({ ...e, L: qvNorm(e.w), wl: e.w.split(/\s+/).map((x) => qvNorm(x).length) }));
 const qvHelp = (lv) => Math.max(0, Math.round(3 * (1 - Math.pow(lvP(lv), 0.6))) + gameDifQ().help);
 const qvDifs = { f: 1, m: 0, d: -1, e: -3 };
 const gameDifQ = () => ({ help: Q && Q.duel ? 0 : qvDifs[(SV.dif && SV.dif.qv) || "m"] });
-const qvTime = (lv) => Math.round(Math.max(18, 45 - 22 * Math.pow(lvP(lv), 0.6)) * (Q && Q.duel ? 1 : difOf("qv").time));
+const qvTime = (lv, n = 8) => Math.round((Math.max(22, 50 - 22 * Math.pow(lvP(lv), 0.6)) + n * 0.6) * (Q && Q.duel ? 1 : difOf("qv").time));
 let Q = null, QT = 0;
 // Variantes de la imagen (a partir del nivel 20): la misma ilustración se ve distinta y cuesta más reconocerla.
 const QV_TW = [
@@ -26,7 +26,7 @@ function qvPick(lv) {
   let pool = QV.slice(); let un = pool.filter((p) => !SV.qvSeen.includes(p.w));
   if (un.length < 12) { SV.qvSeen = []; un = pool; }
   const T = Math.max(1, Math.min(4, 1 + Math.floor(Math.pow(lvP(lv), 0.8) * 3.99) + difOf("qv").tier));
-  return crShuffle(un).map((p) => ({ p, s: Math.abs(qvTier(p.L.length) - T) + Math.random() * 1.1 })).sort((a, b) => a.s - b.s).slice(0, 10).map((x) => x.p);
+  return crShuffle(un).map((p) => ({ p, s: Math.abs(p.t - T) + Math.random() * 1.1 })).sort((a, b) => a.s - b.s).slice(0, 10).map((x) => x.p);
 }
 function qvMenu() {
   const k = "qv"; document.querySelectorAll(`#menu [data-game="${k}"] [data-diff]`).forEach((x) => x.classList.toggle("on", x.dataset.diff === ((SV.dif && SV.dif[k]) || "m")));
@@ -38,7 +38,7 @@ function qvHome() {
   const lv = SV.qvLv; SCENES.apply(SCENES.world(lv)); applyTheme(); difBar($("#qvDiffs"), "qv");
   $("#qvCoins").textContent = SV.coins; $("#qvRank").textContent = titleOf(lv) + " · " + ptsOf("qv") + " pts";
   const h = qvHelp(lv);
-  $("#qvLvl").innerHTML = `<div class="mid"><small>Nivel</small><b>${lv}</b><div class="stars">${stars(SV.starsQ[lv - 1] || 0)}</div><small class="world">🌍 ${SCENES.worldName(lv)}</small><small>${h} ${h === 1 ? "letra de ayuda" : "letras de ayuda"} por imagen · 10 imágenes</small>${lvPath(lv)}</div>`;
+  $("#qvLvl").innerHTML = `<div class="mid"><small>Nivel</small><b>${lv}</b><div class="stars">${stars(SV.starsQ[lv - 1] || 0)}</div><small class="world">🌍 ${SCENES.worldName(lv)}</small><small>${h} ${h === 1 ? "letra de ayuda" : "letras de ayuda"} por enigma · 10 enigmas</small>${lvPath(lv)}</div>`;
 }
 $("#qvBack").onclick = showMenu;
 $("#qvPlay").onclick = () => qvStart();
@@ -52,19 +52,21 @@ function qvLives() { if (Q.duel) { $("#qvLives").innerHTML = `<span class="on" s
 function qvImage() {
   clearInterval(QT);
   const it = Q.list[Q.i]; const n = it.L.length;
-  const k = Math.min(qvHelp(Q.lv), n - 2);
+  const k = Math.min(qvHelp(Q.lv) + (n >= 12 ? 1 : 0), n - 2);
   const given = new Set(); const idx = crShuffle([...Array(n).keys()]); idx.slice(0, Math.max(0, k)).forEach((i) => given.add(i));
   Q.it = it; Q.given = given; Q.ans = [...it.L].map((c, i) => (given.has(i) ? c : null)); Q.wordHints = 0; Q.busy = false;
-  Q.total = qvTime(Q.lv); Q.left = Q.total;
+  Q.total = qvTime(Q.lv, n); Q.left = Q.total;
+  Q.starts = new Set(); { let c = 0; it.wl.forEach((k) => { Q.starts.add(c); c += k; }); }
   $("#qvTotal").textContent = SV.coins; qvLives();
   $("#qvDots").innerHTML = Q.list.map((_, i) => `<i class="${i < Q.i ? "done" : i === Q.i ? "cur" : ""}"></i>`).join("");
-  const im = $("#qvImg"); im.innerHTML = iconSvg(it.w); const tw = Q.duel ? null : qvTwist(Q.lv); if (tw) { const w = document.createElement("div"); w.className = "qvw"; while (im.firstChild) w.appendChild(im.firstChild); im.appendChild(w); Object.assign(w.style, tw.css()); im.insertAdjacentHTML("beforeend", `<b class="qvtw">${tw.n}</b>`); } im.classList.remove("pop"); void im.offsetWidth; im.classList.add("pop");
+  const im = $("#qvImg"); im.innerHTML = `<div class="qvcards c${it.img.length}">${it.img.map((e) => `<span class="qvc">${e}</span>`).join("")}</div>`; $("#qvRubro").innerHTML = `🏷️ ${esc(it.rub)} · <b>${it.wl.length} ${it.wl.length === 1 ? "palabra" : "palabras"}</b>`; const tw = Q.duel ? null : qvTwist(Q.lv); if (tw) { const w = document.createElement("div"); w.className = "qvw"; while (im.firstChild) w.appendChild(im.firstChild); im.appendChild(w); Object.assign(w.style, tw.css()); im.insertAdjacentHTML("beforeend", `<b class="qvtw">${tw.n}</b>`); } im.classList.remove("pop"); void im.offsetWidth; im.classList.add("pop");
   $("#qvHint small").textContent = `Letra · ${hintCost("qv")}🪙`; qvDraw(); qvTimeUI();
   QT = setInterval(() => { if (Q.busy || !$("#modal").hidden) return; Q.left -= 0.1; qvTimeUI(); if (Q.left <= 0) qvFail("¡Se acabó el tiempo!"); }, 100);
 }
 function qvTimeUI() { const p = Math.max(0, Q.left / Q.total); $("#qvBar").style.width = p * 100 + "%"; $("#qvBar").className = p < 0.25 ? "low" : p < 0.5 ? "mid" : ""; $("#qvTime").textContent = Math.ceil(Math.max(0, Q.left)) + " s"; }
 function qvDraw(bad) {
-  $("#qvSlots").innerHTML = Q.ans.map((c, i) => `<span class="tile slot ${c ? "fill" : ""} ${Q.given.has(i) ? "lock" : ""} ${bad && !Q.given.has(i) ? "bad" : ""}">${c || ""}</span>`).join("");
+  let pos = 0;
+  $("#qvSlots").innerHTML = Q.it.wl.map((k) => { const h = Q.ans.slice(pos, pos + k).map((c, j) => { const i = pos + j; return `<span class="tile slot ${c ? "fill" : ""} ${Q.given.has(i) ? "lock" : ""} ${bad && !Q.given.has(i) ? "bad" : ""}">${c || ""}</span>`; }).join(""); pos += k; return `<span class="qvword">${h}</span>`; }).join("");
   const used = new Set(); $("#qvKeys").innerHTML = [...CR_ABC].map((L) => `<button data-k="${L}">${L}</button>`).join("") + `<button data-k="DEL" class="del">⌫</button>`;
 }
 $("#qvKeys").addEventListener("click", (e) => { const k = e.target.closest("[data-k]"); if (k) qvKey(k.dataset.k); });
@@ -104,7 +106,7 @@ function qvFail(msg) {
 function qvNext() { Q.i++; if (Q.duel && Q.i >= Q.list.length) { clearInterval(QT); return dxFinish(Q.pts); } if (Q.i >= Q.list.length) qvEnd(); else qvImage(); }
 function qvOver() {
   clearInterval(QT); Q.over = true;
-  modal(`<h2>Sin vidas 💔</h2><p>Descubriste <b>${Q.solved}</b> de ${Q.list.length} imágenes.</p><button class="big" id="qvRetry">Reintentar nivel</button><button class="mini" id="qvOut">Volver</button>`, true);
+  modal(`<h2>Sin vidas 💔</h2><p>Descubriste <b>${Q.solved}</b> de ${Q.list.length} enigmas.</p><button class="big" id="qvRetry">Reintentar nivel</button><button class="mini" id="qvOut">Volver</button>`, true);
   $("#qvRetry").onclick = () => { closeModal(); qvStart(); };
   $("#qvOut").onclick = () => { closeModal(); $("#qvGame").hidden = true; $("#qvHome").hidden = false; qvHome(); };
 }

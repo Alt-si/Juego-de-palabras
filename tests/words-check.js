@@ -64,16 +64,21 @@ console.log("Adivina: " + cats + " categorías, " + words + " palabras (" + uniq
   console.log("Frases encriptadas: " + F.length + " frases", JSON.stringify(cnt));
 }
 
-// ---- ¿Qué ves? (ilustraciones propias) ----
+// ---- ¿Qué ves? (enigmas de 2 o 3 imágenes) ----
 {
   const fs = require("fs"), path = require("path");
-  const src = ["iconos.js", "iconos-1.js", "iconos-2.js", "iconos-3.js", "iconos-4.js"].map((f) => fs.readFileSync(path.join(__dirname, "..", f), "utf8")).join("\n");
-  const I = new Function(src + "; return ICONS;")();
-  const keys = Object.keys(I);
-  for (const w of keys) {
-    if (!/^[a-záéíóúüñ]{3,12}$/.test(w)) throw new Error("Imágenes: palabra inválida: " + w);
-    if (!I[w] || I[w].length < 40 || /NaN|undefined/.test(I[w])) throw new Error("Imágenes: dibujo roto: " + w);
+  const src = ["enigmas.js", "enigmas-2.js"].map((f) => fs.readFileSync(path.join(__dirname, "..", f), "utf8").replace(/^"use strict";/, "")).join("\n");
+  const E = new Function(src + "; return ENIG;")();
+  const seen = new Set(), tiers = {};
+  for (const e of E) {
+    if (!/^[a-záéíóúüñ]+( [a-záéíóúüñ]+){0,2}$/.test(e.w)) throw new Error("Enigmas: respuesta inválida: " + e.w);
+    if (e.img.length < 2 || e.img.length > 3) throw new Error("Enigmas: debe tener 2 o 3 imágenes: " + e.w + " (" + e.img.length + ")");
+    if (seen.has(e.w)) throw new Error("Enigmas: respuesta repetida: " + e.w); seen.add(e.w);
+    if (![1, 2, 3, 4].includes(e.t)) throw new Error("Enigmas: dificultad inválida: " + e.w);
+    if (!e.rub) throw new Error("Enigmas: falta rubro: " + e.w);
+    if (e.w.replace(/ /g, "").length > 26) throw new Error("Enigmas: respuesta muy larga: " + e.w);
+    tiers[e.t] = (tiers[e.t] || 0) + 1;
   }
-  if (keys.length < 150) throw new Error("Imágenes: pocas (" + keys.length + ")");
-  console.log("¿Qué ves?: " + keys.length + " ilustraciones OK");
+  if (E.length < 200) throw new Error("Enigmas: pocos (" + E.length + ")");
+  console.log("¿Qué ves?: " + E.length + " enigmas OK", JSON.stringify(tiers));
 }

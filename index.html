@@ -32,7 +32,7 @@
     <button class="gcard g3" data-game="adi"><span class="ico">🕵️</span><span><b>Adivina</b><small>106 categorías · 10 pistas: ¡cuantas menos uses, más puntos!</small></span><em><span id="mLvAdi"></span><u id="mPtsAdi"></u></em><em class="chips"><span data-diff="f">🌱 Fácil</span><span data-diff="m">🌿 Medio</span><span data-diff="d">🔥 Difícil</span><span data-diff="e">💀 Experto</span></em></button>
     <button class="gcard g4" data-game="cri"><span class="ico">🔐</span><span><b>Frases encriptadas</b><small>Descubrí la frase famosa: cada letra es un número, objeto o color</small></span>
       <em class="chips"><span data-diff="f">🌱 Fácil</span><span data-diff="m">🌿 Medio</span><span data-diff="d">🔥 Difícil</span><span data-diff="e">💀 Experto</span><u id="mPtsCri"></u></em></button>
-    <button class="gcard g5" data-game="qv"><span class="ico">🖼️</span><span><b>¿Qué ves?</b><small>Mirá la imagen y completá la palabra</small></span><em class="chips"><span data-diff="f">🌱 Fácil</span><span data-diff="m">🌿 Medio</span><span data-diff="d">🔥 Difícil</span><span data-diff="e">💀 Experto</span><u id="mPtsQv"></u></em></button>
+    <button class="gcard g5" data-game="qv"><span class="ico">🖼️</span><span><b>¿Qué ves?</b><small>Descubrí qué palabra une las imágenes</small></span><em class="chips"><span data-diff="f">🌱 Fácil</span><span data-diff="m">🌿 Medio</span><span data-diff="d">🔥 Difícil</span><span data-diff="e">💀 Experto</span><u id="mPtsQv"></u></em></button>
     <button class="gcard g6" data-game="tf"><span class="ico">📝</span><span><b>Tutti Frutti</b><small>Duelo por letra y categorías: ¡el más rápido y original gana!</small></span><em class="chips"><span>⚔ Solo duelos</span><u id="mPtsTf"></u></em></button>
   </section>
 
@@ -86,13 +86,13 @@
   <section id="qvHome" class="screen" hidden>
     <div class="topbar"><button class="ib" id="qvBack" aria-label="Menú de juegos">‹</button><span class="coins">🪙 <b id="qvCoins">0</b></span><span class="rank" id="qvRank"></span><button class="ib help" data-help="qv" aria-label="Cómo se juega">?</button></div>
     <div class="crlogo">🖼️<h1>¿QUÉ VES?</h1></div>
-    <p class="tag">Mirá la imagen y completá la palabra</p>
+    <p class="tag">Descubrí qué palabra une las imágenes</p>
     <div class="diffs" id="qvDiffs"></div>
     <div class="levelcard" id="qvLvl"></div>
     <button class="big" id="qvPlay">▶ Jugar</button>
     <div class="srsel"></div>
     <div class="duelrow"><button class="mini wide" data-dxk="qv" data-dx="live">⚔ Duelo en vivo</button><button class="mini wide" data-dxk="qv" data-dx="link">📨 Desafío por link</button></div>
-    <p class="how">Te damos algunas letras de ayuda. A medida que subís de nivel y de dificultad, hay menos letras para ayudarte. ¡Y cuidado con el tiempo y las vidas!</p>
+    <p class="how">Aparecen 2 o 3 imágenes que se relacionan: descubrí la palabra o frase (de 1 a 3 palabras). Te damos algunas letras de ayuda; a medida que subís de nivel y de dificultad, hay menos letras para ayudarte. ¡Y cuidado con el tiempo y las vidas!</p>
   </section>
 
   <section id="qvGame" class="screen" hidden>
@@ -100,6 +100,7 @@
     <div class="rival dxbar" hidden></div>
     <div class="dots" id="qvDots"></div>
     <div class="timer"><i id="qvBar"></i><b id="qvTime"></b></div>
+    <div class="qvrubro" id="qvRubro"></div>
     <div class="qvimg" id="qvImg"></div>
     <div class="slots" id="qvSlots"></div>
     <div class="crkeys" id="qvKeys"></div>
@@ -185,14 +186,11 @@
 <script src="scenes.js"></script>
 <script src="frases.js"></script>
 <script src="frases-extra.js"></script>
-<script src="iconos.js"></script>
-<script src="iconos-1.js"></script>
-<script src="iconos-2.js"></script>
-<script src="iconos-3.js"></script>
-<script src="iconos-4.js"></script>
 <script src="progreso.js"></script>
 <script src="game.js"></script>
 <script src="cripto.js"></script>
+<script src="enigmas.js"></script>
+<script src="enigmas-2.js"></script>
 <script src="quever.js"></script>
 <script src="duelos.js"></script>
 <script src="serie.js"></script>

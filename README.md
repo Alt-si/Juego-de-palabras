@@ -21,12 +21,12 @@ Publicar: Settings → Pages → Branch `main` / root.
 ~300 frases famosas (refranes, citas, cine, deporte). Cada letra se oculta tras un número, un objeto o un color (al azar en cada frase). Cuatro dificultades elegibles desde el menú (Fácil, Medio, Difícil, Experto): cambia el largo de las frases y cuántas letras te regalan; en cada nivel la ronda de 5 frases se vuelve más exigente. Puntaje propio del juego.
 
 ## ¿Qué ves?
-~285 imágenes (emojis) con la palabra incompleta: te damos 2–3 letras de ayuda y completás el resto. Con el nivel y la dificultad hay menos letras de ayuda, menos tiempo y palabras más largas. Mismas reglas que Anagrama: 10 imágenes por nivel, 3 vidas, tiempo, estrellas, puntos y monedas propios.
+**¿Qué ves?**: enigmas de 2 o 3 imágenes (emojis) que se relacionan; hay que descubrir la palabra o frase (1 a 3 palabras) y escribirla. Se muestra el rubro y cuántas palabras son, y los huecos marcan las letras de cada una. Hay ~337 enigmas de rubros variados (palabras compuestas, frases, películas, cuentos, comidas, profesiones, lugares, deportes, Argentina…) en `enigmas.js` y `enigmas-2.js` (formato `dificultad|imágenes|respuesta`). Con el nivel y la dificultad hay menos letras de ayuda, menos tiempo y respuestas más difíciles.
 
-**Ilustraciones propias:** las imágenes de ¿Qué ves? son dibujos originales (SVG hechos con formas simples, en `iconos-*.js`), sin derechos de terceros. Dificultad: Experto da 3× los puntos, tiempo ×0,45, palabras mucho más largas, una vida menos, pistas a 40 monedas y (en Adivina) solo 6 pistas.
+Dificultad: Experto da 3× los puntos, tiempo ×0,45, palabras mucho más largas, una vida menos, pistas a 40 monedas y (en Adivina) solo 6 pistas.
 
 ## Duelos y Tutti Frutti
-- **Duelos en todos los juegos**: Adivina (5 palabras), Frases encriptadas (3 frases) y ¿Qué ves? (10 imágenes) tienen "Duelo en vivo" y "Desafío por link" (`duelos.js`).
+- **Duelos en todos los juegos**: Adivina (5 palabras), Frases encriptadas (3 frases) y ¿Qué ves? (10 enigmas) tienen "Duelo en vivo" y "Desafío por link" (`duelos.js`).
 - **Tutti Frutti** (`frutti.js`, `frutti-data.js`, `frutti-data2.js`): solo duelos de 5, 10, 15 o 20 partidas (cada una con su letra) y los puntos se acumulan: gana quien más suma. Bien escrita 10, repetida con el rival 5, mal escrita 5, no existe 0, más 10 de bonus para quien termina todo en menos tiempo. Acepta plurales.
 - La validación usa listas de palabras por categoría (`frutti-data.js`): una palabra real que no esté en la lista cuenta como "no existe". Se pueden ampliar agregando palabras.
 - Pruebas: `python3 tests/smoke.py` y `python3 tests/duelos.py`.
