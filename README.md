@@ -45,4 +45,4 @@ Dificultad: Experto da 3× los puntos, tiempo ×0,45, palabras mucho más largas
 - **Adivina sin repetir**: cada categoría se puede completar; las palabras ya jugadas no vuelven. Al terminar una categoría aparece ✔ Completada y hay que elegir otra; cuando se completan todas, se ofrece una nueva vuelta.
 
 ## ¿Cuántas ves?
-Aparece una palabra y hay que armar todas las que se puedan con sus letras (3 o más, existentes en el diccionario). Sin pistas; se escribe, se tocan letras o se dice con el micrófono. Datos: `cuantas-data.js` (800 palabras base, generado a partir del listado de palabras de la RAE de https://github.com/JorgeDuenasLerin/diccionario-espanol-txt; los plurales regulares se generan por regla). Se carga recién al abrir el juego.
+Aparece una palabra y hay que armar todas las que se puedan con sus letras (2 o más, existentes en el diccionario). Sin pistas; se escribe, se tocan letras o se dice con el micrófono. Datos: `cuantas-data.js` (800 palabras base, generado a partir del listado de palabras de la RAE de https://github.com/JorgeDuenasLerin/diccionario-espanol-txt; los plurales regulares se generan por regla). Se carga recién al abrir el juego.
