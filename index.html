@@ -28,13 +28,12 @@
     </button>
     <h2 class="mt">Elegí un juego</h2>
     <button class="gcard g1" data-game="ana"><span class="ico">🔤</span><span><b>Anagrama</b><small>Ordená las letras y armá la palabra</small></span><em><span id="mLvAna"></span><u id="mPtsAna"></u></em><em class="chips"><span data-diff="f">🌱 Fácil</span><span data-diff="m">🌿 Medio</span><span data-diff="d">🔥 Difícil</span><span data-diff="e">💀 Experto</span></em></button>
-    <button class="gcard g2" data-game="hid"><span class="ico">🔍</span><span><b>Palabras escondidas</b><small>Hay letras de más: encontrá la palabra</small></span><em><span id="mLvHid"></span><u id="mPtsHid"></u></em><em class="chips"><span data-diff="f">🌱 Fácil</span><span data-diff="m">🌿 Medio</span><span data-diff="d">🔥 Difícil</span><span data-diff="e">💀 Experto</span></em></button>
+    <button class="gcard g2" data-game="hid"><span class="ico">🔍</span><span><b>Palabras escondidas</b><small>Encontrá la palabra escondida en otra palabra</small></span><em><span id="mLvHid"></span><u id="mPtsHid"></u></em><em class="chips"><span data-diff="f">🌱 Fácil</span><span data-diff="m">🌿 Medio</span><span data-diff="d">🔥 Difícil</span><span data-diff="e">💀 Experto</span></em></button>
     <button class="gcard g3" data-game="adi"><span class="ico">🕵️</span><span><b>Adivina</b><small>106 categorías · 10 pistas: ¡cuantas menos uses, más puntos!</small></span><em><span id="mLvAdi"></span><u id="mPtsAdi"></u></em><em class="chips"><span data-diff="f">🌱 Fácil</span><span data-diff="m">🌿 Medio</span><span data-diff="d">🔥 Difícil</span><span data-diff="e">💀 Experto</span></em></button>
     <button class="gcard g4" data-game="cri"><span class="ico">🔐</span><span><b>Frases encriptadas</b><small>Descubrí la frase famosa: cada letra es un número, objeto o color</small></span>
       <em class="chips"><span data-diff="f">🌱 Fácil</span><span data-diff="m">🌿 Medio</span><span data-diff="d">🔥 Difícil</span><span data-diff="e">💀 Experto</span><u id="mPtsCri"></u></em></button>
     <button class="gcard g5" data-game="qv"><span class="ico">🖼️</span><span><b>¿Qué ves?</b><small>Descubrí qué palabra une las imágenes</small></span><em class="chips"><span data-diff="f">🌱 Fácil</span><span data-diff="m">🌿 Medio</span><span data-diff="d">🔥 Difícil</span><span data-diff="e">💀 Experto</span><u id="mPtsQv"></u></em></button>
     <button class="gcard g6" data-game="tf"><span class="ico">📝</span><span><b>Tutti Frutti</b><small>Duelo por letra y categorías: ¡el más rápido y original gana!</small></span><em class="chips"><span>⚔ Solo duelos</span><u id="mPtsTf"></u></em></button>
-    <button class="gcard g7" data-game="cv"><span class="ico">🔤</span><span><b>¿Cuántas ves?</b><small>Armá todas las palabras que puedas con las letras de una palabra</small></span><em><span id="mLvCv"></span><u id="mPtsCv"></u></em><em class="chips"><span data-diff="f">🌱 Fácil</span><span data-diff="m">🌿 Medio</span><span data-diff="d">🔥 Difícil</span><span data-diff="e">💀 Experto</span></em></button>
   </section>
 
   <section id="adHome" class="screen" hidden>
@@ -82,33 +81,6 @@
     <div class="crkeys" id="crKeys"></div>
     <div class="tools three" id="crTools"><button id="crHint">💡<small>Letra · 10🪙</small></button><button id="crCheck">✔<small>Revisar</small></button><button id="crSkip">⏭<small>Pasar</small></button></div>
     <div class="float" id="crFloat" aria-live="polite"></div>
-  </section>
-
-  <section id="cvHome" class="screen" hidden>
-    <div class="topbar"><button class="ib" id="cvBack" aria-label="Menú de juegos">‹</button><span class="coins">🪙 <b id="cvCoins">0</b></span><span class="rank" id="cvRank"></span><button class="ib help" data-help="cv" aria-label="Cómo se juega">?</button></div>
-    <div class="crlogo">🔤<h1>¿CUÁNTAS VES?</h1></div>
-    <p class="tag">Armá todas las palabras que puedas</p>
-    <div class="diffs" id="cvDiffs"></div>
-    <div class="levelcard" id="cvLvl"></div>
-    <button class="big" id="cvPlay">▶ Jugar</button>
-    <div class="srsel"></div>
-    <div class="duelrow"><button class="mini wide" data-dxk="cv" data-dx="live">⚔ Duelo en vivo</button><button class="mini wide" data-dxk="cv" data-dx="link">📨 Desafío por link</button></div>
-    <p class="how">Aparece una palabra: armá todas las palabras que puedas usando sus letras (de 2 letras o más, existentes en el diccionario). No hay pistas: escribilas, tocá las letras o decilas con el micrófono. Tenés que llegar a la meta antes de que se acabe el tiempo.</p>
-  </section>
-
-  <section id="cvGame" class="screen" hidden>
-    <div class="topbar"><button class="ib" id="cvQuit" aria-label="Salir">✕</button><span class="lives" id="cvLives"></span><span class="coins">🪙 <b id="cvTotal">0</b></span><button class="ib help" data-help="cv" aria-label="Cómo se juega">?</button></div>
-    <div class="rival dxbar" hidden></div>
-    <div class="dots" id="cvDots"></div>
-    <div class="timer"><i id="cvBar"></i><b id="cvTime"></b></div>
-    <div class="cvword" id="cvWord"></div>
-    <div class="cvcount" id="cvCount"></div>
-    <div class="cvfound" id="cvFound"></div>
-    <div class="cvcur" id="cvCur">·</div>
-    <div class="cvtiles pool" id="cvTiles"></div>
-    <div class="tools three"><button id="cvDel">⌫<small>Borrar</small></button><button id="cvShuf">🔀<small>Mezclar</small></button><button id="cvMic" class="mic">🎤<small>Decir</small></button></div>
-    <button class="mini wide" id="cvDone">🏁 Terminar</button>
-    <div class="float" id="cvFloat" aria-live="polite"></div>
   </section>
 
   <section id="qvHome" class="screen" hidden>
@@ -219,7 +191,6 @@
 <script src="enigmas.js"></script>
 <script src="enigmas-2.js"></script>
 <script src="quever.js"></script>
-<script src="cuantas.js"></script>
 <script src="duelos.js"></script>
 <script src="serie.js"></script>
 <script src="voz.js"></script>

@@ -30,7 +30,6 @@ $("#qvMic").onclick = () => Voz.listen($("#qvMic"), (alts) => {
   if (hit) { Q.ans = [...Q.it.L]; qvDraw(); return qvWin(); }
   toast(`Escuché «${alts[0]}»: no es. Probá de nuevo`); beep(SND.bad);
 });
-if (!Voz.api) { document.querySelectorAll(".mic").forEach((b) => b.remove()); const t = document.querySelector("#qvGame .tools"); if (t) t.classList.replace("three", "two"); const c = document.querySelector("#cvGame .tools"); if (c) c.classList.replace("three", "two"); }
+if (!Voz.api) { document.querySelectorAll(".mic").forEach((b) => b.remove()); const t = document.querySelector("#qvGame .tools"); if (t) t.classList.replace("three", "two"); }
 HELP.adi[1].push("🎤 También podés tocar el micrófono y decir la respuesta en voz alta.");
 HELP.qv[1].push("🎤 Tocá el micrófono y decí la palabra completa en voz alta.");
-HELP.cv[1].push("🎤 Con el micrófono podés decir varias palabras seguidas.");

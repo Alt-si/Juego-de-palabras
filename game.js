@@ -5,14 +5,14 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&
 const PER_LEVEL = 10, LIVES = 3, TICK = 100;
 
 // ---------- Guardado ----------
-const DEF = { coins: 0, adBest: {}, pts: { ana: 0, hid: 0, adi: 0, cri: 0, qv: 0, cv: 0, tf: 0 }, crLv: { f: 1, m: 1, d: 1, e: 1 }, crDiff: "f", dif: { ana: "m", hid: "m", adi: "m" }, crSeen: [], crSolved: 0, qvLv: 1, cvLv: 1, cvSeen: [], cvSolved: 0, starsCV: [], qvSeen: [], qvSolved: 0, starsQ: [], adQuick: 0, adAces: 0, adLevel: 1, adSeen: [], level: 1, stars: {}, lvH: 1, starsH: {}, solved: 0, bestStreak: 0, ach: {}, theme: "claro", owned: ["claro"], sound: true, lastDaily: "", dailyStreak: 0, seen: [], played: 0, fastest: 0, name: "", duels: 0, duelWins: 0 };
+const DEF = { coins: 0, adBest: {}, pts: { ana: 0, hid: 0, adi: 0, cri: 0, qv: 0, tf: 0 }, crLv: { f: 1, m: 1, d: 1, e: 1 }, crDiff: "f", dif: { ana: "m", hid: "m", adi: "m" }, crSeen: [], crSolved: 0, qvLv: 1, qvSeen: [], qvSolved: 0, starsQ: [], adQuick: 0, adAces: 0, adLevel: 1, adSeen: [], level: 1, stars: {}, lvH: 1, starsH: {}, solved: 0, bestStreak: 0, ach: {}, theme: "claro", owned: ["claro"], sound: true, lastDaily: "", dailyStreak: 0, seen: [], played: 0, fastest: 0, name: "", duels: 0, duelWins: 0 };
 let SV;
 try { SV = { ...DEF, ...JSON.parse(localStorage.getItem("anagrama-v1") || "{}") }; } catch { SV = { ...DEF }; }
 // Monedas individuales por juego: SV.coins apunta a la billetera del juego en pantalla.
 {
   const old = SV.coins || 0;
-  if (!SV.wal) SV.wal = { ana: old, hid: 0, adi: 0, cri: 0, qv: 0, cv: 0 };
-  const key = () => { try { if (!$("#tfHome").hidden || !$("#tfGame").hidden) return "tf"; if (!$("#crHome").hidden || !$("#crGame").hidden) return "cri"; if (!$("#qvHome").hidden || !$("#qvGame").hidden) return "qv"; if (!$("#cvHome").hidden || !$("#cvGame").hidden) return "cv"; if (adOn) return "adi"; } catch {} return CUR === "hid" ? "hid" : "ana"; };
+  if (!SV.wal) SV.wal = { ana: old, hid: 0, adi: 0, cri: 0, qv: 0 };
+  const key = () => { try { if (!$("#tfHome").hidden || !$("#tfGame").hidden) return "tf"; if (!$("#crHome").hidden || !$("#crGame").hidden) return "cri"; if (!$("#qvHome").hidden || !$("#qvGame").hidden) return "qv"; if (adOn) return "adi"; } catch {} return CUR === "hid" ? "hid" : "ana"; };
   Object.defineProperty(SV, "coins", { enumerable: false, configurable: true, get() { return SV.wal[key()] || 0; }, set(v) { SV.wal[key()] = v; } });
 }
 const walletTotal = () => Object.values(SV.wal).reduce((a, b) => a + b, 0);
@@ -40,7 +40,7 @@ let CUR = "ana"; // juego elegido en el menú: "ana" (Anagrama) o "hid" (Palabra
 function addPts(k, n) { SV.pts = SV.pts || { ana: 0, hid: 0, adi: 0, cri: 0 }; SV.pts[k] = (SV.pts[k] || 0) + n; SV.wal[k] = (SV.wal[k] || 0) + n; }
 const duelRank = (k, n) => { SV.pts = SV.pts || {}; SV.pts[k] = (SV.pts[k] || 0) + n; }; // los duelos solo suman al rango cuando se gana
 const ptsOf = (k) => (SV.pts && SV.pts[k]) || 0;
-const totalPts = () => ptsOf("ana") + ptsOf("hid") + ptsOf("adi") + ptsOf("cri") + ptsOf("qv") + ptsOf("cv") + ptsOf("tf");
+const totalPts = () => ptsOf("ana") + ptsOf("hid") + ptsOf("adi") + ptsOf("cri") + ptsOf("qv") + ptsOf("tf");
 function globalRank() {
   const t = totalPts(); let i = 0; GRANKS.forEach((r, j) => { if (t >= r[0]) i = j; });
   const last = GRANKS.length - 1, base = GRANKS[i];
@@ -51,7 +51,7 @@ const KSk = (k) => (k === "hid" ? { lv: "lvH", st: "starsH" } : { lv: "level", s
 const KS = () => KSk(CUR);
 const curLevel = () => SV[KS().lv];
 const topLevel = () => Math.max(SV.level, SV.lvH);
-const NAMES = { ana: "Anagrama", hid: "Palabras escondidas", adi: "Adivina", cri: "Frases encriptadas", qv: "¿Qué ves?", cv: "¿Cuántas ves?", tf: "Tutti Frutti" };
+const NAMES = { ana: "Anagrama", hid: "Palabras escondidas", adi: "Adivina", cri: "Frases encriptadas", qv: "¿Qué ves?", tf: "Tutti Frutti" };
 const maxLives = (k) => Math.max(1, (SV.owned.includes("vida") ? LIVES + 1 : LIVES) + difOf(k || CUR).lives);
 const hintCost = (k) => difOf(k).hint, timeCost = (k) => Math.round((difOf(k).hint * 1.5) / 5) * 5;
 function costLabels() { const k = typeof G !== "undefined" && G ? G.kind : CUR, d = G && G.duel; $("#tHint small").textContent = `Pista · ${d ? 10 : hintCost(k)}🪙`; $("#tTime small").textContent = `+15 s · ${timeCost(k)}🪙`; }
@@ -83,8 +83,6 @@ const ACH = [
   ["cr50", "Criptógrafo", "Resolvé 50 frases encriptadas", () => SV.crSolved >= 50, 150],
   ["qv10", "Ojo de águila", "Resolvé 10 enigmas en ¿Qué ves?", () => SV.qvSolved >= 10, 40],
   ["qv100", "Ojo clínico", "Resolvé 100 enigmas en ¿Qué ves?", () => SV.qvSolved >= 100, 150],
-  ["cv30", "Palabrero", "Armá 30 palabras en ¿Cuántas ves?", () => SV.cvSolved >= 30, 40],
-  ["cv300", "Diccionario ambulante", "Armá 300 palabras en ¿Cuántas ves?", () => SV.cvSolved >= 300, 150],
   ["rich", "Ahorrista", "Juntá 500 monedas", () => SV.coins >= 500, 50],
   ["duel1", "Competidor", "Ganale un duelo a un amigo", () => SV.duelWins >= 1, 40],
   ["daily3", "Constante", "Entrá 3 días seguidos", () => SV.dailyStreak >= 3, 30],
@@ -118,7 +116,7 @@ let viewLevel = 1;
 function renderHome() {
   applyTheme(); viewLevel = Math.min(viewLevel, curLevel()); SCENES.apply(SCENES.world(viewLevel));
   $("#hLogo").innerHTML = [...(CUR === "hid" ? "ESCONDIDAS" : "ANAGRAMA")].map((c) => `<i>${c}</i>`).join("");
-  $("#hTag").textContent = CUR === "hid" ? "Hay letras de más: encontrá la palabra escondida" : "Ordená las letras y encontrá la palabra";
+  $("#hTag").textContent = CUR === "hid" ? "Hay otra palabra escondida en las letras: encontrala" : "Ordená las letras y encontrá la palabra";
   difBar($("#hDiffs"), CUR === "hid" ? "hid" : "ana"); $("#hCoins").textContent = SV.coins;
   $("#hRank").textContent = titleOf(topLevel()) + " · " + ptsOf(CUR) + " pts";
   $("#btnSound").textContent = SV.sound ? "🔊" : "🔇";
@@ -217,8 +215,22 @@ extendPool();
 const hidClue = (w, c, lv) => { const ad = (buildAdivina().byWord.get(w) || { c: [] }).c, idx = 3 - Math.min(3, Math.floor(lvP(lv || 1) * 4)); return ((typeof CLUES !== "undefined" && lvP(lv || 1) < 0.5 && CLUES[w]) || ad[idx] || (typeof CLUES !== "undefined" && CLUES[w]) || ad[3] || (c ? "Categoría: " + c : "")); };
 // Palabras escondidas: la palabra va mezclada con letras de más (no se usan todas).
 const VOW = "AEIOU", CON = "BCDFGLMNPRSTVZ";
+// Palabras escondidas: se muestra una palabra real (el "anfitrión", p. ej. ELIMINA) y adentro hay otra (LIMA) que se arma con algunas de sus letras, en cualquier orden.
+const cntL = (s) => { const m = {}; for (const c of s) m[c] = (m[c] || 0) + 1; return m; };
+const isSubseq = (a, b) => { let i = 0; for (const c of b) if (c === a[i]) i++; return i === a.length; };
+function hidHost(L, lv) {
+  const extra = Math.max(2, Math.min(3 + Math.round(8 * Math.pow(lvP(lv), 0.7)) + gameDif().extra, 9, 14 - L.length)), need = cntL(L); let best = null, bs = 1e9;
+  for (let n = L.length + 2; n <= Math.min(14, L.length + extra + 3); n++) for (const x of POOL[n] || []) {
+    if (x.c === "✨ Aprendidas" || x.L === L) continue;
+    const h = cntL(x.L); if (Object.keys(need).some((c) => (h[c] || 0) < need[c])) continue;
+    const sc = Math.abs(n - L.length - extra) + (isSubseq(L, x.L) ? 2.5 : 0) + rnd(1000) / 1000;
+    if (sc < bs) { bs = sc; best = x; }
+  }
+  return best;
+}
 function makeScr(L, kind, lv) {
   if (kind !== "hid") return scramble(L);
+  const host = hidHost(L, lv); if (host) { const a = [...host.L]; a.host = host.w; return a; }
   const extra = Math.max(2, Math.min(3 + Math.round(8 * Math.pow(lvP(lv), 0.7)) + gameDif().extra, 11, 16 - L.length));
   const a = [...L];
   for (let i = 0; i < extra; i++) a.push(rnd(5) < 2 ? VOW[rnd(5)] : CON[rnd(CON.length)]);
@@ -228,14 +240,14 @@ const WSET = new Set(); for (const k in POOL) for (const x of POOL[k]) WSET.add(
 function markHint() {
   G.hinted = true; const take = new Set();
   for (const ch of G.target) { const t = G.tiles.find((x) => x.ch === ch && !take.has(x.id)); if (t) take.add(t.id); }
-  G.hl = take; renderTiles(); float("¡Pista! Letras marcadas", "good"); beep(SND.coin);
+  G.hl = take; renderTiles(); beep(SND.coin);
 }
 function renderGame() {
   $("#gCoins").textContent = SV.coins;
   livesUI();
   const dn = G.duel ? G.n : G.solved;
   $("#gDots").innerHTML = Array.from({ length: PER_LEVEL }, (_, i) => `<i class="${i < dn ? "done" : i === dn ? "cur" : ""}"></i>`).join("");
-  $("#gCat").textContent = G.w.c; $("#gLen").textContent = G.kind === "hid" ? `${G.len} letras · sobran ${G.tiles.length - G.len}` : `${G.len} letras`;
+  $("#gCat").textContent = G.w.c; $("#gLen").textContent = G.kind === "hid" ? `Escondida: ${G.len} letras · sobran ${G.tiles.length - G.len}` : `${G.len} letras`;
   const cl = G.kind === "hid" && hidClue(G.w.w, G.w.c, G.lv);
   $("#gClue").hidden = G.kind !== "hid"; $("#gClue").textContent = cl ? "💬 " + cl : " ";
   $("#gStreak").textContent = G.streak >= 2 ? `🔥 Racha x${G.streak}` : "";
@@ -432,13 +444,13 @@ function duelDone() {
 function checkInvite() {
   if (typeof srInvite === "function" && srInvite()) return;
   if (typeof tfInvite === "function" && tfInvite()) return;
-  const r = /^#r=([A-Z0-9]{5})\.(ana|hid|adi|cri|qv|cv|tf)$/.exec(location.hash);
+  const r = /^#r=([A-Z0-9]{5})\.(ana|hid|adi|cri|qv|tf)$/.exec(location.hash);
   if (r && !G) {
     modal(`<h2>⚔ Duelo en vivo</h2><p>Te invitaron a jugar <b>${NAMES[r[2]]}</b> en tiempo real.</p><button class="big" id="liveEnter">Entrar al duelo</button><button class="link" data-close>Ahora no</button>`, true);
     $("#liveEnter").onclick = () => askName(() => liveJoin(r[1], r[2]));
     return;
   }
-  const m = /^#d=(\d+)\.(\d+)\.(?:(ana|hid|adi|cri|qv|cv)\.)?(.*)$/.exec(location.hash); if (!m) return;
+  const m = /^#d=(\d+)\.(\d+)\.(?:(ana|hid|adi|cri|qv)\.)?(.*)$/.exec(location.hash); if (!m) return;
   const seed = +m[1], score = +m[2], kind = m[3] || "ana"; let name = "Un amigo"; try { name = decodeURIComponent(m[4]).slice(0, 16) || name; } catch {}
   if (G) return;
   modal(`<h2>⚔ ¡${esc(name)} te desafió!</h2><p>Hizo <b>${score} puntos</b> en <b>${NAMES[kind]}</b>. Jugás lo mismo: si lo superás, ganás.</p><button class="big" id="accept">Aceptar el desafío</button><button class="link" data-close>Ahora no</button>`, true);
@@ -449,7 +461,7 @@ window.addEventListener("hashchange", checkInvite);
 // ---------- Menú ----------
 function showMenu() {
   SCENES.apply(null);
-  $("#adHome").hidden = true; $("#adGame").hidden = true; adOn = false; $("#crHome").hidden = true; $("#crGame").hidden = true; $("#qvHome").hidden = true; $("#qvGame").hidden = true; $("#cvHome").hidden = true; $("#cvGame").hidden = true; $("#tfHome").hidden = true; $("#tfGame").hidden = true; if (typeof TFT !== "undefined") clearInterval(TFT);
+  $("#adHome").hidden = true; $("#adGame").hidden = true; adOn = false; $("#crHome").hidden = true; $("#crGame").hidden = true; $("#qvHome").hidden = true; $("#qvGame").hidden = true; $("#tfHome").hidden = true; $("#tfGame").hidden = true; if (typeof TFT !== "undefined") clearInterval(TFT);
   $("#home").hidden = true; $("#game").hidden = true; $("#menu").hidden = false;
   $("#mCoins").textContent = walletTotal(); applyTheme();
   const gr = globalRank(); const fmt = (n) => n.toLocaleString("es-AR");
@@ -460,10 +472,10 @@ function showMenu() {
   $("#mFrom").textContent = fmt(gr.from); $("#mTo").textContent = gr.next ? fmt(gr.next) + " pts" : "MÁX";
   $("#mNext").innerHTML = gr.next ? `Te faltan <b>${fmt(gr.next - gr.total)} pts</b> para ser <b>${gr.nextIcon} ${gr.nextName}</b>` : "¡Llegaste al rango más alto! 🎉";
   { const lo = lvClamp(gr.i - 4, 0, GRANKS.length - 9); $("#mSteps").innerHTML = GRANKS.map((r, j) => ({ r, j })).slice(lo, lo + 9).map(({ r, j }) => `<i class="${j < gr.i ? "done" : j === gr.i ? "cur" : ""}" title="${r[1]}">${j <= gr.i ? r[2] : "🔒"}</i>`).join(""); }
-  $("#mPtsAna").textContent = ptsOf("ana") + " pts"; $("#mPtsHid").textContent = ptsOf("hid") + " pts"; $("#mPtsAdi").textContent = ptsOf("adi") + " pts"; $("#mPtsCri").textContent = ptsOf("cri") + " pts"; $("#mPtsCv").textContent = ptsOf("cv") + " pts"; $("#mLvCv").textContent = `Nivel ${SV.cvLv}`; $("#mPtsTf").textContent = ptsOf("tf") + " pts"; if (typeof cvMenu === "function") cvMenu(); if (typeof crMenu === "function") crMenu(); if (typeof qvMenu === "function") qvMenu(); document.querySelectorAll("#menu [data-game]").forEach((c) => { const k = c.dataset.game; if (k !== "cri" && k !== "qv" && k !== "cv") c.querySelectorAll("[data-diff]").forEach((x) => x.classList.toggle("on", x.dataset.diff === SV.dif[k])); });
+  $("#mPtsAna").textContent = ptsOf("ana") + " pts"; $("#mPtsHid").textContent = ptsOf("hid") + " pts"; $("#mPtsAdi").textContent = ptsOf("adi") + " pts"; $("#mPtsCri").textContent = ptsOf("cri") + " pts"; $("#mPtsTf").textContent = ptsOf("tf") + " pts"; if (typeof crMenu === "function") crMenu(); if (typeof qvMenu === "function") qvMenu(); document.querySelectorAll("#menu [data-game]").forEach((c) => { const k = c.dataset.game; if (k !== "cri" && k !== "qv") c.querySelectorAll("[data-diff]").forEach((x) => x.classList.toggle("on", x.dataset.diff === SV.dif[k])); });
   $("#mLvAna").textContent = `Nivel ${SV.level}`; $("#mLvHid").textContent = `Nivel ${SV.lvH}`; $("#mLvAdi").textContent = `Nivel ${SV.adLevel}`;
 }
-function openGame(k) { if (k === "adi") return showAdHome(); if (k === "cri") return crOpen(); if (k === "qv") return qvOpen(); if (k === "cv") return cvOpen(); if (k === "tf") return tfOpen(); CUR = k; viewLevel = curLevel(); $("#menu").hidden = true; $("#home").hidden = false; renderHome(); }
+function openGame(k) { if (k === "adi") return showAdHome(); if (k === "cri") return crOpen(); if (k === "qv") return qvOpen(); if (k === "tf") return tfOpen(); CUR = k; viewLevel = curLevel(); $("#menu").hidden = true; $("#home").hidden = false; renderHome(); }
 
 // ---------- Duelo en vivo ----------
 // Conexión directa entre los dos celulares (WebRTC) usando PeerJS; no hay servidor propio.
@@ -737,18 +749,17 @@ document.addEventListener("click", (e) => {
 // ---------- Ayuda: cómo se juega ----------
 const HELP = {
   ana: ["🔤 Anagrama", ["Ordená las letras mezcladas y armá la palabra antes de que se acabe el tiempo.", "Tocá las letras en orden. Si te equivocás o se acaba el tiempo perdés una vida ❤.", "10 palabras = subís de nivel.", "Ayudas: 🔀 mezclar, 💡 pista (revela una letra), ⏱ tiempo extra."]],
-  hid: ["🔍 Palabras escondidas", ["Hay más letras que las que necesita la palabra: usá la frase-pista para descubrirla.", "Armala solo con las letras justas. A los 10 s finales se marcan las letras correctas.", "3 vidas ❤ y 10 palabras por nivel."]],
+  hid: ["🔍 Palabras escondidas", ["Arriba ves una palabra (por ejemplo ELIMINA) y adentro hay otra escondida (LIMA) que se arma con algunas de sus letras, en cualquier orden. La frase-pista te ayuda a descubrirla.", "Armala solo con las letras justas. En los últimos 10 s se iluminan las letras que forman la palabra escondida.", "3 vidas ❤ y 10 palabras por nivel."]],
   adi: ["🕵️ Adivina", ["Elegí una categoría y descubrí la palabra oculta.", "Arrancás con 1 pista; cada error o \"otra pista\" abre una más.", "Cuantas menos pistas uses, más puntos ganás (hasta 100 por palabra).", "Hay corrector de ortografía: si te equivocás en una letra, igual te la aceptamos.", "Juntá los puntos de la meta del nivel para pasar."]],
   cri: ["🔐 Frases encriptadas", ["Cada letra se esconde detrás de un número, un objeto o un color, y se repite en toda la frase.", "Tocá un casillero y elegí la letra: se completa en todos los que tienen el mismo símbolo.", "En las citas célebres también tenés que completar al autor.", "💡 regala una letra (−15 pts) y ✔ Revisar marca los errores (−10 pts cada vez). Mirá cuánto vale la frase."]],
   tf: ["📝 Tutti Frutti", ["Es un juego de duelos: elegí de 3 a 8 categorías (nombres de personas, en el mercado compro, animales…) y desafiá a un amigo, en vivo o por link.", "Sale una letra al azar: escribí una palabra de cada categoría que empiece con esa letra. Tenés 120 s.", "Antes de empezar elegís 5, 10, 15 o 20 partidas: cada una tiene su letra y los puntos se acumulan, gana quien más suma al final. Tocá ¡BASTA! cuando termines: se guarda tu tiempo. Si tu rival termina primero, te quedan 20 s.", "Corrección: palabra bien escrita 10 pts · repetida con el rival 5 · mal escrita 5 (te mostramos cómo se escribe) · no existe 0.", "Quien termina todo en menos tiempo suma 10 pts extra. El ganador del duelo se lleva 10 🪙 por partida."]],
-  cv: ["🔤 ¿Cuántas ves?", ["Aparece una palabra: armá todas las palabras que puedas usando sus letras. Valen palabras de 2 letras o más que existan en el diccionario (también plurales y verbos conjugados). Se agregan solas apenas las formás.", "No hay pistas: escribí con el teclado, tocá las letras o decilas con el micrófono. Cada palabra suma puntos (más cuanto más larga) y las seguidas dan racha. Si repetís una palabra, restás 5 puntos.", "Tenés que llegar a la meta de cada palabra antes de que se acabe el tiempo; si no, perdés una vida. Un nivel son 3 palabras. Al final de cada una ves todas las que se podían armar."]],
   qv: ["🖼️ ¿Qué ves?", ["Mirá las 2 o 3 imágenes: tienen algo en común. Descubrí la palabra o frase (puede tener 1, 2 o 3 palabras) y escribila.", "Arriba ves el rubro y cuántas palabras son; los huecos te muestran cuántas letras tiene cada una.", "10 enigmas por nivel, 3 vidas ❤ y tiempo límite. Cuanto más subís o más difícil elegís, menos letras de ayuda te damos."]],
   all: ["❓ Cómo se juega", ["Elegí un juego y una dificultad: cuanto más difícil, más puntos ganás.", "Cada juego tiene sus propios niveles, puntos y monedas.", "La suma de tus puntos sube tu rango global, de Novato a Leyenda.", "Tocá el ❓ dentro de cada juego para ver sus reglas."]]
 };
 document.addEventListener("click", (e) => {
   const b = e.target.closest("[data-help]"); if (!b) return;
   let k = b.dataset.help; if (k === "cur") k = CUR;
-  const h0 = HELP[k] || HELP.all, h = ["ana", "hid", "adi", "cri", "qv", "cv"].includes(k) ? [h0[0], h0[1].concat("⚔ Duelos: elegí si la partida dura 1, 3, 5 o 10 duelos. Los puntos se acumulan y gana quien más suma al final. Se juega en vivo o por link.")] : h0; const paused = typeof G !== "undefined" && G && !G.paused && !$("#game").hidden;
+  const h0 = HELP[k] || HELP.all, h = ["ana", "hid", "adi", "cri", "qv"].includes(k) ? [h0[0], h0[1].concat("⚔ Duelos: elegí si la partida dura 1, 3, 5 o 10 duelos. Los puntos se acumulan y gana quien más suma al final. Se juega en vivo o por link.")] : h0; const paused = typeof G !== "undefined" && G && !G.paused && !$("#game").hidden;
   if (paused) G.paused = true;
   modal(`<div class="helpbox"><h2>${h[0]}</h2>${h[1].map((t) => `<p class="hl">• ${t}</p>`).join("")}${k !== "all" ? `<p class="hg">Dificultad</p><p class="hl">Fácil, Medio, Difícil o Experto: cuanto más difícil, menos ayuda y más puntos.</p>` : ""}<button class="big" id="helpOk">¡Entendido!</button></div>`, true);
   $("#helpOk").onclick = () => { closeModal(); if (paused && G) G.paused = false; };

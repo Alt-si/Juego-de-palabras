@@ -63,7 +63,7 @@ function srFinal() {
 }
 function srExit() { if (LIVE) { Net.send({ t: "quit" }); liveReset(); } SR = null; D = null; G = null; clearInterval(timerId); clearInterval(QT); closeModal(); showMenu(); }
 function srInvite() {
-  const m = /^#s=(\d+)\.(ana|hid|adi|cri|qv|cv)\.(\d+)\.([\d-]+)\.(.*)$/.exec(location.hash); if (!m) return false;
+  const m = /^#s=(\d+)\.(ana|hid|adi|cri|qv)\.(\d+)\.([\d-]+)\.(.*)$/.exec(location.hash); if (!m) return false;
   const rounds = +m[3], scores = m[4].split("-").map(Number), kind = m[2];
   if (SR || (typeof G !== "undefined" && G) || !SR_OPTS.includes(rounds) || scores.length !== rounds) return true;
   let name = "Un amigo"; try { name = decodeURIComponent(m[5]).slice(0, 16) || name; } catch {}
