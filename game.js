@@ -690,7 +690,7 @@ function adRender(fresh) {
   $("#adClues").innerHTML = AD.clues.slice(0, AD.shown).map((c, i) => `<li class="${c[1] ? "auto" : ""} ${i === AD.shown - 1 ? "new" : ""}"><b>${i + 1}</b><span>${esc(c[0])}</span></li>`).join("");
   const ul = $("#adClues"); ul.scrollTop = ul.scrollHeight;
   $("#adMore").disabled = AD.shown >= adMax();
-  if (fresh) $("#adIn").focus({ preventScroll: true });
+  // El teclado ya no se abre solo: aparece cuando tocás el campo para escribir.
 }
 function adGoalUI() { $("#adGoal").textContent = AD.duel ? `⚔ Duelo · Llevás ${AD.total} pts` : `Nivel ${AD.lv} · Meta ${adPass(AD.lv)} pts · Llevás ${AD.total}`; }
 function adFloat(t, cls) { const f = $("#adFloat"); f.className = "float " + (cls || ""); f.textContent = t; void f.offsetWidth; f.classList.add("go"); }
