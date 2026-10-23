@@ -44,7 +44,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .cat{text-align:center;color:var(--mut)}.cat b{color:var(--ink)}
 .slots,.pool{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
 .pool{margin-top:6px}
-.tile{width:44px;height:52px;border-radius:11px;background:var(--tile);border:2px solid var(--tileb);font-size:24px;font-weight:800;color:var(--ink);box-shadow:0 3px 0 var(--tileb);transition:transform .1s}
+.tile{display:inline-flex;align-items:center;justify-content:center;padding:0;line-height:1;width:44px;height:52px;border-radius:11px;background:var(--tile);border:2px solid var(--tileb);font-size:24px;font-weight:800;color:var(--ink);box-shadow:0 3px 0 var(--tileb);transition:transform .1s}
 .tile:active{transform:scale(.92)}
 .pool .tile.gone{opacity:.15;box-shadow:none}
 .slot{background:transparent;border-style:dashed;box-shadow:none}
