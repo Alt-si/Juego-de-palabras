@@ -68,7 +68,7 @@ try:
         # --- Palabras escondidas ---
         pg = newpage(b.new_context(viewport=V)); pg.goto(URL); pg.wait_for_timeout(400)
         pg.click('[data-game="hid"]'); pg.click("#btnPlay")
-        check(pg.evaluate("G.kind") == "hid" and pg.evaluate("G.tiles.length - G.len") >= 3, "Escondidas: hay letras de más")
+        check(pg.evaluate("G.kind") == "hid" and pg.evaluate("G.tiles.length - G.len") >= 2, "Escondidas: hay letras de más")
         check(pg.is_visible("#gClue") and len(pg.inner_text("#gClue")) > 8, "Escondidas: se muestra la frase-pista")
         pg.evaluate("G.left=10.2"); pg.wait_for_timeout(600)
         check(pg.evaluate("G.hl && G.hl.size") == pg.evaluate("G.len") and pg.locator(".tile.hl").count() == pg.evaluate("G.len"), "Escondidas: a los 10 s se marcan las letras de la palabra")

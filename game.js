@@ -186,7 +186,7 @@ function pickWords(lv) {
 function startLevel(lv) {
   closeModal();
   SV.played++; save();
-  CUR = CUR; G = { kind: CUR, lv, queue: pickWords(lv), solved: 0, lives: maxLives(CUR), lostLives: 0, hints: 0, streak: 0, paused: false, over: false, busy: false };
+  $("#game").classList.remove("paused"); G = { kind: CUR, lv, queue: pickWords(lv), solved: 0, lives: maxLives(CUR), lostLives: 0, hints: 0, streak: 0, paused: false, over: false, busy: false };
   SCENES.apply(SCENES.world(lv)); $("#home").hidden = true; $("#game").hidden = false;
   nextWord();
 }
@@ -355,7 +355,7 @@ function levelFailed() {
   G.over = true; clearInterval(timerId); save(); beep(SND.lose);
   modal(`<h2>💔 Sin vidas</h2><p>Resolviste ${G.solved} de ${PER_LEVEL} palabras. ¡Podés volver a intentarlo con palabras nuevas!</p><button class="big" id="retry">Reintentar nivel ${G.lv}</button><button class="link" id="goHome">Inicio</button>`, true);
 }
-function toHome() { SR = null; if (LIVE) { Net.send({ t: "quit" }); liveReset(); } closeModal(); clearInterval(timerId); G = null; $("#game").hidden = true; $("#menu").hidden = true; $("#home").hidden = false; viewLevel = curLevel(); renderHome(); }
+function toHome() { $("#game").classList.remove("paused"); SR = null; if (LIVE) { Net.send({ t: "quit" }); liveReset(); } closeModal(); clearInterval(timerId); G = null; $("#game").hidden = true; $("#menu").hidden = true; $("#home").hidden = false; viewLevel = curLevel(); renderHome(); }
 
 // ---------- Eventos ----------
 $("#btnDuel").onclick = () => srLaunch(CUR, false);
@@ -411,7 +411,7 @@ function startDuel(seed, from, kind, live) {
   if (!SRGO) SR = null; SRGO = false;
   kind = kind || CUR; CUR = kind;
   closeModal(); history.replaceState(null, "", location.pathname);
-  G = { kind, duel: { seed, from, pts: 0, kind, live: !!live }, lv: 0, queue: duelWords(seed, kind), solved: 0, n: 0, lives: 99, lostLives: 0, hints: 0, streak: 0, paused: false, over: false, busy: false };
+  $("#game").classList.remove("paused"); G = { kind, duel: { seed, from, pts: 0, kind, live: !!live }, lv: 0, queue: duelWords(seed, kind), solved: 0, n: 0, lives: 99, lostLives: 0, hints: 0, streak: 0, paused: false, over: false, busy: false };
   $("#home").hidden = true; $("#menu").hidden = true; $("#game").hidden = false; if (live) { $("#gRival").hidden = false; $("#gRival").textContent = "⚔ Conectando con el rival…"; } liveBar(); SCENES.apply(SCENES.world(7)); nextWord();
 }
 const duelLink = (seed, score, kind) => `${location.origin}${location.pathname}#d=${seed}.${score}.${kind || CUR}.${encodeURIComponent(SV.name)}`;
