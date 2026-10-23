@@ -690,7 +690,8 @@ function adRender(fresh) {
   $("#adClues").innerHTML = AD.clues.slice(0, AD.shown).map((c, i) => `<li class="${c[1] ? "auto" : ""} ${i === AD.shown - 1 ? "new" : ""}"><b>${i + 1}</b><span>${esc(c[0])}</span></li>`).join("");
   const ul = $("#adClues"); ul.scrollTop = ul.scrollHeight;
   $("#adMore").disabled = AD.shown >= adMax();
-  // El teclado ya no se abre solo: aparece cuando tocás el campo para escribir.
+  // El teclado no se abre solo: se cierra al cambiar de pista o palabra y aparece cuando tocás el campo.
+  $("#adIn").blur();
 }
 function adGoalUI() { $("#adGoal").textContent = AD.duel ? `⚔ Duelo · Llevás ${AD.total} pts` : `Nivel ${AD.lv} · Meta ${adPass(AD.lv)} pts · Llevás ${AD.total}`; }
 function adFloat(t, cls) { const f = $("#adFloat"); f.className = "float " + (cls || ""); f.textContent = t; void f.offsetWidth; f.classList.add("go"); }
@@ -698,7 +699,7 @@ function adMore() { if (AD.busy || AD.shown >= adMax()) return; AD.shown++; adRe
 function adAnswers() { const w = AD.cur.w; return [plain(w), ...(ALIAS[w] || []).map(plain)]; }
 function adGuess() {
   if (AD.busy) return;
-  const g = plain($("#adIn").value); if (!g) return;
+  $("#adIn").blur(); const g = plain($("#adIn").value); if (!g) return;
   const ans = adAnswers();
   if (ans.includes(g)) return adWin();
   if (ans.some((a) => spellOk(g, a))) { AD.fixed = true; return adWin(); }
