@@ -173,7 +173,7 @@ try:
         check(cp.is_visible("#adHome") and cp.evaluate("document.querySelector('#toast')?document.querySelector('#toast').textContent:''").find("completaste") >= 0, "categoría completa no se puede jugar de nuevo")
         cp.evaluate("ADI.cats.forEach(c=>c.words.forEach(adMark));renderAdCats()")
         check(cp.query_selector("[data-lap]") is not None, "todas completas: opción de nueva vuelta")
-        cp.once("dialog", lambda d: d.accept()); cp.click("[data-lap]"); cp.wait_for_timeout(200)
+        cp.click("[data-lap]"); cp.click("#askYes"); cp.wait_for_timeout(200)
         check(cp.evaluate("adLeftOf('Mezcla').length") == cp.evaluate("ADI.all.length"), "nueva vuelta reinicia las palabras")
         nov = np(b.new_context(viewport=V)); nov.goto(URL); nov.evaluate("delete window.SpeechRecognition; delete window.webkitSpeechRecognition")
         check(True, "voz: sin soporte no se rompe")

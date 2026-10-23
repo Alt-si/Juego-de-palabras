@@ -163,4 +163,4 @@ $("#crSkip").onclick = () => {
   modal(`<h2>¿Pasar esta frase?</h2><p>No suma puntos.</p><button class="big" id="crYes">Pasar</button><button class="mini" data-close>Seguir</button>`);
   $("#crYes").onclick = () => { closeModal(); P.over = true; crAdvance(); };
 };
-$("#crQuit").onclick = () => { if (confirm("¿Salir de la ronda?")) { if (CR.duel) { dxAbort(); showMenu(); return; } $("#crGame").hidden = true; $("#crHome").hidden = false; crHome(); } };
+$("#crQuit").onclick = () => ask("¿Salir de la ronda?", () => { if (CR.duel) { dxAbort(); showMenu(); return; } $("#crGame").hidden = true; $("#crHome").hidden = false; crHome(); });

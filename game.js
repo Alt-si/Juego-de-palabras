@@ -143,6 +143,8 @@ function claimDaily() {
 // ---------- Modal ----------
 function modal(html, noClose) { $("#box").innerHTML = html; $("#modal").hidden = false; $("#modal").dataset.lock = noClose ? "1" : ""; }
 function closeModal() { $("#modal").hidden = true; }
+// Confirmación dentro de la app (los confirm() del navegador pueden estar bloqueados en la app instalada)
+function ask(msg, yes, yesLabel) { modal(`<h2>${msg}</h2><button class="big" id="askYes">${yesLabel || "Sí, salir"}</button><button class="link" data-close>Seguir jugando</button>`); $("#askYes").onclick = () => { closeModal(); yes(); }; }
 $("#modal").addEventListener("click", (e) => { if (e.target.closest("[data-close]") || (e.target.id === "modal" && !$("#modal").dataset.lock)) closeModal(); });
 
 function checkAch() {
@@ -364,7 +366,7 @@ $("#btnPlay").onclick = () => startLevel(viewLevel);
 $("#btnDaily").onclick = claimDaily;
 $("#btnAch").onclick = showAch; $("#btnShop").onclick = showShop; $("#btnStats").onclick = showStats;
 $("#btnSound").onclick = () => { SV.sound = !SV.sound; save(); renderHome(); };
-$("#btnHome").onclick = () => { if (!G) return; if (G.duel && G.duel.live) { if (confirm("¿Abandonar el duelo?")) toHome(); return; } pause(true); };
+$("#btnHome").onclick = () => { if (!G) return; if (G.duel && G.duel.live) { ask("¿Abandonar el duelo?", toHome); return; } pause(true); };
 $("#btnPause").onclick = () => pause(true);
 $("#gPool").onclick = (e) => { const b = e.target.closest("[data-tile]"); if (b) place(+b.dataset.tile); };
 $("#gSlots").onclick = (e) => { const b = e.target.closest("[data-slot]"); if (b) takeBack(+b.dataset.slot); };
@@ -646,7 +648,7 @@ function renderAdCats() {
 }
 $("#adSearch").addEventListener("input", renderAdCats);
 $("#adCats").addEventListener("click", (e) => {
-  if (e.target.closest("[data-lap]")) { if (confirm("¿Empezar una nueva vuelta? Se reinician todas las categorías.")) { SV.adDone = {}; SV.adLap = (SV.adLap || 0) + 1; save(); renderAdCats(); toast("🔄 ¡Nueva vuelta!"); } return; }
+  if (e.target.closest("[data-lap]")) { ask("¿Empezar una nueva vuelta? Se reinician todas las categorías.", () => { SV.adDone = {}; SV.adLap = (SV.adLap || 0) + 1; save(); renderAdCats(); toast("🔄 ¡Nueva vuelta!"); }, "Sí, empezar"); return; }
   const b = e.target.closest("[data-cat]"); if (b) adStart(b.dataset.cat);
 });
 $("#adBack").onclick = showMenu;
@@ -723,7 +725,7 @@ $("#adGo").onclick = adGuess;
 $("#adIn").addEventListener("keydown", (e) => { if (e.key === "Enter") adGuess(); });
 $("#adMore").onclick = adMore;
 $("#adSkip").onclick = () => { if (!AD.busy) adLose(); };
-$("#adQuit").onclick = () => { if (confirm("¿Salir de la ronda?")) { if (AD.duel) dxAbort(); showAdHome(); } };
+$("#adQuit").onclick = () => ask("¿Salir de la ronda?", () => { if (AD.duel) dxAbort(); showAdHome(); });
 function adEnd() {
   if (AD.duel) return dxFinish(AD.total);
   const rec = !SV.adBest[AD.cat] || AD.total > SV.adBest[AD.cat]; if (rec) SV.adBest[AD.cat] = AD.total;

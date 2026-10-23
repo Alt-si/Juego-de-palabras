@@ -131,7 +131,7 @@ $("#qvHint").onclick = () => {
   if (Q.ans.every(Boolean)) { if (Q.ans.join("") === Q.it.L) qvWin(); else qvWrong(); }
 };
 $("#qvSkip").onclick = () => { if (!Q || Q.busy) return; qvFail("Pasaste (−1 ❤)."); };
-$("#qvQuit").onclick = () => { if (confirm("¿Salir del nivel?")) { clearInterval(QT); if (Q.duel) { dxAbort(); showMenu(); return; } $("#qvGame").hidden = true; $("#qvHome").hidden = false; qvHome(); } };
+$("#qvQuit").onclick = () => ask("¿Salir del nivel?", () => { clearInterval(QT); if (Q.duel) { dxAbort(); showMenu(); return; } $("#qvGame").hidden = true; $("#qvHome").hidden = false; qvHome(); });
 
 // Ajusta el tamaño de las casillas para que ninguna palabra se salga de la pantalla (si aun así no entra, sigue en la línea de abajo).
 function qvFit() {
