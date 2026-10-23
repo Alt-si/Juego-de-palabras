@@ -68,7 +68,7 @@ function qvDraw(bad) {
   let pos = 0;
   $("#qvSlots").innerHTML = Q.it.wl.map((k) => { const h = Q.ans.slice(pos, pos + k).map((c, j) => { const i = pos + j; return `<span class="tile slot ${c ? "fill" : ""} ${Q.given.has(i) ? "lock" : ""} ${bad && !Q.given.has(i) ? "bad" : ""}">${c || ""}</span>`; }).join(""); pos += k; return `<span class="qvword">${h}</span>`; }).join("");
   qvFit();
-  const used = new Set(); $("#qvKeys").innerHTML = [...CR_ABC].map((L) => `<button data-k="${L}">${L}</button>`).join("") + `<button data-k="DEL" class="del">⌫</button>`;
+  const used = new Set(); $("#qvKeys").innerHTML = crKeyboard();
 }
 $("#qvKeys").addEventListener("click", (e) => { const k = e.target.closest("[data-k]"); if (k) qvKey(k.dataset.k); });
 document.addEventListener("keydown", (e) => {

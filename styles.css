@@ -138,7 +138,7 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 .cc>b.ob{font-size:17px}.cc>b.co{width:22px;height:20px;border-radius:6px;color:#fff;font-size:10px;text-shadow:0 1px 2px #000a}
 .cc.lk .cl{background:var(--tileb);color:var(--ac)}.cc.sel .cl{background:#fde68a;border-bottom-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}
 .cc.bad .cl{background:#fecaca;color:var(--bad);border-bottom-color:var(--bad)}
-.crkeys{display:grid;grid-template-columns:repeat(9,1fr);gap:5px}.crkeys button{background:var(--panel);border-radius:10px;padding:10px 0;font-weight:800;font-size:16px;box-shadow:0 1px 3px #0002;color:var(--ink)}
+.crkeys{display:flex;flex-direction:column;gap:5px}.crkeys .krow{display:flex;justify-content:center;gap:4px}.crkeys .krow button{flex:1;max-width:44px;min-width:0}.crkeys .krow .wide{flex:1.6;max-width:70px}.crkeys button{background:var(--panel);border-radius:10px;padding:10px 0;font-weight:800;font-size:16px;box-shadow:0 1px 3px #0002;color:var(--ink)}
 .crkeys .used{opacity:.4}.crkeys .del{background:var(--tileb)}
 .crq{font-size:18px;font-weight:700;margin:6px 0}.crau{color:var(--mut);margin:0 0 6px}
 #crGame .tools{margin-top:0}

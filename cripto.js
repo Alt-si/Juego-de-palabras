@@ -7,6 +7,9 @@ const CR_DIFF = {
   e: { name: "Experto", icon: "💀", min: 40, max: 99, reveal: 1, base: 300, hint: 40 },
 };
 const CR_ABC = "ABCDEFGHIJKLMNOÑPQRSTUVWXYZ";
+// Teclado en disposición QWERTY (filas); usedFn(L) devuelve la clase extra de cada tecla.
+const CR_ROWS = ["QWERTYUIOP", "ASDFGHJKLÑ", "ZXCVBNM"];
+const crKeyboard = (cls) => CR_ROWS.map((r, i) => `<div class="krow">${[...r].map((L) => `<button data-k="${L}" class="${(cls && cls(L)) || ""}">${L}</button>`).join("")}${i === 2 ? `<button data-k="DEL" class="del wide">⌫</button>` : ""}</div>`).join("");
 const CR_OBJ = ["🍎", "🐟", "🔑", "⭐", "🎈", "🌙", "🍄", "🔔", "🎩", "🐢", "🍋", "🚲", "🎸", "🌵", "🍕", "🐝", "🎁", "🦋", "🍇", "🚀", "🧲", "🌻", "🍒", "🍩", "🦉", "🎯", "🐙"];
 const crLetter = (ch) => { if (/[ñÑ]/.test(ch)) return "Ñ"; const b = ch.normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase(); return /^[A-Z]$/.test(b) ? b : ""; };
 const CRP = FRASES_RAW.map((x) => { const [t, o] = x.split("|"); return { t, o, n: [...t].filter((c) => crLetter(c)).length }; });
@@ -85,7 +88,7 @@ function crDraw() {
   $("#crPhrase").innerHTML = `<div class="crtext">${crCells(P.ph.t)}</div>` + (P.au ? `<div class="crauthor"><span class="cp dash">—</span>${crCells(P.au)}</div>` : `<div class="crorigin">— ${esc(P.ph.o)}</div>`);
   $("#crWorth").innerHTML = `Esta frase vale <b>${crWorth()} pts</b>`;
   const used = new Set(Object.values(P.guess));
-  $("#crKeys").innerHTML = [...CR_ABC].map((L) => `<button data-k="${L}" class="${used.has(L) ? "used" : ""}">${L}</button>`).join("") + `<button data-k="DEL" class="del">⌫</button>`;
+  $("#crKeys").innerHTML = crKeyboard((L) => (used.has(L) ? "used" : ""));
 }
 function crNext(from) {
   const order = []; [...P.all].forEach((ch) => { const L = crLetter(ch); if (L && !order.includes(P.sym[L])) order.push(P.sym[L]); });
