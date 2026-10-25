@@ -33,10 +33,10 @@ Anagramas, adivinanzas, frases y más juegos de palabras, con duelos.
 ### Descripción completa
 Entrená tu cabeza con seis juegos de palabras e ingenio, con 1000 niveles y más:
 🔤 Anagrama: ordená las letras contrarreloj.
-🔍 Palabras escondidas: encontrá todas en la grilla.
+🔍 Palabras escondidas: descubrí la palabra oculta dentro de otra.
 🕵️ Adivina: 100 categorías, cuantas menos pistas uses, más puntos. ¡Podés responder con tu voz!
 🔐 Frases encriptadas: descubrí refranes y frases célebres.
-🖼️ ¿Qué ves?: adiviná la palabra de la imagen, con giros y desafíos.
+🖼️ ¿Qué ves?: 2 o 3 imágenes y una sola palabra que las une.
 📝 Tutti Frutti: elegí categorías y competí contra un amigo.
 ⚔ Duelos en vivo o por link, en series de 1, 3, 5 o 10 partidas: gana quien sume más.
 🏆 21 rangos, logros, premio diario, temas de color y niveles interminables.
