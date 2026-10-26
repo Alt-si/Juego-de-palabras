@@ -258,3 +258,54 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 /* ¿Qué ves?: casillas que se adaptan al ancho */
 #qvSlots .tile{width:var(--tw,44px);height:calc(var(--tw,44px)*1.18);font-size:calc(var(--tw,44px)*.52);min-width:0}
 .qvword{max-width:100%;flex-wrap:wrap;justify-content:center}
+
+/* ===== Portada colorida ===== */
+:root{--rounded:ui-rounded,"SF Pro Rounded","Arial Rounded MT Bold","Varela Round",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+#menu{position:relative;isolation:isolate}
+#menu::before{content:"";position:absolute;inset:-10px -16px;z-index:-1;pointer-events:none;opacity:.9;
+  background:
+   radial-gradient(circle at 8% 6%,#fde04766 0 22px,transparent 23px),radial-gradient(circle at 92% 12%,#f472b655 0 16px,transparent 17px),
+   radial-gradient(circle at 14% 30%,#38bdf855 0 12px,transparent 13px),radial-gradient(circle at 90% 38%,#a3e63555 0 20px,transparent 21px),
+   radial-gradient(circle at 6% 58%,#fb923c55 0 18px,transparent 19px),radial-gradient(circle at 94% 64%,#c084fc55 0 14px,transparent 15px),
+   radial-gradient(circle at 10% 84%,#34d39955 0 20px,transparent 21px),radial-gradient(circle at 92% 90%,#fde04766 0 16px,transparent 17px)}
+.brand h1.logo2{font-family:var(--rounded);text-shadow:none;margin:4px 0 6px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:inherit}
+.logo2 .lw{display:flex;justify-content:center;gap:4px}
+.logo2 i{font-style:normal;display:grid;place-items:center;width:34px;height:42px;border-radius:11px;background:var(--c);color:#fff;font-size:26px;font-weight:900;transform:rotate(var(--r));box-shadow:0 4px 0 #0003,inset 0 -3px 0 #0002;animation:logo 2.6s ease-in-out infinite}
+.logo2 .lw:nth-child(2) i{width:30px;height:38px;font-size:23px}
+.logo2 i:nth-child(2n){animation-delay:.3s}.logo2 i:nth-child(3n){animation-delay:.6s}
+@keyframes logo{0%,100%{translate:0 0}50%{translate:0 -4px}}
+.brand p{font-family:var(--rounded);font-weight:700;color:var(--ink);opacity:.75}
+.mt{font-family:var(--rounded);font-weight:900;letter-spacing:.5px}
+.grank{background:linear-gradient(135deg,#6366f1 0%,#a855f7 55%,#ec4899 100%)}
+.grank::after{background:#fde04755}
+.gcard{font-family:var(--rounded);overflow:hidden;border:3px solid #fff5;box-shadow:0 5px 0 #0003,0 10px 18px #0002}
+.gcard::before{content:"";position:absolute;right:-26px;top:-26px;width:110px;height:110px;border-radius:50%;background:#ffffff26;pointer-events:none}
+.gcard .ico{display:grid;place-items:center;width:58px;height:58px;border-radius:18px;background:#ffffff40;font-size:34px;transform:rotate(-6deg);box-shadow:inset 0 -3px 0 #0002;flex:none}
+.gcard b{font-weight:900;letter-spacing:.2px;text-shadow:0 2px 0 #0003}
+.g1{background:linear-gradient(135deg,#6366f1,#a855f7)}.g2{background:linear-gradient(135deg,#10b981,#84cc16)}
+.g3{background:linear-gradient(135deg,#fb923c,#ec4899)}.g4{background:linear-gradient(135deg,#0ea5e9,#6366f1)}
+.g5{background:linear-gradient(135deg,#d946ef,#8b5cf6)}.g6{background:linear-gradient(135deg,#fbbf24,#ef4444)}
+.gcard .chips span.on,.gcard em span.on{background:#fff;color:#1e1b4b;font-weight:800}
+/* Tarjeta de la palabra del día */
+.dlycard{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:14px 16px;border-radius:22px;color:#4a1d00;font-family:var(--rounded);background:linear-gradient(135deg,#fde047,#fb923c);border:3px solid #fff8;box-shadow:0 5px 0 #b4530955,0 10px 18px #0002;margin:6px 0 4px;position:relative;overflow:hidden}
+.dlycard:active{transform:translateY(2px)}
+.dlycard .ico{display:grid;place-items:center;width:54px;height:54px;border-radius:17px;background:#fff8;font-size:32px;transform:rotate(5deg);flex:none}
+.dlycard>span:nth-child(2){flex:1;min-width:0}.dlycard b{display:block;font-size:20px;font-weight:900}.dlycard small{display:block;font-size:13px;font-weight:700;opacity:.85}
+.dlycard i{font-style:normal;font-size:28px;animation:bob 1.8s ease-in-out infinite}
+.dlycard.done{background:linear-gradient(135deg,#86efac,#22d3ee);color:#064e3b}.dlycard.done i{animation:none}
+/* Pantalla del desafío diario */
+.dlystats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dlystats div{background:var(--panel);border-radius:16px;padding:10px;text-align:center;box-shadow:0 2px 0 #0002}
+.dlystats b{display:block;font-size:22px;font-weight:900}.dlystats small{color:var(--mut);font-size:12px}
+.dlyplay{background:linear-gradient(135deg,#f59e0b,#ef4444)}.dlyplay small{display:block;font-size:12px;font-weight:600;opacity:.9}
+.dlyplay.done{background:linear-gradient(135deg,#22c55e,#06b6d4)}
+.dlycal{background:var(--panel);border-radius:20px;padding:12px;box-shadow:0 3px 0 #0002}
+.dlyhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}.dlyhead b{font-size:18px;text-transform:capitalize;font-weight:900}
+.dlydow,.dlygrid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.dlydow i{font-style:normal;text-align:center;font-size:12px;font-weight:800;color:var(--mut)}
+.dlygrid .e{display:block}
+.dlygrid .d{aspect-ratio:1;border-radius:12px;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;font-weight:800;border:2px solid transparent;padding:0}
+.dlygrid .d span{font-size:13px;line-height:1}.dlygrid .d b{font-size:13px;line-height:1.2}
+.dlygrid .d.ok{background:#22c55e;color:#fff}.dlygrid .d.fail{background:#fed7aa;color:#9a3412}
+.dlygrid .d.today{border-color:var(--ac);box-shadow:0 0 0 2px var(--ac)}.dlygrid .d.fut{opacity:.45}.dlygrid .d.old{opacity:.25}
+.dlynotif{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-radius:16px;padding:12px;font-weight:800;text-align:center;box-shadow:0 3px 0 #0003}
+.dlynotif small{display:block;font-weight:600;opacity:.9;font-size:12px}.dlynotif.on{background:linear-gradient(135deg,#16a34a,#0d9488)}.dlynotif u{text-decoration:underline}

@@ -43,3 +43,6 @@ Dificultad: Experto da 3× los puntos, tiempo ×0,45, palabras mucho más largas
 - Adivina y ¿Qué ves? tienen un botón 🎤 para decir la palabra en vez de tipearla (`voz.js`, Web Speech API, es-AR). Requiere Chrome/Safari, HTTPS, permiso de micrófono e internet. En ¿Qué ves? una palabra errada no quita vidas.
 - **Palabras aprendidas**: si decís por voz en Adivina una palabra que el juego no conoce (4 a 12 letras, no parecida por un solo error a una existente), se guarda en tu dispositivo y suma a la categoría «✨ Aprendidas» (se juega con 5 o más). No entra en los duelos para que ambos jugadores vean las mismas palabras (`aprende.js`).
 - **Adivina sin repetir**: cada categoría se puede completar; las palabras ya jugadas no vuelven. Al terminar una categoría aparece ✔ Completada y hay que elegir otra; cuando se completan todas, se ofrece una nueva vuelta.
+
+## Palabra del día (desafío diario)
+`diario.js`: una palabra de Palabras escondidas por día, igual para todos (se elige con una semilla por fecha; hora de Argentina). Calendario mensual con días resueltos, racha y posibilidad de jugar días pasados. Aviso diario opcional: usa `periodicsync` + `notificationclick` del service worker (`sw.js`); no se puede garantizar una hora exacta sin un servidor de notificaciones push.
