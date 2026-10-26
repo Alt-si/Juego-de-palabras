@@ -19,14 +19,13 @@
 <div id="app">
   <section id="menu" class="screen">
     <div class="topbar"><span class="coins">🪙 <b id="mCoins">0</b></span><span class="rank" id="mRank"></span><button class="ib help" data-help="all" aria-label="Cómo se juega">?</button></div>
-    <div class="brand"><div class="brain">🧠</div><h1 class="logo2" aria-label="Juegos mentales"><span class="lw"><i style="--c:#ef4444;--r:-5deg">J</i><i style="--c:#f59e0b;--r:4deg">U</i><i style="--c:#22c55e;--r:-3deg">E</i><i style="--c:#3b82f6;--r:5deg">G</i><i style="--c:#a855f7;--r:-4deg">O</i><i style="--c:#ec4899;--r:3deg">S</i></span><span class="lw"><i style="--c:#3b82f6;--r:5deg">M</i><i style="--c:#a855f7;--r:-4deg">E</i><i style="--c:#ec4899;--r:3deg">N</i><i style="--c:#14b8a6;--r:-5deg">T</i><i style="--c:#f97316;--r:4deg">A</i><i style="--c:#ef4444;--r:-5deg">L</i><i style="--c:#f59e0b;--r:4deg">E</i><i style="--c:#22c55e;--r:-3deg">S</i></span></h1><p>Entrená tu cabeza, un nivel a la vez</p></div>
+    <div class="brand"><div class="brain">🧠</div><h1>JUEGOS<br><span>MENTALES</span></h1><p>Entrená tu cabeza, un nivel a la vez</p></div>
     <button class="grank" id="gRank" aria-label="Ver todos los rangos">
       <div class="gtop"><div class="gbadge" id="mBadge">🥚</div><div class="gname"><small>TU RANGO</small><b id="mRankName"></b></div><div class="gpts"><b id="mTotal">0</b><small>puntos</small></div></div>
       <div class="gtrack"><div class="gbar"><i id="mBar"></i></div><div class="gends"><span id="mFrom"></span><span id="mTo"></span></div></div>
       <div class="gsteps" id="mSteps"></div>
       <p class="gnext" id="mNext"></p>
     </button>
-    <button class="dlycard" id="dlyCard" data-game="dly"><span class="ico">🧩</span><span><b>Palabra del día</b><small id="dlySub"></small></span><i id="dlyBadge">🎯</i></button>
     <h2 class="mt">Elegí un juego</h2>
     <button class="gcard g1" data-game="ana"><span class="ico">🔤</span><span><b>Anagrama</b><small>Ordená las letras y armá la palabra</small></span><em><span id="mLvAna"></span><u id="mPtsAna"></u></em><em class="chips"><span data-diff="f">🌱 Fácil</span><span data-diff="m">🌿 Medio</span><span data-diff="d">🔥 Difícil</span><span data-diff="e">💀 Experto</span></em></button>
     <button class="gcard g2" data-game="hid"><span class="ico">🔍</span><span><b>Palabras escondidas</b><small>Encontrá la palabra escondida en otra palabra</small></span><em><span id="mLvHid"></span><u id="mPtsHid"></u></em><em class="chips"><span data-diff="f">🌱 Fácil</span><span data-diff="m">🌿 Medio</span><span data-diff="d">🔥 Difícil</span><span data-diff="e">💀 Experto</span></em></button>
@@ -82,21 +81,6 @@
     <div class="crkeys" id="crKeys"></div>
     <div class="tools three" id="crTools"><button id="crHint">💡<small>Letra · 10🪙</small></button><button id="crCheck">✔<small>Revisar</small></button><button id="crSkip">⏭<small>Pasar</small></button></div>
     <div class="float" id="crFloat" aria-live="polite"></div>
-  </section>
-
-  <section id="dlyHome" class="screen" hidden>
-    <div class="topbar"><button class="ib" id="dlyBack" aria-label="Menú de juegos">‹</button><span class="coins">🪙 <b id="dlyCoins">0</b></span><span class="rank">Desafío diario</span></div>
-    <div class="crlogo">🧩<h1>PALABRA DEL DÍA</h1></div>
-    <p class="tag">Un desafío nuevo cada día, igual para todos</p>
-    <div class="dlystats"><div id="dlyStreak"></div><div id="dlyTotal"></div></div>
-    <button class="big dlyplay" id="dlyPlay"></button>
-    <div class="dlycal">
-      <div class="dlyhead"><button class="ib" id="dlyPrev" aria-label="Mes anterior">‹</button><b id="dlyMonth"></b><button class="ib" id="dlyNext" aria-label="Mes siguiente">›</button></div>
-      <div class="dlydow"><i>L</i><i>M</i><i>M</i><i>J</i><i>V</i><i>S</i><i>D</i></div>
-      <div class="dlygrid" id="dlyGrid"></div>
-    </div>
-    <button class="dlynotif" id="dlyNotif"></button>
-    <p class="how">Cada día hay una palabra nueva de Palabras escondidas. Si no la resolvés, podés intentarlo de nuevo. Los días pasados que te faltan se pueden jugar desde el calendario.</p>
   </section>
 
   <section id="qvHome" class="screen" hidden>
@@ -209,7 +193,6 @@
 <script src="quever.js"></script>
 <script src="duelos.js"></script>
 <script src="serie.js"></script>
-<script src="diario.js"></script>
 <script src="voz.js"></script>
 <script src="frutti-data.js"></script>
 <script src="frutti-data2.js"></script>
