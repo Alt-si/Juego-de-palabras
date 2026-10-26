@@ -175,10 +175,12 @@ $("#box").addEventListener("click", (e) => {
 
 // ---------- Juego ----------
 let G = null, timerId = null;
+const ambig = (L) => { const a = ALL.get([...L].sort().join("")); return !!a && a.size > 1; };
 function pickWords(lv) {
   const [a0, b0] = rangeOf(lv), dl = gameDif().len; let a = lvClamp(a0 + dl, 4, 12); const b = lvClamp(b0 + dl, a, 12);
   let c = []; for (let n = a; n <= b; n++) c = c.concat(POOL[n] || []);
   while (c.length < PER_LEVEL + 15 && a > 4) { a--; c = c.concat(POOL[a] || []); }
+  if (CUR !== "hid") { const clean = c.filter((x) => !ambig(x.L)); if (clean.length >= PER_LEVEL + 5) c = clean; } // en Anagrama se evitan palabras con otra palabra hermana (barco/cobra, amor/mora) para que siempre coincida con la pista
   const fresh = c.filter((x) => !SV.seen.includes(x.L));
   const src = fresh.length >= PER_LEVEL + 5 ? fresh : c;
   return shuffle(src);
@@ -404,6 +406,7 @@ function askName(then) {
 function duelWords(seed, kind) {
   const old = R; R = mulberry(seed);
   let c = []; for (let n = kind === "hid" ? 5 : 5; n <= (kind === "hid" ? 6 : 7); n++) c = c.concat(POOL[n]);
+  if (kind !== "hid") { const clean = c.filter((x) => !ambig(x.L)); if (clean.length >= PER_LEVEL + 5) c = clean; }
   const out = shuffle(c).slice(0, PER_LEVEL).map((w) => ({ ...w, scr: makeScr(w.L, kind, 5) }));
   R = old; return out;
 }
