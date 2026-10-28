@@ -174,6 +174,9 @@ $("#box").addEventListener("click", (e) => {
 });
 
 // ---------- Juego ----------
+// Nombres más claros para las categorías generales (la pista de Anagrama es solo la categoría)
+const CAT_LABEL = { Ciudad: "En la ciudad (calles y lugares)", Lugar: "Un lugar", Objeto: "Un objeto", Objetos: "Objetos de todos los días", Varios: "Cosas variadas", Mundo: "El mundo", "Acción": "Una acción", Arte: "Arte y cultura", Espacio: "El espacio", Clima: "El clima", Fiestas: "Fiestas y celebraciones", Viajes: "De viaje", Mar: "El mar", Mitos: "Mitos y leyendas", Juegos: "Juegos y juguetes", Cuerpo: "El cuerpo humano", Hogar: "En el hogar", Escuela: "En la escuela", Trabajo: "El trabajo", "Tecnología": "Tecnología", Salud: "Salud", Ciencia: "Ciencia", Adjetivos: "Una cualidad", Verbos: "Un verbo" };
+const catLabel = (c) => CAT_LABEL[c] || c;
 let G = null, timerId = null;
 const ambig = (L) => { const a = ALL.get([...L].sort().join("")); return !!a && a.size > 1; };
 function pickWords(lv) {
@@ -216,7 +219,7 @@ function extendPool() {
 }
 extendPool();
 // La pista de Escondidas se vuelve más vaga a medida que subís de nivel.
-const hidClue = (w, c, lv) => { const ad = (buildAdivina().byWord.get(w) || { c: [] }).c, idx = 3 - Math.min(3, Math.floor(lvP(lv || 1) * 4)); return ((typeof CLUES !== "undefined" && lvP(lv || 1) < 0.5 && CLUES[w]) || ad[idx] || (typeof CLUES !== "undefined" && CLUES[w]) || ad[3] || (c ? "Categoría: " + c : "")); };
+const hidClue = (w, c, lv) => { const ad = (buildAdivina().byWord.get(w) || { c: [] }).c, idx = 3 - Math.min(3, Math.floor(lvP(lv || 1) * 4)); return ((typeof CLUES !== "undefined" && lvP(lv || 1) < 0.5 && CLUES[w]) || ad[idx] || (typeof CLUES !== "undefined" && CLUES[w]) || ad[3] || (c ? "Categoría: " + catLabel(c) : "")); };
 // Palabras escondidas: la palabra va mezclada con letras de más (no se usan todas).
 const VOW = "AEIOU", CON = "BCDFGLMNPRSTVZ";
 // Palabras escondidas: se muestra una palabra real (el "anfitrión", p. ej. ELIMINA) y adentro hay otra (LIMA) que se arma con algunas de sus letras, en cualquier orden.
@@ -251,7 +254,7 @@ function renderGame() {
   livesUI();
   const dn = G.duel ? G.n : G.solved;
   $("#gDots").innerHTML = Array.from({ length: PER_LEVEL }, (_, i) => `<i class="${i < dn ? "done" : i === dn ? "cur" : ""}"></i>`).join("");
-  $("#gCat").textContent = G.w.c; $("#gLen").textContent = G.kind === "hid" ? `Escondida: ${G.len} letras · sobran ${G.tiles.length - G.len}` : `${G.len} letras`;
+  $("#gCat").textContent = catLabel(G.w.c); $("#gLen").textContent = G.kind === "hid" ? `Escondida: ${G.len} letras · sobran ${G.tiles.length - G.len}` : `${G.len} letras`;
   const cl = G.kind === "hid" && hidClue(G.w.w, G.w.c, G.lv);
   $("#gClue").hidden = G.kind !== "hid"; $("#gClue").textContent = cl ? "💬 " + cl : " ";
   $("#gStreak").textContent = G.streak >= 2 ? `🔥 Racha x${G.streak}` : "";
