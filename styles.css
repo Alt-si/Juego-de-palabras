@@ -258,3 +258,7 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 /* ¿Qué ves?: casillas que se adaptan al ancho */
 #qvSlots .tile{width:var(--tw,44px);height:calc(var(--tw,44px)*1.18);font-size:calc(var(--tw,44px)*.52);min-width:0}
 .qvword{max-width:100%;flex-wrap:wrap;justify-content:center}
+
+/* Adivina: la pantalla ocupa justo el alto visible (también con el teclado abierto) y la lista de pistas se desplaza por dentro */
+#adGame{height:var(--vvh,100dvh);min-height:0;overflow:hidden;box-sizing:border-box}
+#adGame .clues{min-height:0}

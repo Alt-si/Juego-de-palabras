@@ -773,3 +773,6 @@ document.addEventListener("click", (e) => {
   modal(`<div class="helpbox"><h2>${h[0]}</h2>${h[1].map((t) => `<p class="hl">• ${t}</p>`).join("")}${k !== "all" ? `<p class="hg">Dificultad</p><p class="hl">Fácil, Medio, Difícil o Experto: cuanto más difícil, menos ayuda y más puntos.</p>` : ""}<button class="big" id="helpOk">¡Entendido!</button></div>`, true);
   $("#helpOk").onclick = () => { closeModal(); if (paused && G) G.paused = false; };
 });
+
+// Alto realmente visible (con el teclado abierto se achica): lo usa Adivina para no quedar fuera de cuadro
+(() => { const vv = window.visualViewport, set = () => document.documentElement.style.setProperty("--vvh", (vv ? vv.height : innerHeight) + "px"); set(); if (vv) { vv.addEventListener("resize", set); vv.addEventListener("scroll", () => { if (!$("#adGame").hidden) window.scrollTo(0, 0); }); } window.addEventListener("resize", set); })();
