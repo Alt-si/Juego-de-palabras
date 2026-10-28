@@ -776,3 +776,7 @@ document.addEventListener("click", (e) => {
 
 // Alto realmente visible (con el teclado abierto se achica): lo usa Adivina para no quedar fuera de cuadro
 (() => { const vv = window.visualViewport, set = () => document.documentElement.style.setProperty("--vvh", (vv ? vv.height : innerHeight) + "px"); set(); if (vv) { vv.addEventListener("resize", set); vv.addEventListener("scroll", () => { if (!$("#adGame").hidden) window.scrollTo(0, 0); }); } window.addEventListener("resize", set); })();
+(() => { const g = $("#adGame"), inp = $("#adIn"); let t;
+  inp.addEventListener("focus", () => { clearTimeout(t); g.classList.add("typing"); window.scrollTo(0, 0); });
+  inp.addEventListener("blur", () => { clearTimeout(t); t = setTimeout(() => g.classList.remove("typing"), 250); });
+})();

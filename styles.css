@@ -262,3 +262,10 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 /* Adivina: la pantalla ocupa justo el alto visible (también con el teclado abierto) y la lista de pistas se desplaza por dentro */
 #adGame{height:var(--vvh,100dvh);min-height:0;overflow:hidden;box-sizing:border-box}
 #adGame .clues{min-height:0}
+/* Adivina: al escribir, el campo sube arriba y las pistas nuevas quedan a la vista aunque el teclado no achique la pantalla */
+#adGame.typing>*{order:0}
+#adGame.typing .topbar{order:-3}
+#adGame.typing .rival{order:-3}
+#adGame.typing .guess{order:-2;margin-top:2px;margin-bottom:6px}
+#adGame.typing .dots,#adGame.typing .goal,#adGame.typing .tools{display:none}
+#adGame.typing .clues{flex-direction:column-reverse;justify-content:flex-end}
