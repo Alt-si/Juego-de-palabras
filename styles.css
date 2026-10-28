@@ -269,3 +269,7 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 #adGame.typing .guess{order:-2;margin-top:2px;margin-bottom:6px}
 #adGame.typing .dots,#adGame.typing .goal,#adGame.typing .tools{display:none}
 #adGame.typing .clues{flex-direction:column-reverse;justify-content:flex-end}
+#adGame.typing{gap:6px;padding-top:8px}
+#adGame.typing .worth{display:none}
+#adGame.typing .clues{flex:0 1 auto;max-height:38vh;overflow:auto}
+#adGame.typing .clues li{padding:7px 10px}
