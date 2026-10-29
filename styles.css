@@ -274,3 +274,8 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 #adGame.typing .clues{flex:0 1 auto;max-height:38vh;overflow:auto}
 #adGame.typing .clues li{padding:7px 10px}
 .tools.five{grid-template-columns:repeat(5,1fr)}.tools.five small{font-size:9.5px}
+/* ¿Qué ves?: casilleros más marcados */
+#qvSlots .slot{background:#ffffffb3;border:2.5px dashed var(--ac);box-shadow:0 2px 0 #0002}
+#qvSlots .slot.fill{background:var(--tile);border:2.5px solid var(--ac);box-shadow:0 3px 0 var(--ac)}
+#qvSlots .slot.lock{background:var(--ac);border-color:var(--ac)}
+#qvSlots .slot.bad{background:#fecaca;border-color:var(--bad);box-shadow:0 3px 0 var(--bad)}
