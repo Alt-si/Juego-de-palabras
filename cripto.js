@@ -83,7 +83,7 @@ function crCells(text) {
     return `<button class="cc${P.lock[s] ? " lk" : ""}${P.sel === s ? " sel" : ""}${P.wrong[s] ? " bad" : ""}" data-s="${s}"><span class="cl">${g || ""}</span>${crSymHtml(s)}</button>`;
   }).join("")}</span>`).join("");
 }
-const crWorth = () => Math.round(Math.max(10, CR_DIFF[CR.d].base + P.ph.n * 3 - P.hints * 15 - P.checks * 10 - P.mistakes * 8) * (CR.duel ? 1 : lvMult(CR.lv)));
+const crWorth = () => Math.round(Math.max(10, CR_DIFF[CR.d].base + P.ph.n * 3 - (P.hintPts || 0) - P.checks * 10 - P.mistakes * 8) * (CR.duel ? 1 : lvMult(CR.lv)));
 function crDraw() {
   $("#crPhrase").innerHTML = `<div class="crtext">${crCells(P.ph.t)}</div>` + (P.au ? `<div class="crauthor"><span class="cp dash">—</span>${crCells(P.au)}</div>` : `<div class="crorigin">— ${esc(P.ph.o)}</div>`);
   $("#crWorth").innerHTML = `Esta frase vale <b>${crWorth()} pts</b>`;
@@ -148,7 +148,7 @@ $("#crHint").onclick = () => {
   const open = Object.keys(P.bySym).filter((s) => !P.lock[s]); if (!open.length) return;
   const s = P.sel != null && !P.lock[P.sel] ? P.sel : +open[Math.floor(Math.random() * open.length)], L = P.bySym[s];
   const other = Object.keys(P.guess).find((k) => P.guess[k] === L && +k !== s); if (other != null) { delete P.guess[other]; delete P.wrong[other]; }
-  SV.coins -= CR_DIFF[CR.d].hint; P.hints++; crFloat("−15 pts", "bad"); P.guess[s] = L; P.lock[s] = L; delete P.wrong[s]; save(); $("#crTotal").textContent = SV.coins; beep(SND.coin);
+  SV.coins -= CR_DIFF[CR.d].hint; P.hints++; const rep = [...P.all].filter((c) => crLetter(c) === L).length, cost = rep * 5; P.hintPts = (P.hintPts || 0) + cost; crFloat(`−${cost} pts (${rep} ${rep === 1 ? "letra" : "letras"})`, "bad"); P.guess[s] = L; P.lock[s] = L; delete P.wrong[s]; save(); $("#crTotal").textContent = SV.coins; beep(SND.coin);
   crNext(s); crDraw(); crComplete();
 };
 $("#crCheck").onclick = () => {
