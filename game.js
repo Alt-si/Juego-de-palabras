@@ -254,7 +254,7 @@ function renderGame() {
   livesUI();
   const dn = G.duel ? G.n : G.solved;
   $("#gDots").innerHTML = Array.from({ length: PER_LEVEL }, (_, i) => `<i class="${i < dn ? "done" : i === dn ? "cur" : ""}"></i>`).join("");
-  $("#tMic").hidden = G.kind !== "hid"; $("#gSlots").closest("section").querySelector(".tools").classList.toggle("five", G.kind === "hid");
+  $("#tMic").hidden = false; $("#gSlots").closest("section").querySelector(".tools").classList.add("five");
   $("#gCat").textContent = catLabel(G.w.c); $("#gLen").textContent = G.kind === "hid" ? `Escondida: ${G.len} letras · sobran ${G.tiles.length - G.len}` : `${G.len} letras`;
   const cl = G.kind === "hid" && hidClue(G.w.w, G.w.c, G.lv);
   $("#gClue").hidden = G.kind !== "hid"; $("#gClue").textContent = cl ? "💬 " + cl : " ";
