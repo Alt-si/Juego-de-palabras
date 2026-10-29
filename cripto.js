@@ -83,7 +83,7 @@ function crCells(text) {
     return `<button class="cc${P.lock[s] ? " lk" : ""}${P.sel === s ? " sel" : ""}${P.wrong[s] ? " bad" : ""}" data-s="${s}"><span class="cl">${g || ""}</span>${crSymHtml(s)}</button>`;
   }).join("")}</span>`).join("");
 }
-const crWorth = () => Math.round(Math.max(10, CR_DIFF[CR.d].base + P.ph.n * 3 - (P.hintPts || 0) - P.checks * 10 - P.mistakes * 8) * (CR.duel ? 1 : lvMult(CR.lv)));
+const crWorth = () => Math.round(Math.max(10, CR_DIFF[CR.d].base + P.ph.n * 3 - (P.hintPts || 0) - (P.checkPts || 0) - P.mistakes * 8) * (CR.duel ? 1 : lvMult(CR.lv)));
 function crDraw() {
   $("#crPhrase").innerHTML = `<div class="crtext">${crCells(P.ph.t)}</div>` + (P.au ? `<div class="crauthor"><span class="cp dash">—</span>${crCells(P.au)}</div>` : `<div class="crorigin">— ${esc(P.ph.o)}</div>`);
   $("#crWorth").innerHTML = `Esta frase vale <b>${crWorth()} pts</b>`;
@@ -153,9 +153,11 @@ $("#crHint").onclick = () => {
 };
 $("#crCheck").onclick = () => {
   if (!P || P.over) return; P.checks++;
-  const bad = Object.keys(P.guess).filter((s) => !P.lock[s] && P.guess[s] !== P.bySym[s]);
+  const put = Object.keys(P.guess).filter((s) => !P.lock[s]);
+  const rep = put.reduce((n, s) => n + [...P.all].filter((c) => crLetter(c) === P.bySym[s]).length, 0), cost = rep * 2; P.checkPts = (P.checkPts || 0) + cost;
+  const bad = put.filter((s) => P.guess[s] !== P.bySym[s]);
   bad.forEach((s) => (P.wrong[s] = 1));
-  toast((bad.length ? `${bad.length} ${bad.length === 1 ? "letra está mal" : "letras están mal"} (en rojo)` : "Todo lo que pusiste va bien 👍") + " · −10 pts"); crFloat("−10 pts", "bad"); crDraw();
+  toast((bad.length ? `${bad.length} ${bad.length === 1 ? "letra está mal" : "letras están mal"} (en rojo)` : "Todo lo que pusiste va bien 👍") + (cost ? ` · −${cost} pts` : "")); if (cost) crFloat(`−${cost} pts (${rep} ${rep === 1 ? "letra" : "letras"})`, "bad"); crDraw();
 };
 function crFloat(t, cls) { const f = $("#crFloat"); f.className = "float " + (cls || ""); f.textContent = t; void f.offsetWidth; f.classList.add("go"); }
 $("#crSkip").onclick = () => {
