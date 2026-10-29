@@ -273,3 +273,4 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 #adGame.typing .worth{display:none}
 #adGame.typing .clues{flex:0 1 auto;max-height:38vh;overflow:auto}
 #adGame.typing .clues li{padding:7px 10px}
+.tools.five{grid-template-columns:repeat(5,1fr)}.tools.five small{font-size:9.5px}

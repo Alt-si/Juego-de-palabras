@@ -25,6 +25,13 @@ $("#adMic").onclick = () => { $("#adIn").blur(); Voz.listen($("#adMic"), (alts) 
   const ans = adAnswers(), pick = alts.find((a) => ans.includes(plain(a))) || alts.find((a) => ans.some((x) => spellOk(plain(a), x))) || alts[0];
   $("#adIn").value = pick; if (!ans.includes(plain(pick)) && !ans.some((x) => spellOk(plain(pick), x))) toast(`Escuché «${pick}»`); AD.said = true; adGuess();
 }); };
+// Palabras escondidas: dice la palabra; si se arma con las letras y es válida, se completa sola
+$("#tMic").onclick = () => { if (!G || G.busy || G.paused) return; Voz.listen($("#tMic"), (alts) => {
+  if (!G || G.busy || G.kind !== "hid") return;
+  const fits = (w) => { if (w.length !== G.len || !(w === G.target || WSET.has(w))) return false; const used = new Set(), ids = []; for (const ch of w) { const t = G.tiles.find((x) => x.ch === ch && !used.has(x.id)); if (!t) return false; used.add(t.id); ids.push(t.id); } return ids; };
+  for (const a of alts) { const w = plain(a).toUpperCase().replace(/[^A-ZÑ]/g, ""), ids = fits(w); if (ids) { G.ans = ids; G.locked = Array(G.len).fill(false); renderTiles(); return solveWord(); } }
+  toast(`Escuché «${alts[0]}»: no es. Probá de nuevo`); beep(SND.bad);
+}); };
 // ¿Qué ves?: si dice la palabra correcta se completa sola; si no, muestra lo que entendió (sin quitar vidas)
 $("#qvMic").onclick = () => Voz.listen($("#qvMic"), (alts) => {
   if (!Q || Q.busy) return;
