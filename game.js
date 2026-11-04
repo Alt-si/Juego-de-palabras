@@ -781,3 +781,24 @@ document.addEventListener("click", (e) => {
   inp.addEventListener("focus", () => { clearTimeout(t); g.classList.add("typing"); window.scrollTo(0, 0); });
   inp.addEventListener("blur", () => { clearTimeout(t); t = setTimeout(() => g.classList.remove("typing"), 250); });
 })();
+
+// ---- Pedir calificación (va directo a la ficha de Google Play) ----
+(() => {
+  const ua = navigator.userAgent || "", can = /Android/.test(ua) && !/Silk|AmazonWebAppPlatform/.test(ua);
+  const go = () => { SV.rated = 1; save(); closeModal(); location.href = PLAY_URL; };
+  function rateAsk() {
+    modal(`<h2>⭐ ¿Te gusta Juegos mentales?</h2><p>Tu calificación y tu reseña en Google Play nos ayudan un montón.</p><div class="ratestars" role="group" aria-label="Calificar">${[1, 2, 3, 4, 5].map((n) => `<button data-star="${n}" aria-label="${n} estrellas">⭐</button>`).join("")}</div><button class="big" id="rateGo">Calificar en Google Play</button><button class="link" id="rateLater">Más tarde</button><button class="link" id="rateNo">No, gracias</button>`);
+    $("#box").querySelectorAll("[data-star]").forEach((b) => (b.onclick = go));
+    $("#rateGo").onclick = go;
+    $("#rateLater").onclick = () => { SV.rateAt = Date.now(); save(); closeModal(); };
+    $("#rateNo").onclick = () => { SV.rated = 2; save(); closeModal(); };
+  }
+  $("#btnRate").hidden = !can; $("#btnRate").onclick = rateAsk;
+  let shown = false;
+  const maybe = () => {
+    if (!can || shown || SV.rated || SV.solved < 30 || Date.now() - (SV.rateAt || 0) < 5 * 864e5 || !$("#modal").hidden) return;
+    shown = true; setTimeout(() => { if (!$("#menu").hidden && $("#modal").hidden) rateAsk(); }, 900);
+  };
+  const base = showMenu; showMenu = function () { base.apply(this, arguments); maybe(); };
+  maybe();
+})();

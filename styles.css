@@ -279,3 +279,4 @@ body.scened::after{content:"";position:fixed;inset:0;z-index:-1;background:var(-
 #qvSlots .slot.fill{background:var(--tile);border:2.5px solid var(--ac);box-shadow:0 3px 0 var(--ac)}
 #qvSlots .slot.lock{background:var(--ac);border-color:var(--ac)}
 #qvSlots .slot.bad{background:#fecaca;border-color:var(--bad);box-shadow:0 3px 0 var(--bad)}
+.ratestars{display:flex;justify-content:center;gap:4px;margin:6px 0 12px}.ratestars button{font-size:36px;background:none;padding:2px 4px;filter:grayscale(.2)}.ratestars button:active{transform:scale(1.2)}
