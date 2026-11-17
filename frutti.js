@@ -8,7 +8,7 @@ const tfIdx = {};
 function tfIndex(id) {
   if (!tfIdx[id]) {
     const m = new Map(), add = (w) => { const k = tfN(w); if (k && !m.has(k)) m.set(k, String(w).trim()); };
-    TF_BY[id].words.forEach(add); ((typeof TF_EXTRA !== "undefined" && TF_EXTRA[id]) || "").split(",").forEach(add);
+    TF_BY[id].words.forEach(add); ((typeof TF_EXTRA !== "undefined" && TF_EXTRA[id]) || "").split(",").forEach(add); ((typeof TF_EXTRA2 !== "undefined" && TF_EXTRA2[id]) || "").split(",").forEach(add);
     try { buildAdivina(); const cs = (typeof TF_ADI !== "undefined" && TF_ADI[id]) || []; ADI.cats.forEach((c) => { if (cs.includes(c.name)) c.words.forEach((e) => add(e.w)); }); } catch {}
     tfIdx[id] = m;
   }
